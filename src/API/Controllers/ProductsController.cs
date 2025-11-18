@@ -1,8 +1,8 @@
-﻿using CleanArchitecture.Application.DTOs;
-using CleanArchitecture.Application.Interfaces;
+﻿using ShoppingProject.Application.DTOs;
+using ShoppingProject.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CleanArchitecture.WebApi.Controllers
+namespace ShoppingProject.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

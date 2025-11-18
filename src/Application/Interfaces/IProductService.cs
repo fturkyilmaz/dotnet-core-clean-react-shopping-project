@@ -1,6 +1,6 @@
-﻿using CleanArchitecture.Application.DTOs;
+﻿using ShoppingProject.Application.DTOs;
 
-namespace CleanArchitecture.Application.Interfaces
+namespace ShoppingProject.Application.Interfaces
 {
     public interface IProductService
     {

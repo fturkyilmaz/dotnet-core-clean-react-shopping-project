@@ -1,6 +1,6 @@
-using CleanArchitecture.Application.DTOs;
+using ShoppingProject.Application.DTOs;
 
-namespace CleanArchitecture.Application.DTOs
+namespace ShoppingProject.Application.DTOs
 {
     public class UpdateProductDto
     {

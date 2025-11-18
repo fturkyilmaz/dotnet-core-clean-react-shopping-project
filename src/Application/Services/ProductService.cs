@@ -1,10 +1,10 @@
 ﻿
-using CleanArchitecture.Application.DTOs;
-using CleanArchitecture.Application.Interfaces;
-using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.Interfaces;
+using ShoppingProject.Application.DTOs;
+using ShoppingProject.Application.Interfaces;
+using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.Interfaces;
 
-namespace CleanArchitecture.Application.Services
+namespace ShoppingProject.Application.Services
 {
     public class ProductService : IProductService
     {

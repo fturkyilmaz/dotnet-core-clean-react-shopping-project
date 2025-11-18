@@ -1,10 +1,10 @@
 ﻿
-using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.Interfaces;
-using CleanArchitecture.Infrastructure.Data;
+using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.Interfaces;
+using ShoppingProject.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanArchitecture.Infrastructure.Repositories
+namespace ShoppingProject.Infrastructure.Repositories
 {
     public class ProductRepository : IProductRepository
     {

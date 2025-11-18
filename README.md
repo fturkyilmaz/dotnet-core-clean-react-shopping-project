@@ -6,7 +6,7 @@ A modern, clean architecture template for .NET applications following domain-dri
 ## 🏗️ Architecture Overview
 
 ```
-CleanArchitectureDemo/
+ShoppingProject/
 ├── Domain/             # Enterprise/domain entities & business rules
 ├── Application/        # Business logic & use cases
 ├── Infrastructure/     # External concerns (database, file systems, etc.)
