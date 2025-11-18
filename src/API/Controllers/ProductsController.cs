@@ -18,16 +18,9 @@ namespace ShoppingProject.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll()
         {
-            // var products = await _productService.GetAllAsync();
+             var products = await _productService.GetAllAsync();
 
-            var fakeProducts = new List<ProductDto>
-            {
-                new ProductDto(1, "Product 1", "Description 1", 100),
-                new ProductDto(2, "Product 2", "Description 2", 200),
-                new ProductDto(3, "Product 3", "Description 3", 300)
-            };
-
-            return Ok(fakeProducts);
+            return Ok(products);
         }
 
         [HttpGet("{id}")]

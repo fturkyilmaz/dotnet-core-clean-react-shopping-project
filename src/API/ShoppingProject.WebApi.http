@@ -4,3 +4,9 @@ GET {{ShoppingProject.WebApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+ GET {{ShoppingProject.WebApi_HostAddress}}/products        
+Accept: application/json    
+
+### 
+GET {{ShoppingProject.WebApi_HostAddress}}/products/1        
+Accept: application/json    

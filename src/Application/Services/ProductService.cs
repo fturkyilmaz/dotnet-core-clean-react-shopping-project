@@ -18,33 +18,48 @@ namespace ShoppingProject.Application.Services
         public async Task<ProductDto> GetByIdAsync(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            return new ProductDto(product.Id, product.Title, product.Description, product.Price);
+            var ratingDto = product.Rating != null ? new RatingDto { Rate = product.Rating.Rate, Count = product.Rating.Count } : null;
+            return new ProductDto(product.Id, product.Title, product.Description, product.Price, product.Category, product.Image, ratingDto);
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllAsync()
         {
             var products = await _productRepository.GetAllAsync();
-            return products.Select(p => new ProductDto(p.Id, p.Title, p.Description, p.Price));
+            return products.Select(p => 
+            {
+                var ratingDto = p.Rating != null ? new RatingDto { Rate = p.Rating.Rate, Count = p.Rating.Count } : null;
+                return new ProductDto(p.Id, p.Title, p.Description, p.Price, p.Category, p.Image, ratingDto);
+            });
         }
 
         public async Task<ProductDto> CreateAsync(CreateProductDto dto)
         {
             var product = new Product
             {
-                Title = dto.Name,
+                Title = dto.Title,
                 Description = dto.Description,
-                Price = dto.Price
+                Price = dto.Price,
+                Category = dto.Category,
+                Image = dto.Image,
+                Rating = dto.Rating != null ? new Rating { Rate = dto.Rating.Rate, Count = dto.Rating.Count } : new Rating()
             };
             var created = await _productRepository.AddAsync(product);
-            return new ProductDto(created.Id, created.Title, created.Description, created.Price);
+            var ratingDto = created.Rating != null ? new RatingDto { Rate = created.Rating.Rate, Count = created.Rating.Count } : null;
+            return new ProductDto(created.Id, created.Title, created.Description, created.Price, created.Category, created.Image, ratingDto);
         }
 
         public async Task UpdateAsync(int id, UpdateProductDto dto)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            product.Title = dto.Name;
+            product.Title = dto.Title;
             product.Description = dto.Description;
             product.Price = dto.Price;
+            product.Category = dto.Category;
+            product.Image = dto.Image;
+            if (dto.Rating != null)
+            {
+                product.Rating = new Rating { Rate = dto.Rating.Rate, Count = dto.Rating.Count };
+            }
             await _productRepository.UpdateAsync(product);
         }
 
