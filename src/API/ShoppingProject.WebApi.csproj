@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CleanArchitecture.Application\CleanArchitecture.Application.csproj" />
-    <ProjectReference Include="..\CleanArchitecture.Infrastructure\CleanArchitecture.Infrastructure.csproj" />
+    <ProjectReference Include="..\Application\ShoppingProject.Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\ShoppingProject.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
