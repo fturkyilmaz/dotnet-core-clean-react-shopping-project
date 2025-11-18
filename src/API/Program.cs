@@ -1,8 +1,8 @@
-using CleanArchitecture.Application.Interfaces;
-using CleanArchitecture.Application.Services;
-using CleanArchitecture.Domain.Interfaces;
-using CleanArchitecture.Infrastructure.Data;
-using CleanArchitecture.Infrastructure.Repositories;
+using ShoppingProject.Application.Interfaces;
+using ShoppingProject.Application.Services;
+using ShoppingProject.Domain.Interfaces;
+using ShoppingProject.Infrastructure.Data;
+using ShoppingProject.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 
 // Register dependencies And Use InMemory Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseInMemoryDatabase("CleanArchitectureDb"));
+    options.UseInMemoryDatabase("ShoppingProjectDb"));
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
