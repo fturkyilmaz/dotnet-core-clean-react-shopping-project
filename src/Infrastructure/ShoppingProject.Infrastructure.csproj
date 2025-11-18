@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ShoppingProject.Domain\ShoppingProject.Domain.csproj" />
+    <ProjectReference Include="..\Domain\ShoppingProject.Domain.csproj" />
   </ItemGroup>
 
 </Project>
