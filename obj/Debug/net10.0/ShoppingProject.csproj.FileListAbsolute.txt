@@ -33,3 +33,4 @@
 /Users/furkanturkyilmaz/Desktop/dotnet-inf/ShoppingProject/obj/Debug/net10.0/ref/ShoppingProject.dll
 /Users/furkanturkyilmaz/Desktop/dotnet-inf/ShoppingProject/bin/Debug/net10.0/Pipelines.Sockets.Unofficial.dll
 /Users/furkanturkyilmaz/Desktop/dotnet-inf/ShoppingProject/bin/Debug/net10.0/StackExchange.Redis.dll
+/Users/furkanturkyilmaz/Desktop/dotnet-inf/ShoppingProject/obj/Debug/net10.0/ShoppingProject.sourcelink.json

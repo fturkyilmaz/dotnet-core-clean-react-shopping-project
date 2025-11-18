@@ -1,0 +1,7 @@
+# This is the configuration file for Azure DevOps# Name of the application.
+name: clean-architecture-azd
+services:
+  web:
+    language: csharp
+    project: ./src/Web
+    host: appservice
