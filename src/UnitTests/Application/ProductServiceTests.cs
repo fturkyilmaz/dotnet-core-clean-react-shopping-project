@@ -27,7 +27,10 @@ namespace ShoppingProject.UnitTests.Application
             {
                 Title = "Test",
                 Description = "Description",
-                Price = 19.99m
+                Price = 19.99m,
+                Category = "Test Category",
+                Image = "https://example.com/test.png",
+                Rating = new Rating { Rate = 4.5, Count = 100 }
             };
             _mockRepository.Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync(product);
@@ -37,7 +40,7 @@ namespace ShoppingProject.UnitTests.Application
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(product.Title, result.Name);
+            Assert.Equal(product.Title, result.Title);
             Assert.Equal(product.Price, result.Price);
         }
 
@@ -47,9 +50,12 @@ namespace ShoppingProject.UnitTests.Application
             // Arrange
             var createDto = new CreateProductDto
             {
-                Name = "Test",
+                Title = "Test",
                 Description = "Description",
-                Price = 19.99m
+                Price = 19.99m,
+                Category = "Test Category",
+                Image = "https://example.com/test.png",
+                Rating = new RatingDto { Rate = 4.5, Count = 100 }
             };
             _mockRepository.Setup(repo => repo.AddAsync(It.IsAny<Product>()))
                 .ReturnsAsync((Product p) => p);
@@ -59,7 +65,7 @@ namespace ShoppingProject.UnitTests.Application
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(createDto.Name, result.Name);
+            Assert.Equal(createDto.Title, result.Title);
             Assert.Equal(createDto.Price, result.Price);
         }
     }

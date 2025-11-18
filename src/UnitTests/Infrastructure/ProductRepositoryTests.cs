@@ -27,7 +27,10 @@ namespace ShoppingProject.UnitTests.Infrastructure
             {
                 Title = "Test Product",
                 Description = "Description",
-                Price = 19.99m
+                Price = 19.99m,
+                Category = "Test Category",
+                Image = "https://example.com/test.png",
+                Rating = new Rating { Rate = 4.5, Count = 100 }
             };
 
             // Act
@@ -48,8 +51,24 @@ namespace ShoppingProject.UnitTests.Infrastructure
             var repository = new ProductRepository(context);
 
             await context.Products.AddRangeAsync(
-                new Product { Title = "Test 1", Description = "Description 1", Price = 19.99m },
-                new Product { Title = "Test 2", Description = "Description 2", Price = 29.99m }
+                new Product 
+                { 
+                    Title = "Test 1", 
+                    Description = "Description 1", 
+                    Price = 19.99m,
+                    Category = "Category 1",
+                    Image = "https://example.com/test1.png",
+                    Rating = new Rating { Rate = 4.0, Count = 50 }
+                },
+                new Product 
+                { 
+                    Title = "Test 2", 
+                    Description = "Description 2", 
+                    Price = 29.99m,
+                    Category = "Category 2",
+                    Image = "https://example.com/test2.png",
+                    Rating = new Rating { Rate = 4.5, Count = 75 }
+                }
             );
             await context.SaveChangesAsync();
 
