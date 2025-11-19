@@ -1,6 +1,8 @@
 using ShoppingProject.Application.Interfaces;
+using ShoppingProject.Application;
 using ShoppingProject.Application.Services;
 using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Infrastructure.Bus;
 using ShoppingProject.Domain.Interfaces;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Repositories;
@@ -18,10 +20,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddApplicationServices();
+builder.Services.AddBusExt(builder.Configuration);
 builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection") ?? "localhost:6379"));   
 
