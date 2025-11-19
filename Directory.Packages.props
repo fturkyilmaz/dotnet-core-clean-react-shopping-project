@@ -50,6 +50,9 @@
     <PackageVersion Include="NUnit.Analyzers" Version="4.11.2" />
     <PackageVersion Include="NUnit3TestAdapter" Version="5.2.0" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="8.0.1" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
     <PackageVersion Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.7.1" />

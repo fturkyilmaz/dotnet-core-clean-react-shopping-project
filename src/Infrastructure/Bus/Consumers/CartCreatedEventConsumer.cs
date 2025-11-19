@@ -1,4 +1,4 @@
-    using MassTransit;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 using ShoppingProject.Domain.Events;
 
