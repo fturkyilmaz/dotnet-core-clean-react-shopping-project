@@ -58,7 +58,7 @@ namespace ShoppingProject.UnitTests.Application
                 Rating = new RatingDto { Rate = 4.5, Count = 100 }
             };
             _mockRepository.Setup(repo => repo.AddAsync(It.IsAny<Product>()))
-                .ReturnsAsync((Product p) => p);
+                .Returns(Task.CompletedTask);
 
             // Act
             var result = await _productService.CreateAsync(createDto);

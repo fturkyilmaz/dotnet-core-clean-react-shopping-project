@@ -34,11 +34,10 @@ namespace ShoppingProject.UnitTests.Infrastructure
             };
 
             // Act
-            var result = await repository.AddAsync(product);
+            await repository.AddAsync(product);
 
             // Assert
-            Assert.NotEqual(0, result.Id);
-            var savedProduct = await context.Products.FindAsync(result.Id);
+            var savedProduct = await context.Products.FirstOrDefaultAsync(p => p.Title == product.Title);
             Assert.NotNull(savedProduct);
             Assert.Equal(product.Title, savedProduct.Title);
         }

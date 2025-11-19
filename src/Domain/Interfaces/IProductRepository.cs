@@ -1,13 +1,12 @@
-﻿using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.Entities;
 
-namespace ShoppingProject.Domain.Interfaces
+namespace ShoppingProject.Domain.Interfaces;
+
+public interface IProductRepository
 {
-    public interface IProductRepository
-    {
-        Task<Product> GetByIdAsync(int id);
-        Task<IEnumerable<Product>> GetAllAsync();
-        Task<Product> AddAsync(Product product);
-        Task UpdateAsync(Product product);
-        Task DeleteAsync(int id);
-    }
+    Task<Product?> GetByIdAsync(int id);
+    Task<List<Product>> GetAllAsync();
+    Task AddAsync(Product product);
+    Task UpdateAsync(Product product);
+    Task DeleteAsync(Product product);
 }

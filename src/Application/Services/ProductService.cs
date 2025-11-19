@@ -18,6 +18,7 @@ namespace ShoppingProject.Application.Services
         public async Task<ProductDto> GetByIdAsync(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
+            if (product == null) throw new Exception($"Product with id {id} not found");
             var ratingDto = product.Rating != null ? new RatingDto { Rate = product.Rating.Rate, Count = product.Rating.Count } : null;
             return new ProductDto(product.Id, product.Title, product.Description, product.Price, product.Category, product.Image, ratingDto);
         }
@@ -43,14 +44,15 @@ namespace ShoppingProject.Application.Services
                 Image = dto.Image,
                 Rating = dto.Rating != null ? new Rating { Rate = dto.Rating.Rate, Count = dto.Rating.Count } : new Rating()
             };
-            var created = await _productRepository.AddAsync(product);
-            var ratingDto = created.Rating != null ? new RatingDto { Rate = created.Rating.Rate, Count = created.Rating.Count } : null;
-            return new ProductDto(created.Id, created.Title, created.Description, created.Price, created.Category, created.Image, ratingDto);
+            await _productRepository.AddAsync(product);
+            var ratingDto = product.Rating != null ? new RatingDto { Rate = product.Rating.Rate, Count = product.Rating.Count } : null;
+            return new ProductDto(product.Id, product.Title, product.Description, product.Price, product.Category, product.Image, ratingDto);
         }
 
         public async Task UpdateAsync(int id, UpdateProductDto dto)
         {
             var product = await _productRepository.GetByIdAsync(id);
+            if (product == null) throw new Exception($"Product with id {id} not found");
             product.Title = dto.Title;
             product.Description = dto.Description;
             product.Price = dto.Price;
@@ -58,14 +60,16 @@ namespace ShoppingProject.Application.Services
             product.Image = dto.Image;
             if (dto.Rating != null)
             {
-                product.Rating = new Rating { Rate = dto.Rating?.Rate, Count = dto.Rating?.Count };
+                product.Rating = new Rating { Rate = dto.Rating.Rate, Count = dto.Rating.Count };
             }
             await _productRepository.UpdateAsync(product);
         }
 
         public async Task DeleteAsync(int id)
         {
-            await _productRepository.DeleteAsync(id);
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null) throw new Exception($"Product with id {id} not found");
+            await _productRepository.DeleteAsync(product);
         }
     }
 }
