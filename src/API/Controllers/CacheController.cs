@@ -16,20 +16,22 @@ namespace ShoppingProject.WebApi.Controllers
             _redisCacheService = redisCacheService;
         }
 
-        [HttpGet("cache/{key}")]
+        [HttpGet("{key}")]
         public async Task<IActionResult> Get(string key)
         {
-            return Ok(await _redisCacheService.GetValueAsync(key));
+            var value = await _redisCacheService.GetValueAsync(key);
+            if (value == null) return NotFound();
+            return Ok(value);
         }
 
-        [HttpPost("cache/set")]
+        [HttpPost("set")]
         public async Task<IActionResult> Set([FromBody] RedisCacheRequest redisCacheRequestModel)
         {
             await _redisCacheService.SetValueAsync(redisCacheRequestModel.Key, redisCacheRequestModel.Value);
             return Ok();
         }
 
-        [HttpDelete("cache/{key}")]
+        [HttpDelete("{key}")]
         public async Task<IActionResult> Delete(string key)
         {
             await _redisCacheService.Clear(key);
