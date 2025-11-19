@@ -1,6 +1,7 @@
 ﻿using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Interfaces;
+using ShoppingProject.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ShoppingProject.WebApi.Controllers
@@ -48,6 +49,16 @@ namespace ShoppingProject.WebApi.Controllers
         public async Task<ActionResult<ServiceResult<bool>>> Delete(int id)
         {
             var result = await _productService.DeleteAsync(id);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpPost("search")]
+        public async Task<ActionResult<ServiceResult<IPaginate<ProductDto>>>> Search(
+            [FromBody] DynamicQuery dynamicQuery,
+            [FromQuery] int index = 0,
+            [FromQuery] int size = 10)
+        {
+            var result = await _productService.GetAllByDynamicAsync(dynamicQuery, index, size);
             return StatusCode((int)result.StatusCode, result);
         }
     }

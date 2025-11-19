@@ -9,6 +9,7 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
+        // Entity to DTO mappings
         CreateMap<Product, ProductDto>().ReverseMap();
         CreateMap<CreateProductDto, Product>();
         CreateMap<UpdateProductDto, Product>();
@@ -16,23 +17,36 @@ public class MappingProfile : Profile
         CreateMap<Cart, CartDto>().ReverseMap();
         CreateMap<CreateCartDto, Cart>();
         CreateMap<UpdateCartDto, Cart>();
-        CreateMap(typeof(IPaginate<>), typeof(IPaginate<>)).ConvertUsing(typeof(PaginateConverter<,>));
-    }
-}
-
-public class PaginateConverter<TSource, TDestination> : ITypeConverter<IPaginate<TSource>, IPaginate<TDestination>>
-{
-    public IPaginate<TDestination> Convert(IPaginate<TSource> source, IPaginate<TDestination> destination, ResolutionContext context)
-    {
-        var items = context.Mapper.Map<IList<TSource>, IList<TDestination>>(source.Items);
-        return new Paginate<TDestination>
-        {
-            Index = source.Index,
-            Size = source.Size,
-            From = source.From,
-            Count = source.Count,
-            Pages = source.Pages,
-            Items = items
-        };
+        
+        // Paginate mappings with inline conversion
+        CreateMap<IPaginate<Product>, IPaginate<ProductDto>>()
+            .ConvertUsing((src, dest, context) =>
+            {
+                var items = context.Mapper.Map<IList<Product>, IList<ProductDto>>(src.Items);
+                return new Paginate<ProductDto>
+                {
+                    Index = src.Index,
+                    Size = src.Size,
+                    From = src.From,
+                    Count = src.Count,
+                    Pages = src.Pages,
+                    Items = items
+                };
+            });
+        
+        CreateMap<IPaginate<Cart>, IPaginate<CartDto>>()
+            .ConvertUsing((src, dest, context) =>
+            {
+                var items = context.Mapper.Map<IList<Cart>, IList<CartDto>>(src.Items);
+                return new Paginate<CartDto>
+                {
+                    Index = src.Index,
+                    Size = src.Size,
+                    From = src.From,
+                    Count = src.Count,
+                    Pages = src.Pages,
+                    Items = items
+                };
+            });
     }
 }
