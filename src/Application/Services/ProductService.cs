@@ -58,7 +58,7 @@ namespace ShoppingProject.Application.Services
             product.Image = dto.Image;
             if (dto.Rating != null)
             {
-                product.Rating = new Rating { Rate = dto.Rating.Rate, Count = dto.Rating.Count };
+                product.Rating = new Rating { Rate = dto.Rating?.Rate, Count = dto.Rating?.Count };
             }
             await _productRepository.UpdateAsync(product);
         }
