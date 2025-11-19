@@ -1,9 +1,11 @@
 using ShoppingProject.Application.Interfaces;
 using ShoppingProject.Application.Services;
+using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Interfaces;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection") ?? "localhost:6379"));   
 
 var app = builder.Build();
 

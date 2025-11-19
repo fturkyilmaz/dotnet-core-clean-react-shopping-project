@@ -12,10 +12,12 @@ namespace ShoppingProject.Infrastructure.Data
         }
 
         public DbSet<Product> Products { get; set; }
+        public DbSet<Cart> Carts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>().HasKey(p => p.Id);
+            modelBuilder.Entity<Cart>().HasKey(c => c.Id);
             
             // Configure Rating as an owned entity (no separate table, embedded in Product)
             modelBuilder.Entity<Product>()
