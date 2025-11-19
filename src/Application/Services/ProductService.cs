@@ -6,6 +6,7 @@ using ShoppingProject.Application.Interfaces;
 using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Entities;
 using ShoppingProject.Domain.Interfaces;
+using System.Net;
 
 namespace ShoppingProject.Application.Services
 {
@@ -20,10 +21,36 @@ namespace ShoppingProject.Application.Services
             _mapper = mapper;
         }
 
+        public async Task<ServiceResult<ProductDto>> CreateAsync(CreateProductDto dto)
+        {
+            var product = _mapper.Map<Product>(dto);
+            await _productRepository.AddAsync(product);
+            var productDto = _mapper.Map<ProductDto>(product);
+            return ServiceResult<ProductDto>.SuccessAsCreated(productDto, $"/api/products/{product.Id}");
+        }
+
+        public async Task<ServiceResult<bool>> UpdateAsync(int id, UpdateProductDto dto)
+        {
+            var product = await _productRepository.GetAsync(p => p.Id == id);
+            if (product == null) return ServiceResult<bool>.Fail($"Product with id {id} not found", HttpStatusCode.NotFound);
+            
+            _mapper.Map(dto, product);
+            await _productRepository.UpdateAsync(product);
+            return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);
+        }
+
+        public async Task<ServiceResult<bool>> DeleteAsync(int id)
+        {
+            var product = await _productRepository.GetAsync(p => p.Id == id);
+            if (product == null) return ServiceResult<bool>.Fail($"Product with id {id} not found", HttpStatusCode.NotFound);
+            await _productRepository.DeleteAsync(product);
+            return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);
+        }
+
         public async Task<ServiceResult<ProductDto>> GetByIdAsync(int id)
         {
             var product = await _productRepository.GetAsync(p => p.Id == id);
-            if (product == null) return ServiceResult<ProductDto>.Fail($"Product with id {id} not found", System.Net.HttpStatusCode.NotFound);
+            if (product == null) return ServiceResult<ProductDto>.Fail($"Product with id {id} not found", HttpStatusCode.NotFound);
             return ServiceResult<ProductDto>.Success(_mapper.Map<ProductDto>(product));
         }
 
@@ -37,32 +64,6 @@ namespace ShoppingProject.Application.Services
         {
             var products = await _productRepository.GetListByDynamicAsync(dynamicQuery, index: index, size: size);
             return ServiceResult<IPaginate<ProductDto>>.Success(_mapper.Map<IPaginate<ProductDto>>(products));
-        }
-
-        public async Task<ServiceResult<ProductDto>> CreateAsync(CreateProductDto dto)
-        {
-            var product = _mapper.Map<Product>(dto);
-            await _productRepository.AddAsync(product);
-            var productDto = _mapper.Map<ProductDto>(product);
-            return ServiceResult<ProductDto>.SuccessAsCreated(productDto, $"/api/products/{product.Id}");
-        }
-
-        public async Task<ServiceResult<bool>> UpdateAsync(int id, UpdateProductDto dto)
-        {
-            var product = await _productRepository.GetAsync(p => p.Id == id);
-            if (product == null) return ServiceResult<bool>.Fail($"Product with id {id} not found", System.Net.HttpStatusCode.NotFound);
-            
-            _mapper.Map(dto, product);
-            await _productRepository.UpdateAsync(product);
-            return ServiceResult<bool>.Success(true, System.Net.HttpStatusCode.NoContent);
-        }
-
-        public async Task<ServiceResult<bool>> DeleteAsync(int id)
-        {
-            var product = await _productRepository.GetAsync(p => p.Id == id);
-            if (product == null) return ServiceResult<bool>.Fail($"Product with id {id} not found", System.Net.HttpStatusCode.NotFound);
-            await _productRepository.DeleteAsync(product);
-            return ServiceResult<bool>.Success(true, System.Net.HttpStatusCode.NoContent);
         }
     }
 }

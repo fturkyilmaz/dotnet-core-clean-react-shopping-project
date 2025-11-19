@@ -13,7 +13,9 @@ public class MappingProfile : Profile
         CreateMap<CreateProductDto, Product>();
         CreateMap<UpdateProductDto, Product>();
         CreateMap<Rating, RatingDto>().ReverseMap();
-        
+        CreateMap<Cart, CartDto>().ReverseMap();
+        CreateMap<CreateCartDto, Cart>();
+        CreateMap<UpdateCartDto, Cart>();
         CreateMap(typeof(IPaginate<>), typeof(IPaginate<>)).ConvertUsing(typeof(PaginateConverter<,>));
     }
 }
