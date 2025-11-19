@@ -1,18 +1,25 @@
-import { useContext } from "react";
+import type { FC } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { BasketContext, BasketContextType } from "./../context/basketContext";
+import { useBasket, useTheme } from "../hooks";
+import ThemeToggle from "./ThemeToggle";
 
-const Header = () => {
-  const { basket } = useContext(BasketContext) as BasketContextType;
+const Header: FC = () => {
+  const { basket } = useBasket();
+  const { theme } = useTheme();
 
-  /* Sepetteki ürün sayısını hesapla */
-  const total = basket?.reduce((total, product) => total + product.amount, 0);
+  const totalItems = basket.reduce((total, product) => total + product.amount, 0);
 
   return (
-    <nav className="navbar navbar-dark bg-black sticky-top navbar-expand-md ">
+    <nav
+      className={`navbar sticky-top navbar-expand-md shadow-sm ${theme === "dark" ? "navbar-dark" : "navbar-light"}`}
+      style={{
+        backgroundColor: theme === "dark" ? "#0d1117" : "#ffffff",
+        transition: "background-color 0.3s ease"
+      }}
+    >
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
-          Furkan TURKYILMAZ Store
+        <Link className="navbar-brand fw-bold" to="/">
+          🛒 Furkan Store
         </Link>
         <button
           className="navbar-toggler"
@@ -25,9 +32,10 @@ const Header = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div
-          className="offcanvas offcanvas-end text-bg-dark"
+          className={`offcanvas offcanvas-end ${theme === "dark" ? "text-bg-dark" : "bg-white"}`}
           tabIndex={-1}
           id="offcanvasDarkNavbar"
+          style={{ transition: "background-color 0.3s ease" }}
         >
           <div className="offcanvas-header">
             <h5 className="offcanvas-title" id="offcanvasDarkNavbarLabel">
@@ -35,7 +43,7 @@ const Header = () => {
             </h5>
             <button
               type="button"
-              className="btn-close btn-close-white"
+              className={`btn-close ${theme === "dark" ? "btn-close-white" : ""}`}
               data-bs-dismiss="offcanvas"
               aria-label="Close"
             ></button>
@@ -50,21 +58,18 @@ const Header = () => {
               <li className="nav-item">
                 <NavLink className="nav-link" to="/checkout">
                   <span>Sepet</span>
-                  <span className="badge bg-danger ms-1">{total}</span>
+                  <span className="badge bg-danger ms-1">{totalItems}</span>
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink
-                  className="nav-link"
-                  to="/category"
-                  role="button"
-                // data-bs-toggle="dropdown"
-                // aria-expanded="false"
-                >
+                <NavLink className="nav-link" to="/category">
                   Kategoriler
                 </NavLink>
               </li>
             </ul>
+            <div className="d-flex align-items-center mt-3 mt-md-0 ms-md-3">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </div>

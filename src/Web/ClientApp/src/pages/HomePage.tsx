@@ -1,39 +1,45 @@
+import type { FC } from "react";
 import Loader from "../components/Loader";
 import Card from "../components/Card";
-/* 
-*useContext hooku kullanarak bir CONTEXT yapısına abone olmayı sağlayabiliriz.
+import { useProduct } from "../hooks";
 
-*/
+const HomePage: FC = () => {
+  const { products, category } = useProduct();
 
-import { useContext } from "react";
-
-/*
-Abone olmak istediğimiz CONTEXT'i çağırmak için bu şekilde import etmeliyiz.
-*/
-import { ProductContext, ProductContextType } from "../context/productContext";
-
-const HomePage = () => {
-  /*
-    * Context yapısında tutulan bir veriye projedeki bileşen içerisinde erişmek istiyorsak bileşenden ilgili context'e abone olmak gerekiyor.
-    
-    */
-
-  const { products, category } = useContext(ProductContext) as ProductContextType;
+  const displayCategory = category === "all" ? "Tüm Ürünler" : category;
+  const productCount = products?.length ?? 0;
 
   return (
-    <div className="container">
-      <h2 className="my-4">{category && category}</h2>
-
-      <div className="d-flex flex-wrap justify-content-center justify-content-md-between gap-3 gap-md-4 my-5">
-        {/*Veriler gelmediyse yükleniyor göster */}
-        {!products && <Loader />}
-
-        {/*Veriler geldiyse herbiri için kart basıp göster */}
-
-        {products?.map((product) => (
-          <Card key={product.id} product={product} />
-        ))}
+    <div className="container my-5">
+      {/* Header Section */}
+      <div className="text-center mb-5">
+        <h1 className="display-4 fw-bold mb-3">{displayCategory}</h1>
+        <p className="text-muted fs-5">
+          {products ? `${productCount} ürün bulundu` : "Ürünler yükleniyor..."}
+        </p>
       </div>
+
+      {/* Products Grid */}
+      {!products ? (
+        <div className="d-flex justify-content-center my-5">
+          <Loader />
+        </div>
+      ) : productCount === 0 ? (
+        <div className="text-center my-5">
+          <div className="p-5 bg-light rounded-3 shadow-sm">
+            <h2 className="display-6 text-secondary mb-3">Ürün Bulunamadı</h2>
+            <p className="text-muted">Bu kategoride şu anda ürün bulunmamaktadır.</p>
+          </div>
+        </div>
+      ) : (
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+          {products.map((product) => (
+            <div className="col" key={product.id}>
+              <Card product={product} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
