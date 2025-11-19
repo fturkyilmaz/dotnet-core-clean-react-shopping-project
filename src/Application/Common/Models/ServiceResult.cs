@@ -19,10 +19,13 @@ namespace ShoppingProject.Application.Common.Models
             Location = location;
         }
 
+        public static ServiceResult<T> Success(T data, HttpStatusCode statusCode = HttpStatusCode.OK)
+            => new(true, data, "Operation successful", statusCode);
+
         public static ServiceResult<T> SuccessAsCreated(T data, string location)
             => new(true, data, "Operation successful", HttpStatusCode.Created, location);
 
-        public static ServiceResult<T> Fail(string message, HttpStatusCode statusCode)
+        public static ServiceResult<T> Fail(string message, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
             => new(false, default, message, statusCode);
     }
 }

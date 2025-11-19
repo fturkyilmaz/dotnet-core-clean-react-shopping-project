@@ -72,10 +72,10 @@ namespace ShoppingProject.UnitTests.Infrastructure
             await context.SaveChangesAsync();
 
             // Act
-            var results = await repository.GetAllAsync();
+            var results = await repository.GetListAsync();
 
             // Assert
-            Assert.Equal(2, results.Count());
+            Assert.Equal(2, results.Items.Count);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using ShoppingProject.Application.DTOs;
+﻿using ShoppingProject.Application.Common.Models;
+using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,39 +17,38 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll()
+        public async Task<ActionResult<ServiceResult<IEnumerable<ProductDto>>>> GetAll()
         {
-             var products = await _productService.GetAllAsync();
-
-            return Ok(products);
+             var result = await _productService.GetAllAsync();
+             return StatusCode((int)result.StatusCode, result);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProductDto>> GetById(int id)
+        public async Task<ActionResult<ServiceResult<ProductDto>>> GetById(int id)
         {
-            var product = await _productService.GetByIdAsync(id);
-            return Ok(product);
+            var result = await _productService.GetByIdAsync(id);
+            return StatusCode((int)result.StatusCode, result);
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProductDto>> Create(CreateProductDto dto)
+        public async Task<ActionResult<ServiceResult<ProductDto>>> Create(CreateProductDto dto)
         {
-            var product = await _productService.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+            var result = await _productService.CreateAsync(dto);
+            return StatusCode((int)result.StatusCode, result);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UpdateProductDto dto)
+        public async Task<ActionResult<ServiceResult<bool>>> Update(int id, UpdateProductDto dto)
         {
-            await _productService.UpdateAsync(id, dto);
-            return NoContent();
+            var result = await _productService.UpdateAsync(id, dto);
+            return StatusCode((int)result.StatusCode, result);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult<ServiceResult<bool>>> Delete(int id)
         {
-            await _productService.DeleteAsync(id);
-            return NoContent();
+            var result = await _productService.DeleteAsync(id);
+            return StatusCode((int)result.StatusCode, result);
         }
     }
 }
