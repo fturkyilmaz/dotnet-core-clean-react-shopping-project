@@ -1,10 +1,10 @@
 using System;
+using ShoppingProject.Domain.Common;
 
 namespace ShoppingProject.Domain.Entities
 {
-    public class Product
+    public class Product: BaseAuditableEntity
     {
-        public int Id { get; set; }
         public string Title { get; set; } = "";
         public decimal Price { get; set; }
         public string Description { get; set; } = "";
