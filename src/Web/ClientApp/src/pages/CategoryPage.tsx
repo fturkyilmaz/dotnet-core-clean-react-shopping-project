@@ -1,14 +1,14 @@
 import axios from "axios";
 import { useState, useEffect, useContext } from "react";
-import { ProductContext } from "../context/productContext";
+import { ProductContext, ProductContextType } from "../context/productContext";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 
 const CategoryList = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
-  const { setCategory } = useContext(ProductContext);
-  const handleSetCategory = (category) => {
+  const [categories, setCategories] = useState<string[]>([]);
+  const { setCategory } = useContext(ProductContext) as ProductContextType;
+  const handleSetCategory = (category: string) => {
     setCategory(category);
     navigate("/");
   };
@@ -25,7 +25,7 @@ const CategoryList = () => {
       <h2 className="my-4">Kategoriler</h2>
       <ul className="">
         {/*Veriler gelmediyse yükleniyor göster */}
-        {!categories && <Loader />}
+        {categories.length === 0 && <Loader />}
         <li onClick={() => handleSetCategory("all")} className="">
           <button className="btn btn-light mb-2">Hepsi</button>
         </li>

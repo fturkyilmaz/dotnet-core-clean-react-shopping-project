@@ -1,9 +1,9 @@
 import { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { BasketContext } from "./../context/basketContext";
+import { BasketContext, BasketContextType } from "./../context/basketContext";
 
 const Header = () => {
-  const { basket } = useContext(BasketContext);
+  const { basket } = useContext(BasketContext) as BasketContextType;
 
   /* Sepetteki ürün sayısını hesapla */
   const total = basket?.reduce((total, product) => total + product.amount, 0);
@@ -12,7 +12,7 @@ const Header = () => {
     <nav className="navbar navbar-dark bg-black sticky-top navbar-expand-md ">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">
-          FT Store
+          Furkan TURKYILMAZ Store
         </Link>
         <button
           className="navbar-toggler"
@@ -26,12 +26,12 @@ const Header = () => {
         </button>
         <div
           className="offcanvas offcanvas-end text-bg-dark"
-          tabIndex="-1"
+          tabIndex={-1}
           id="offcanvasDarkNavbar"
         >
           <div className="offcanvas-header">
             <h5 className="offcanvas-title" id="offcanvasDarkNavbarLabel">
-              FT Store
+              Furkan TURKYILMAZ
             </h5>
             <button
               type="button"
@@ -58,8 +58,8 @@ const Header = () => {
                   className="nav-link"
                   to="/category"
                   role="button"
-                  // data-bs-toggle="dropdown"
-                  // aria-expanded="false"
+                // data-bs-toggle="dropdown"
+                // aria-expanded="false"
                 >
                   Kategoriler
                 </NavLink>

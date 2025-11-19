@@ -10,7 +10,7 @@ import { useContext } from "react";
 /*
 Abone olmak istediğimiz CONTEXT'i çağırmak için bu şekilde import etmeliyiz.
 */
-import { ProductContext } from "../context/productContext";
+import { ProductContext, ProductContextType } from "../context/productContext";
 
 const HomePage = () => {
   /*
@@ -18,7 +18,7 @@ const HomePage = () => {
     
     */
 
-  const { products, category } = useContext(ProductContext);
+  const { products, category } = useContext(ProductContext) as ProductContextType;
 
   return (
     <div className="container">

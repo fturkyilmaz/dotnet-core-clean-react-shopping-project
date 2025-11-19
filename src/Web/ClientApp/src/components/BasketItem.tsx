@@ -1,4 +1,12 @@
-const BasketItem = ({ item, addToBasket, removeFromBasket }) => {
+import { BasketItem as BasketItemType, Product } from "../types";
+
+interface BasketItemProps {
+  item: BasketItemType;
+  addToBasket: (product: Product) => void;
+  removeFromBasket: (id: number) => void;
+}
+
+const BasketItem = ({ item, addToBasket, removeFromBasket }: BasketItemProps) => {
   return (
     <div className="d-flex flex-column flex-md-row  gap-3 align-items-center justify-content-between">
       <div className="d-flex align-items-center gap-3">

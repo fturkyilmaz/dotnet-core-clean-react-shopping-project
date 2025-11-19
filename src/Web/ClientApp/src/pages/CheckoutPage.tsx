@@ -1,11 +1,11 @@
 import { useContext } from "react";
-import { BasketContext } from "../context/basketContext";
+import { BasketContext, BasketContextType } from "../context/basketContext";
 import BasketItem from "../components/BasketItem";
 import { Link } from "react-router-dom";
 
 const CheckoutPage = () => {
   const { basket, addToBasket, removeFromBasket, purchaseBasket } =
-    useContext(BasketContext);
+    useContext(BasketContext) as BasketContextType;
 
   const totalAmount = basket.reduce((total, i) => total + i.amount, 0);
 

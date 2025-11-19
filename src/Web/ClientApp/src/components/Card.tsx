@@ -1,8 +1,13 @@
 import { useContext } from "react";
-import { BasketContext } from "../context/basketContext";
+import { BasketContext, BasketContextType } from "../context/basketContext";
+import { Product } from "../types";
 
-const Card = ({ product }) => {
-  const { addToBasket } = useContext(BasketContext);
+interface CardProps {
+  product: Product;
+}
+
+const Card = ({ product }: CardProps) => {
+  const { addToBasket } = useContext(BasketContext) as BasketContextType;
 
   return (
     <div className="card py-2" style={{ width: "250px" }}>
@@ -11,7 +16,7 @@ const Card = ({ product }) => {
           className="object-fit-contain"
           height={120}
           src={product?.image}
-          alt={product?.name}
+          alt={product?.title}
         />
       </div>
 
@@ -19,7 +24,7 @@ const Card = ({ product }) => {
         <h4 className="text-truncate">{product?.title}</h4>
         <p>{product?.price}</p>
         <p>{product?.category}</p>
-        <button onClick={() => addToBasket(product)}>Sepete Ekle</button>
+        <button onClick={() => addToBasket(product)} className="btn btn-primary">Sepete Ekle</button>
       </div>
     </div>
   );
