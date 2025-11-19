@@ -1,14 +1,13 @@
-import { useContext } from "react";
-import { BasketContext, BasketContextType } from "../context/basketContext";
+import type { FC } from "react";
+import { useBasket } from "../hooks";
 import BasketItem from "../components/BasketItem";
 import { Link } from "react-router-dom";
 
-const CheckoutPage = () => {
-  const { basket, addToBasket, removeFromBasket, purchaseBasket } =
-    useContext(BasketContext) as BasketContextType;
+const CheckoutPage: FC = () => {
+  const { basket, addToBasket, removeFromBasket, purchaseBasket, totalItems, totalPrice } = useBasket();
 
-  const totalAmount = basket.reduce((total, i) => total + i.amount, 0);
-  const totalPrice = basket.reduce((total, i) => total + i.price * i.amount, 0);
+  const shippingCost = totalPrice > 0 ? 29.99 : 0;
+  const grandTotal = totalPrice + shippingCost;
 
   if (basket.length === 0) {
     return (
@@ -132,7 +131,7 @@ const CheckoutPage = () => {
 
               <div className="d-flex justify-content-between mb-3">
                 <span className="text-muted">Toplam Ürün</span>
-                <span className="fw-semibold">{totalAmount} adet</span>
+                <span className="fw-semibold">{totalItems} adet</span>
               </div>
 
               <div className="d-flex justify-content-between mb-3">
@@ -142,14 +141,16 @@ const CheckoutPage = () => {
 
               <div className="d-flex justify-content-between mb-3">
                 <span className="text-muted">Kargo</span>
-                <span className="text-success fw-semibold">Ücretsiz</span>
+                <span className={shippingCost === 0 ? "text-success fw-semibold" : "fw-semibold"}>
+                  {shippingCost === 0 ? "Ücretsiz" : `${shippingCost.toFixed(2)} ₺`}
+                </span>
               </div>
 
               <hr className="my-4" />
 
               <div className="d-flex justify-content-between mb-4 align-items-center">
                 <span className="fs-5 fw-bold">Toplam</span>
-                <span className="fs-4 fw-bold text-primary">{totalPrice.toFixed(2)} ₺</span>
+                <span className="fs-4 fw-bold text-primary">{grandTotal.toFixed(2)} ₺</span>
               </div>
 
               <button

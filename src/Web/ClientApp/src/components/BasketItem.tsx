@@ -20,7 +20,7 @@ const BasketItem = ({ item, addToBasket, removeFromBasket }: BasketItemProps) =>
       </div>
 
       <div className="col-md-5">
-        <h5 className="mb-1 text-dark fw-semibold text-truncate" title={item?.title}>
+        <h5 className="mb-1 text-muted fw-semibold text-truncate" title={item?.title}>
           {item?.title}
         </h5>
         <p className="text-muted small mb-0 text-truncate">
