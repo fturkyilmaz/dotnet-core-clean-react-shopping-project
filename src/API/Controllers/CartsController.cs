@@ -1,52 +1,60 @@
-using ShoppingProject.Application.DTOs;
-using ShoppingProject.Application.Interfaces;
+using ShoppingProject.Application.Carts.Commands.CreateCart;
+using ShoppingProject.Application.Carts.Commands.DeleteCart;
+using ShoppingProject.Application.Carts.Commands.UpdateCart;
+using ShoppingProject.Application.Carts.Queries.GetCartById;
+using ShoppingProject.Application.Carts.Queries.GetCarts;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ShoppingProject.WebApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class CartsController : ControllerBase
     {
-        private readonly ICartService _cartService;
+        private readonly ISender _sender;
 
-        public CartsController(ICartService cartService)
+        public CartsController(ISender sender)
         {
-            _cartService = cartService;
+            _sender = sender;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CartDto>>> GetAll()
+        public async Task<ActionResult<List<CartBriefDto>>> GetCarts()
         {
-            var carts = await _cartService.GetAllAsync();
-            return Ok(carts);
+            return await _sender.Send(new GetCartsQuery());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CartDto>> GetById(int id)
+        public async Task<ActionResult<CartBriefDto>> GetCart(int id)
         {
-            var cart = await _cartService.GetByIdAsync(id);
-            return Ok(cart);
+            return await _sender.Send(new GetCartByIdQuery(id));
         }
 
         [HttpPost]
-        public async Task<ActionResult<CartDto>> Create(CreateCartDto dto)
+        public async Task<ActionResult<int>> Create(CreateCartCommand command)
         {
-            var cart = await _cartService.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = cart.Id }, cart);
+            return await _sender.Send(command);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UpdateCartDto dto)
+        public async Task<ActionResult> Update(int id, UpdateCartCommand command)
         {
-            await _cartService.UpdateAsync(id, dto);
+            if (id != command.Id)
+            {
+                return BadRequest();
+            }
+
+            await _sender.Send(command);
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            await _cartService.DeleteAsync(id);
+            await _sender.Send(new DeleteCartCommand(id));
+
             return NoContent();
         }
     }
