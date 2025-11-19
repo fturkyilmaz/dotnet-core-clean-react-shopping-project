@@ -1,5 +1,6 @@
 ﻿using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Events;
+using Ardalis.GuardClauses;
 
 namespace ShoppingProject.Application.Products.Commands.DeleteProduct;
 

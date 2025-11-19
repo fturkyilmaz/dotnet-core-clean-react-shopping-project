@@ -1,4 +1,4 @@
-﻿namespace ShoppingProject.Application.TodoItems.Commands.CreateTodoItem;
+﻿namespace ShoppingProject.Application.Products.Commands.CreateProduct;
 
 public class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
@@ -12,7 +12,7 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
         RuleFor(v => v.Description)
             .NotEmpty();    
         RuleFor(v => v.Image)
-            .NotEmpty();    
+            .NotEmpty();        
         RuleFor(v => v.Category)
             .NotEmpty();           
     }

@@ -1,4 +1,5 @@
 ﻿using ShoppingProject.Application.Common.Interfaces;
+using Ardalis.GuardClauses;
 
 namespace ShoppingProject.Application.Products.Commands.UpdateProduct;
 
@@ -33,11 +34,11 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand>
 
         Guard.Against.NotFound(request.Id, entity);
 
-        entity.Title = request.Title;
+        entity.Title = request.Title ?? entity.Title;
         entity.Price = request.Price;
-        entity.Description = request.Description;
-        entity.Image = request.Image;
-        entity.Category = request.Category;
+        entity.Description = request.Description ?? entity.Description;
+        entity.Image = request.Image ?? entity.Image;
+        entity.Category = request.Category ?? entity.Category;
 
         await _context.SaveChangesAsync(cancellationToken);
     }

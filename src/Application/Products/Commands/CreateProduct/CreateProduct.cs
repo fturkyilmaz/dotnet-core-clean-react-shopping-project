@@ -6,9 +6,11 @@ namespace ShoppingProject.Application.Products.Commands.CreateProduct;
 
 public record CreateProductCommand : IRequest<int>
 {
-    public int ListId { get; init; }
-
     public string? Title { get; init; }
+    public decimal Price { get; init; }
+    public string? Description { get; init; }
+    public string? Category { get; init; }
+    public string? Image { get; init; }
 }
 
 public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, int>
@@ -24,8 +26,12 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
     {
         var entity = new Product
         {
-            Title = request.Title,
-            Done = false
+            Title = request.Title ?? "",
+            Price = request.Price,
+            Description = request.Description ?? "",
+            Category = request.Category ?? "",
+            Image = request.Image ?? "",
+            Rating = new Rating()
         };
 
         entity.AddDomainEvent(new ProductCreatedEvent(entity));
