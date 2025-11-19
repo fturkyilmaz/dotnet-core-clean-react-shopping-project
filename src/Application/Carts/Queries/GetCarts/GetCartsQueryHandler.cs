@@ -14,9 +14,9 @@ public class CartBriefDto
     public string Title { get; init; } = "";
     public decimal Price { get; init; }
     public string Image { get; init; } = "";
-    public int Quantity { get; init; }
+    public int Quantity { get; init; } = 1;
 
-    private class Mapping : Profile
+    private class Mapping : Profile 
     {
         public Mapping()
         {

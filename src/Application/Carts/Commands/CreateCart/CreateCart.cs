@@ -33,7 +33,7 @@ public class CreateCartCommandHandler : IRequestHandler<CreateCartCommand, int>
             Quantity = request.Quantity
         };
 
-        // entity.AddDomainEvent(new CartCreatedEvent(entity)); // Event to be created later
+        entity.AddDomainEvent(new CartCreatedEvent(entity)); // Event to be created later
 
         _context.Carts.Add(entity);
 

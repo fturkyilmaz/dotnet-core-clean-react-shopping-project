@@ -1,6 +1,7 @@
 using ShoppingProject.Application.Common.Interfaces;
 using Ardalis.GuardClauses;
 using MediatR;
+using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Carts.Commands.UpdateCart;
 
@@ -33,6 +34,8 @@ public class UpdateCartCommandHandler : IRequestHandler<UpdateCartCommand>
         entity.Price = request.Price;
         entity.Image = request.Image;
         entity.Quantity = request.Quantity;
+
+        entity.AddDomainEvent(new CartUpdatedEvent(entity)); // Event to be created later
 
         await _context.SaveChangesAsync(cancellationToken);
     }

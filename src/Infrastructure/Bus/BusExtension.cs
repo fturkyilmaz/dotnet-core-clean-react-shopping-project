@@ -17,11 +17,17 @@ namespace ShoppingProject.Infrastructure.Bus
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<ProductAddedEventConsumer>();
+                x.AddConsumer<CartCreatedEventConsumer>();
+                
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(new Uri(serviceBusOption!.Url), h => { });
+                    
                     cfg.ReceiveEndpoint(ServiceBusConst.ProductAddedEventQueueName,
                         e => { e.ConfigureConsumer<ProductAddedEventConsumer>(context); });
+                        
+                    cfg.ReceiveEndpoint(ServiceBusConst.CartCreatedEventQueueName,
+                        e => { e.ConfigureConsumer<CartCreatedEventConsumer>(context); });
                 });
             });
         }

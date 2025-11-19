@@ -6,19 +6,23 @@ using ShoppingProject.Application.Interfaces;
 using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Entities;
 using ShoppingProject.Domain.Interfaces;
+using ShoppingProject.Application.Contracts.ServiceBus;
 using System.Net;
-
+using ShoppingProject.Domain.Events;
+using ShoppingProject.Domain.Enums;
 namespace ShoppingProject.Application.Services
 {
     public class CartService : ICartService
     {
         private readonly ICartRepository _cartRepository;
         private readonly IMapper _mapper;
+        private readonly IServiceBus _busService;
 
-        public CartService(ICartRepository cartRepository, IMapper mapper)
+        public CartService(ICartRepository cartRepository, IMapper mapper, IServiceBus busService)
         {
             _cartRepository = cartRepository;
             _mapper = mapper;
+            _busService = busService;
         }
 
 
@@ -26,16 +30,18 @@ namespace ShoppingProject.Application.Services
         {
             var cart = _mapper.Map<Cart>(dto);
             await _cartRepository.AddAsync(cart);
-            var cartDto = _mapper.Map<CartDto>(cart);
+            var cartDto = _mapper.Map<CartDto>(cart);            
+            await _busService.SendAsync<CartCreatedEvent>(new CartCreatedEvent(cart), ServiceBusConst.CartEventExchangeName);
+            
             return ServiceResult<CartDto>.SuccessAsCreated(cartDto, $"/api/carts/{cart.Id}");
         }
 
-        public async Task<ServiceResult<bool>> UpdateAsync(int id, UpdateCartDto dto)
+        public async Task<ServiceResult<bool>> UpdateAsync(int id, UpdateCartDto request)
         {
             var cart = await _cartRepository.GetAsync(c => c.Id == id);
             if (cart == null) return ServiceResult<bool>.Fail($"Cart with id {id} not found", HttpStatusCode.NotFound);
             
-            _mapper.Map(dto, cart);
+            _mapper.Map(request, cart);
             await _cartRepository.UpdateAsync(cart);
             return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);
         }

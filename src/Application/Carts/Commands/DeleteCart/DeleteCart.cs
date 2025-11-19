@@ -1,6 +1,7 @@
 using ShoppingProject.Application.Common.Interfaces;
 using Ardalis.GuardClauses;
 using MediatR;
+using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Carts.Commands.DeleteCart;
 
@@ -24,7 +25,7 @@ public class DeleteCartCommandHandler : IRequestHandler<DeleteCartCommand>
 
         _context.Carts.Remove(entity);
 
-        // entity.AddDomainEvent(new CartDeletedEvent(entity)); // Event to be created later
+        entity.AddDomainEvent(new CartDeletedEvent(entity)); // Event to be created later
 
         await _context.SaveChangesAsync(cancellationToken);
     }

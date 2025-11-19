@@ -1,5 +1,3 @@
 namespace ShoppingProject.Domain.Interfaces;
 
-public interface IEventOrMessage
-{
-}
+ public interface IEventOrMessage : IEvent, IMessage;
