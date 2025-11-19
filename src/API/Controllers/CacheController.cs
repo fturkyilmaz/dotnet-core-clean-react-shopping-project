@@ -2,11 +2,13 @@ using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 namespace ShoppingProject.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class CacheController : ControllerBase
     {
         private readonly IRedisCacheService _redisCacheService;

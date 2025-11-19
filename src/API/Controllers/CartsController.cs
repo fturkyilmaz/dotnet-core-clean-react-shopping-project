@@ -2,10 +2,12 @@ using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 namespace ShoppingProject.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     public class CartsController : ControllerBase
     {

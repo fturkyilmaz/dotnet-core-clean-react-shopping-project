@@ -3,11 +3,13 @@ using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Interfaces;
 using ShoppingProject.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 namespace ShoppingProject.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;

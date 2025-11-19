@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using ShoppingProject.Infrastructure.Identity;
 using ShoppingProject.WebApi.Services;
+using Asp.Versioning;
+using ShoppingProject.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+})
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
 // Register dependencies And Use PostgreSQL Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -43,7 +59,14 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        var descriptions = app.DescribeApiVersions();
+        foreach (var description in descriptions)
+        {
+            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+        }
+    });
 }
 
 app.UseHttpsRedirection();
