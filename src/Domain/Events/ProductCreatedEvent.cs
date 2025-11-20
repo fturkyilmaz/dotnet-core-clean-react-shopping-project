@@ -1,4 +1,6 @@
-﻿namespace ShoppingProject.Domain.Events;
+﻿using ShoppingProject.Domain.Common;
+
+namespace ShoppingProject.Domain.Events;
 
 public class ProductCreatedEvent : BaseEvent
 {

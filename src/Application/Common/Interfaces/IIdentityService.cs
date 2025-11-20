@@ -15,4 +15,8 @@ public interface IIdentityService
     Task<Result> DeleteUserAsync(string userId);
 
     Task<(Result Result, string Token)> LoginAsync(string email, string password);
+
+    Task<Result> AddUserToRoleAsync(string userId, string role);
+
+    Task<Result> CreateRoleAsync(string roleName);
 }

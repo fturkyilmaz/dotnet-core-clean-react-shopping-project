@@ -1,9 +1,12 @@
 ﻿using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Domain.Events;
 using Ardalis.GuardClauses;
+using ShoppingProject.Domain.Constants;
+using ShoppingProject.Domain.Events;
+using ShoppingProject.Application.Common.Security;
 
 namespace ShoppingProject.Application.Products.Commands.DeleteProduct;
 
+[Authorize(Policy = Policies.CanManageProducts)]
 public record DeleteProductCommand(int Id) : IRequest;
 
 public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>

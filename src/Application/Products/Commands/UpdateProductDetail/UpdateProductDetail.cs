@@ -1,9 +1,12 @@
 ﻿using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Domain.Enums;
 using Ardalis.GuardClauses;
+using ShoppingProject.Domain.Constants;
+using ShoppingProject.Application.Common.Security;
+using ShoppingProject.Domain.Enums;
 
 namespace ShoppingProject.Application.Products.Commands.UpdateProductDetail;
 
+[Authorize(Policy = Policies.CanManageProducts)]
 public record UpdateProductDetailCommand : IRequest
 {
     public int Id { get; init; }

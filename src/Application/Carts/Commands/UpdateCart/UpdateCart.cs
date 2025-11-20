@@ -1,10 +1,13 @@
 using ShoppingProject.Application.Common.Interfaces;
 using Ardalis.GuardClauses;
 using MediatR;
+using ShoppingProject.Domain.Constants;
+using ShoppingProject.Application.Common.Security;
 using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Carts.Commands.UpdateCart;
 
+[Authorize]
 public record UpdateCartCommand : IRequest
 {
     public int Id { get; init; }

@@ -1,9 +1,12 @@
 ﻿using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Application.Common.Security;
+using ShoppingProject.Domain.Constants;
 using ShoppingProject.Domain.Entities;
 using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Products.Commands.CreateProduct;
 
+[Authorize(Policy = Policies.CanManageProducts)]
 public record CreateProductCommand : IRequest<int>
 {
     public string? Title { get; init; }

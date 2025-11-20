@@ -17,17 +17,20 @@ public class IdentityService : IIdentityService
     private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
     private readonly IAuthorizationService _authorizationService;
     private readonly IConfiguration _configuration;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
         IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
         IAuthorizationService authorizationService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        RoleManager<IdentityRole> roleManager)
     {
         _userManager = userManager;
         _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
         _authorizationService = authorizationService;
         _configuration = configuration;
+        _roleManager = roleManager;
     }
 
     public async Task<string?> GetUserNameAsync(string userId)
@@ -96,7 +99,7 @@ public class IdentityService : IIdentityService
             return (Result.Failure(new[] { "Invalid email or password." }), string.Empty);
         }
 
-        var token = GenerateJwtToken(user);
+        var token = await GenerateJwtToken(user);
 
         return (Result.Success(), token);
     }
@@ -128,7 +131,7 @@ public class IdentityService : IIdentityService
         return Result.Success();
     }
 
-    private string GenerateJwtToken(ApplicationUser user)
+    private async Task<string> GenerateJwtToken(ApplicationUser user)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
         var secretKey = jwtSettings["Secret"];
@@ -140,6 +143,13 @@ public class IdentityService : IIdentityService
             new Claim(ClaimTypes.Name, user.UserName!),
             new Claim(ClaimTypes.Email, user.Email!)
         };
+
+        // Add role claims
+        var roles = await _userManager.GetRolesAsync(user);
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -154,5 +164,39 @@ public class IdentityService : IIdentityService
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
         return tokenHandler.WriteToken(token);
+    }
+
+    public async Task<Result> AddUserToRoleAsync(string userId, string role)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        
+        if (user == null)
+        {
+            return Result.Failure(new[] { "User not found." });
+        }
+
+        var roleExists = await _userManager.GetRolesAsync(user);
+        if (roleExists.Contains(role))
+        {
+            return Result.Failure(new[] { $"User already has the role '{role}'." });
+        }
+
+        var result = await _userManager.AddToRoleAsync(user, role);
+        
+        return result.ToApplicationResult();
+    }
+
+    public async Task<Result> CreateRoleAsync(string roleName)
+    {
+        var roleExists = await _roleManager.RoleExistsAsync(roleName);
+        
+        if (roleExists)
+        {
+            return Result.Failure(new[] { $"Role '{roleName}' already exists." });
+        }
+
+        var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
+        
+        return result.ToApplicationResult();
     }
 }

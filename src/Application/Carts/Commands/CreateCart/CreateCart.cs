@@ -1,11 +1,14 @@
 using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Domain.Entities;
-using ShoppingProject.Domain.Events;
 using FluentValidation;
 using MediatR;
+using ShoppingProject.Domain.Constants;
+using ShoppingProject.Application.Common.Security;
+using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Carts.Commands.CreateCart;
 
+[Authorize]
 public record CreateCartCommand : IRequest<int>
 {
     public string Title { get; init; } = "";
