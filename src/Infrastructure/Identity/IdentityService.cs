@@ -1,32 +1,81 @@
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace ShoppingProject.Infrastructure.Identity;
 
 public class IdentityService : IIdentityService
 {
-    public Task<string?> GetUserNameAsync(string userId)
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
+    private readonly IAuthorizationService _authorizationService;
+
+    public IdentityService(
+        UserManager<ApplicationUser> userManager,
+        IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
+        IAuthorizationService authorizationService)
     {
-        return Task.FromResult<string?>("Unknown User");
+        _userManager = userManager;
+        _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
+        _authorizationService = authorizationService;
     }
 
-    public Task<bool> IsInRoleAsync(string userId, string role)
+    public async Task<string?> GetUserNameAsync(string userId)
     {
-        return Task.FromResult(true);
+        var user = await _userManager.FindByIdAsync(userId);
+
+        return user?.UserName;
     }
 
-    public Task<bool> AuthorizeAsync(string userId, string policyName)
+    public async Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password)
     {
-        return Task.FromResult(true);
+        var user = new ApplicationUser
+        {
+            UserName = userName,
+            Email = userName,
+        };
+
+        var result = await _userManager.CreateAsync(user, password);
+
+        return (result.ToApplicationResult(), user.Id);
     }
 
-    public Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password)
+    public async Task<bool> IsInRoleAsync(string userId, string role)
     {
-        return Task.FromResult((Result.Success(), Guid.NewGuid().ToString()));
+        var user = await _userManager.FindByIdAsync(userId);
+
+        return user != null && await _userManager.IsInRoleAsync(user, role);
     }
 
-    public Task<Result> DeleteUserAsync(string userId)
+    public async Task<bool> AuthorizeAsync(string userId, string policyName)
     {
-        return Task.FromResult(Result.Success());
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+        {
+            return false;
+        }
+
+        var principal = await _userClaimsPrincipalFactory.CreateAsync(user);
+
+        var result = await _authorizationService.AuthorizeAsync(principal, policyName);
+
+        return result.Succeeded;
+    }
+
+    public async Task<Result> DeleteUserAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        return user != null ? await DeleteUserAsync(user) : Result.Success();
+    }
+
+    public async Task<Result> DeleteUserAsync(ApplicationUser user)
+    {
+        var result = await _userManager.DeleteAsync(user);
+
+        return result.ToApplicationResult();
     }
 }
