@@ -14,6 +14,8 @@ using Asp.Versioning;
 using ShoppingProject.WebApi;
 using Serilog;
 using Microsoft.Extensions.DependencyInjection;
+using Hangfire;
+using Hangfire.PostgreSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +57,19 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddBusExt(builder.Configuration);
 builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 
+// Add Hangfire services
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UsePostgreSqlStorage(options =>
+        options.UseNpgsqlConnection(builder.Configuration.GetSection("Hangfire:ConnectionString").Value)));
+
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = builder.Configuration.GetValue<int>("Hangfire:WorkerCount", 5);
+});
+
 
 var app = builder.Build();
 
@@ -71,6 +86,9 @@ if (app.Environment.IsDevelopment())
             options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
         }
     });
+    
+    // Add Hangfire Dashboard
+    app.UseHangfireDashboard(builder.Configuration.GetValue<string>("Hangfire:DashboardPath", "/hangfire"));
 }
 
 app.UseHttpsRedirection();

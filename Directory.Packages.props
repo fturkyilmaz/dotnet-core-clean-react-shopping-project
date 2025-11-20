@@ -17,6 +17,11 @@
     <PackageVersion Include="FluentValidation" Version="12.1.0" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
+    <PackageVersion Include="Hangfire.Core" Version="1.8.18" />
+    <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.18" />
+    <PackageVersion Include="Hangfire.PostgreSql" Version="1.20.10" />
+    <PackageVersion Include="MassTransit" Version="8.3.0" />
+    <PackageVersion Include="MassTransit.RabbitMQ" Version="8.3.0" />
     <PackageVersion Include="MediatR" Version="13.1.0" />
     <PackageVersion Include="MediatR.Contracts" Version="2.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer"
@@ -28,12 +33,15 @@
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.14.28" />
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="5.2.2" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json"
       Version="$(MicrosoftExtensionsVersion)" />
@@ -45,7 +53,10 @@
       Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageVersion Include="Microsoft.Playwright" Version="1.56.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageVersion Include="NSwag.AspNetCore" Version="14.6.2" />
     <PackageVersion Include="NSwag.MSBuild" Version="14.6.2" />
     <PackageVersion Include="nunit" Version="4.4.0" />
@@ -54,24 +65,18 @@
     <PackageVersion Include="Respawn" Version="6.2.1" />
     <PackageVersion Include="Serilog.AspNetCore" Version="8.0.1" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageVersion Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
-    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
-    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="$(AspnetVersion)" />
-    <PackageVersion Include="Microsoft.Playwright" Version="1.56.0" />
     <PackageVersion Include="SpecFlow.Plus.LivingDocPlugin" Version="3.9.57" />
     <PackageVersion Include="SpecFlow.NUnit" Version="3.9.74" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfcoreVersion)" />
-    <PackageVersion Include="Testcontainers.MsSql" Version="4.8.1" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageVersion Include="StackExchange.Redis" Version="2.9.32" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.6.0.2" />
+    <PackageVersion Include="Testcontainers.MsSql" Version="4.8.1" />
     <PackageVersion Include="xunit" Version="2.5.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
-    <PackageVersion Include="MassTransit" Version="8.3.0" />
-    <PackageVersion Include="MassTransit.RabbitMQ" Version="8.3.0" />
-    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.6.0.2" />
   </ItemGroup>
 </Project>
