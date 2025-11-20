@@ -1,6 +1,7 @@
 using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 
@@ -9,6 +10,7 @@ namespace ShoppingProject.WebApi.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [Authorize]  
     public class CartsController : ControllerBase
     {
         private readonly ICartService _cartService;

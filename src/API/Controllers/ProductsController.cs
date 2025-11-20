@@ -2,6 +2,8 @@
 using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Interfaces;
 using ShoppingProject.Domain.Common;
+using ShoppingProject.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 
@@ -20,6 +22,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResult<IEnumerable<ProductDto>>>> GetAll()
         {
              var result = await _productService.GetAllAsync();
@@ -27,6 +30,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResult<ProductDto>>> GetById(int id)
         {
             var result = await _productService.GetByIdAsync(id);
@@ -34,6 +38,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = Policies.CanManageProducts)]
         public async Task<ActionResult<ServiceResult<ProductDto>>> Create(CreateProductDto dto)
         {
             var result = await _productService.CreateAsync(dto);
@@ -41,6 +46,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = Policies.CanManageProducts)]
         public async Task<ActionResult<ServiceResult<bool>>> Update(int id, UpdateProductDto dto)
         {
             var result = await _productService.UpdateAsync(id, dto);
@@ -48,6 +54,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = Policies.CanManageProducts)]
         public async Task<ActionResult<ServiceResult<bool>>> Delete(int id)
         {
             var result = await _productService.DeleteAsync(id);
@@ -55,6 +62,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpPost("search")]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResult<IPaginate<ProductDto>>>> Search(
             [FromBody] DynamicQuery dynamicQuery,
             [FromQuery] int index = 0,

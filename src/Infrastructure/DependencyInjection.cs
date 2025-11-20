@@ -21,6 +21,7 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+        builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
@@ -31,8 +32,6 @@ public static class DependencyInjection
 
 
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
-
-        builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
         builder.Services
             .AddIdentity<ApplicationUser, IdentityRole>()

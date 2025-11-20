@@ -27,9 +27,30 @@ public class IdentityController : ControllerBase
 
         return Ok(ServiceResult<string>.Success(token));
     }
+
+    [HttpPost("register")]
+    public async Task<ActionResult<ServiceResult<string>>> Register(RegisterRequest request)
+    {
+       var (result, userId) = await _identityService.CreateUserAsync(
+            request.Email, 
+            request.Password);
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
+        }
+
+        return Ok(ServiceResult<string>.Success("User registered successfully"));
+    }
 }
 
 public class LoginRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+}
+
+public class RegisterRequest
 {
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;

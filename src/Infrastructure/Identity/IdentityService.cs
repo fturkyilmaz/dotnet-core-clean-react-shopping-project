@@ -101,6 +101,33 @@ public class IdentityService : IIdentityService
         return (Result.Success(), token);
     }
 
+    public async Task<Result> RegisterAsync(string email, string password, string? firstName = null, string? lastName = null)
+    {
+        var existingUser = await _userManager.FindByEmailAsync(email);
+        
+        if (existingUser != null)
+        {
+            return Result.Failure(new[] { "User with this email already exists." });
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = email,
+            Email = email,
+            FirstName = firstName,
+            LastName = lastName
+        };
+
+        var result = await _userManager.CreateAsync(user, password);
+
+        if (!result.Succeeded)
+        {
+            return Result.Failure(result.Errors.Select(e => e.Description).ToArray());
+        }
+
+        return Result.Success();
+    }
+
     private string GenerateJwtToken(ApplicationUser user)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
