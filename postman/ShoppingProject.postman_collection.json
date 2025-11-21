@@ -1,0 +1,589 @@
+{
+    "info": {
+        "name": "Shopping Project API",
+        "_postman_id": "shopping-project-api-v1",
+        "description": "Complete API collection for Shopping Project with authentication, products, carts, and cache management.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "version": "1.0.0"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "{{baseUrl}}",
+            "type": "string"
+        },
+        {
+            "key": "apiVersion",
+            "value": "{{apiVersion}}",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Identity",
+            "item": [
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.succeeded && response.data) {",
+                                    "        pm.environment.set('token', response.data);",
+                                    "        pm.collectionVariables.set('token', response.data);",
+                                    "        console.log('Token saved:', response.data);",
+                                    "    }",
+                                    "}",
+                                    "",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has token', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.succeeded).to.be.true;",
+                                    "    pm.expect(jsonData.data).to.be.a('string');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Identity/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Identity",
+                                "login"
+                            ]
+                        },
+                        "description": "Authenticate user and receive JWT token"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Register",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Registration successful', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.succeeded).to.be.true;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"User123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Identity/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Identity",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new user account"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Assign Admin Role",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Identity/:userId/assign-admin-role",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Identity",
+                                ":userId",
+                                "assign-admin-role"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "userId",
+                                    "value": "user-id-here"
+                                }
+                            ]
+                        },
+                        "description": "Assign administrator role to a user"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Role",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Identity/roles/:roleName",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Identity",
+                                "roles",
+                                ":roleName"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "roleName",
+                                    "value": "Manager"
+                                }
+                            ]
+                        },
+                        "description": "Create a new role in the system"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Authentication and user management endpoints"
+        },
+        {
+            "name": "Products",
+            "item": [
+                {
+                    "name": "Get All Products",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response is array', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.be.an('array');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Products",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Products"
+                            ]
+                        },
+                        "description": "Retrieve all products (anonymous access)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Product by ID",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Products/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Products",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Retrieve a specific product by ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Product ID returned', function () {",
+                                    "    const productId = pm.response.json();",
+                                    "    pm.expect(productId).to.be.a('number');",
+                                    "    pm.collectionVariables.set('lastProductId', productId);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"New Product\",\n  \"price\": 29.99,\n  \"description\": \"A great product description\",\n  \"category\": \"Electronics\",\n  \"image\": \"https://example.com/image.jpg\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Products",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Products"
+                            ]
+                        },
+                        "description": "Create a new product (requires CanManageProducts policy)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Product",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": 1,\n  \"title\": \"Updated Product\",\n  \"price\": 39.99,\n  \"description\": \"Updated description\",\n  \"category\": \"Electronics\",\n  \"image\": \"https://example.com/updated-image.jpg\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Products/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Products",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Update an existing product (requires CanManageProducts policy)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Product",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Products/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Products",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Delete a product (requires CanManageProducts policy)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Search Products",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"filter\": {\n    \"field\": \"category\",\n    \"operator\": \"eq\",\n    \"value\": \"Electronics\"\n  },\n  \"sort\": [\n    {\n      \"field\": \"price\",\n      \"dir\": \"asc\"\n    }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Products/search?index=0&size=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Products",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "index",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10"
+                                }
+                            ]
+                        },
+                        "description": "Search products with dynamic query and pagination"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Product management endpoints"
+        },
+        {
+            "name": "Carts",
+            "item": [
+                {
+                    "name": "Get All Carts",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Carts",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Carts"
+                            ]
+                        },
+                        "description": "Retrieve all carts"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Cart by ID",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Carts/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Carts",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Retrieve a specific cart by ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Cart",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"userId\": 1,\n  \"date\": \"2024-01-01\",\n  \"products\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 2\n    }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Carts",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Carts"
+                            ]
+                        },
+                        "description": "Create a new cart (requires CanPurge policy)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Cart",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": 1,\n  \"userId\": 1,\n  \"date\": \"2024-01-02\",\n  \"products\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 3\n    }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Carts/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Carts",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Update an existing cart (requires CanPurge policy)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Cart",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v{{apiVersion}}/Carts/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v{{apiVersion}}",
+                                "Carts",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Delete a cart (requires CanPurge policy)"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Shopping cart management endpoints"
+        }
+    ]
+}

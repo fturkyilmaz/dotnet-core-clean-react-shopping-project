@@ -1,16 +1,16 @@
-﻿using ShoppingProject.Application.DTOs;
+﻿using Asp.Versioning;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Products.Commands.CreateProduct;
-using ShoppingProject.Application.Products.Commands.UpdateProduct;
 using ShoppingProject.Application.Products.Commands.DeleteProduct;
-using ShoppingProject.Application.Products.Queries.GetProducts;
+using ShoppingProject.Application.Products.Commands.UpdateProduct;
 using ShoppingProject.Application.Products.Queries.GetProductById;
+using ShoppingProject.Application.Products.Queries.GetProducts;
 using ShoppingProject.Application.Products.Queries.SearchProducts;
 using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Constants;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Asp.Versioning;
-using MediatR;
 
 namespace ShoppingProject.WebApi.Controllers
 {
@@ -28,6 +28,7 @@ namespace ShoppingProject.WebApi.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [Microsoft.AspNetCore.OutputCaching.OutputCache(PolicyName = "ProductsList")]
         public async Task<ActionResult<List<ProductDto>>> GetAll()
         {
             var products = await _sender.Send(new GetProductsQuery());
@@ -36,6 +37,7 @@ namespace ShoppingProject.WebApi.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
+        [Microsoft.AspNetCore.OutputCaching.OutputCache(PolicyName = "ProductDetail")]
         public async Task<ActionResult<ProductDto>> GetById(int id)
         {
             var product = await _sender.Send(new GetProductByIdQuery(id));
@@ -76,7 +78,8 @@ namespace ShoppingProject.WebApi.Controllers
         public async Task<ActionResult<IPaginate<ProductDto>>> Search(
             [FromBody] DynamicQuery dynamicQuery,
             [FromQuery] int index = 0,
-            [FromQuery] int size = 10)
+            [FromQuery] int size = 10
+        )
         {
             var result = await _sender.Send(new SearchProductsQuery(dynamicQuery, index, size));
             return Ok(result);

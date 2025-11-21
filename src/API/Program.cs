@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using AspNetCoreRateLimit;
 using Hangfire;
 using Hangfire.PostgreSql;
 using HealthChecks.UI.Client;
@@ -20,6 +21,37 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog(
     (context, configuration) => configuration.ReadFrom.Configuration(context.Configuration)
 );
+
+// Add Rate Limiting
+builder.Services.AddMemoryCache();
+builder.Services.Configure<AspNetCoreRateLimit.IpRateLimitOptions>(
+    builder.Configuration.GetSection("IpRateLimiting")
+);
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<
+    AspNetCoreRateLimit.IRateLimitConfiguration,
+    AspNetCoreRateLimit.RateLimitConfiguration
+>();
+
+// Add Caching
+builder.Services.AddResponseCaching();
+builder.Services.AddOutputCache(options =>
+{
+    // Default policy: cache for 60 seconds
+    options.AddBasePolicy(builder => builder.Expire(TimeSpan.FromSeconds(60)));
+
+    // Products list policy: cache for 2 minutes
+    options.AddPolicy(
+        "ProductsList",
+        builder => builder.Expire(TimeSpan.FromMinutes(2)).Tag("products")
+    );
+
+    // Product detail policy: cache for 5 minutes with ETag
+    options.AddPolicy(
+        "ProductDetail",
+        builder => builder.Expire(TimeSpan.FromMinutes(5)).Tag("products").SetVaryByQuery("id")
+    );
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -130,6 +162,52 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Security Headers
+app.Use(
+    async (context, next) =>
+    {
+        // HSTS - HTTP Strict Transport Security
+        context.Response.Headers.Append(
+            "Strict-Transport-Security",
+            "max-age=31536000; includeSubDomains"
+        );
+
+        // Prevent MIME sniffing
+        context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+
+        // Prevent clickjacking
+        context.Response.Headers.Append("X-Frame-Options", "DENY");
+
+        // XSS Protection
+        context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+
+        // Content Security Policy
+        context.Response.Headers.Append(
+            "Content-Security-Policy",
+            "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'"
+        );
+
+        // Referrer Policy
+        context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+
+        // Permissions Policy
+        context.Response.Headers.Append(
+            "Permissions-Policy",
+            "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+        );
+
+        await next();
+    }
+);
+
+// Rate Limiting
+app.UseIpRateLimiting();
+
+// Caching
+app.UseResponseCaching();
+app.UseOutputCache();
+
 app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();

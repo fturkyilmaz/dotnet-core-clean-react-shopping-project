@@ -1,6 +1,7 @@
+using Ardalis.GuardClauses;
+using Microsoft.EntityFrameworkCore;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.DTOs;
-using Ardalis.GuardClauses;
 
 namespace ShoppingProject.Application.Products.Queries.GetProductById;
 
@@ -10,21 +11,40 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly ICacheService _cacheService;
 
-    public GetProductByIdQueryHandler(IApplicationDbContext context, IMapper mapper)
+    public GetProductByIdQueryHandler(
+        IApplicationDbContext context,
+        IMapper mapper,
+        ICacheService cacheService
+    )
     {
         _context = context;
         _mapper = mapper;
+        _cacheService = cacheService;
     }
 
-    public async Task<ProductDto> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
+    public async Task<ProductDto> Handle(
+        GetProductByIdQuery request,
+        CancellationToken cancellationToken
+    )
     {
-        var product = await Task.FromResult(_context.Products
-            .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
-            .FirstOrDefault(p => p.Id == request.Id));
+        var key = $"product-{request.Id}";
 
-        Guard.Against.NotFound(request.Id, product);
+        return await _cacheService.GetOrSetAsync(
+            key,
+            async () =>
+            {
+                var product = await _context
+                    .Products.ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
+                    .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
 
-        return product;
+                Guard.Against.NotFound(request.Id, product);
+
+                return product;
+            },
+            TimeSpan.FromMinutes(10),
+            cancellationToken
+        );
     }
 }
