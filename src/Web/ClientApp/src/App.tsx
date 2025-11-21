@@ -1,19 +1,32 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Header from "./components/Header";
-import HomePage from "./pages/HomePage";
-import CheckoutPage from "./pages/CheckoutPage";
-import Category from "./pages/CategoryPage";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './i18n/config'; // Initialize i18n
+
+import { store } from './store';
+import { queryClient } from './api/queryClient';
+import Header from './components/Header';
+import HomePage from './pages/HomePage';
+import CartsPage from './pages/CartsPage';
+import Category from './pages/CategoryPage';
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/category" element={<Category />} />
-      </Routes>
-    </BrowserRouter>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Header />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/carts" element={<CartsPage />} />
+            <Route path="/category" element={<Category />} />
+          </Routes>
+          <ToastContainer position="top-right" autoClose={3000} />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </Provider>
   );
 };
 

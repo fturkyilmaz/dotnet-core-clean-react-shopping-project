@@ -12,8 +12,16 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   succeeded: boolean;
-  data?: string; // JWT token
+  data?: {
+    token: string;
+    refreshToken: string;
+  };
   errors?: string;
+}
+
+export interface RefreshTokenRequest {
+  token: string;
+  refreshToken: string;
 }
 
 export const authApi = {
@@ -27,8 +35,14 @@ export const authApi = {
     return response.data;
   },
 
+  refreshToken: async (data: RefreshTokenRequest): Promise<AuthResponse> => {
+    const response = await apiClient.post('/Identity/refresh', data);
+    return response.data;
+  },
+
   logout: async (): Promise<void> => {
     // Clear local storage
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
   },
 };

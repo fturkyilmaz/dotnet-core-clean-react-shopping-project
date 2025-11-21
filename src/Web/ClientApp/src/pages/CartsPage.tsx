@@ -3,7 +3,7 @@ import { useBasket } from "../hooks";
 import BasketItem from "../components/BasketItem";
 import { Link } from "react-router-dom";
 
-const CheckoutPage: FC = () => {
+const CartsPage: FC = () => {
   const { basket, addToBasket, removeFromBasket, purchaseBasket, totalItems, totalPrice } = useBasket();
 
   const shippingCost = totalPrice > 0 ? 29.99 : 0;
@@ -172,4 +172,4 @@ const CheckoutPage: FC = () => {
   );
 };
 
-export default CheckoutPage;
+export default CartsPage;
