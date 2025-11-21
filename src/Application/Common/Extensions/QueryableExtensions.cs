@@ -1,6 +1,7 @@
 using System.Linq.Dynamic.Core;
 using ShoppingProject.Domain.Common;
 using System.Text;
+using System.Reflection;
 
 namespace ShoppingProject.Application.Common.Extensions;
 
@@ -25,7 +26,7 @@ public static class QueryableExtensions
 
     private static IQueryable<T> ApplyFilter<T>(this IQueryable<T> query, Filter filter)
     {
-        var whereClause = BuildWhereClause(filter);
+        var whereClause = BuildWhereClause(filter, typeof(T));
         if (!string.IsNullOrEmpty(whereClause))
         {
             query = query.Where(whereClause);
@@ -33,7 +34,7 @@ public static class QueryableExtensions
         return query;
     }
 
-    private static string BuildWhereClause(Filter filter)
+    private static string BuildWhereClause(Filter filter, Type entityType)
     {
         if (filter == null) return string.Empty;
 
@@ -41,7 +42,7 @@ public static class QueryableExtensions
 
         if (filter.Filters != null && filter.Filters.Any())
         {
-            var childFilters = filter.Filters.Select(BuildWhereClause).Where(f => !string.IsNullOrEmpty(f)).ToList();
+            var childFilters = filter.Filters.Select(f => BuildWhereClause(f, entityType)).Where(f => !string.IsNullOrEmpty(f)).ToList();
             if (childFilters.Any())
             {
                 var logic = string.IsNullOrEmpty(filter.Logic) ? "and" : filter.Logic;
@@ -53,20 +54,27 @@ public static class QueryableExtensions
             var op = GetOperator(filter.Operator);
             var value = filter.Value;
             
-            // Basic handling for string/number values
-            // Note: This is a simplified implementation and might need adjustment based on actual Filter usage
             if (value != null)
             {
-                if (op == "contains")
+                var property = entityType.GetProperty(filter.Field, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                var isString = property?.PropertyType == typeof(string);
+
+                if (isString)
                 {
-                    sb.Append($"{filter.Field}.Contains(\"{value}\")");
+                    var safeValue = value.Replace("\"", "\\\"");
+                    if (op == "contains")
+                    {
+                        sb.Append($"({filter.Field} != null && {filter.Field}.ToLower().Contains(\"{safeValue.ToLower()}\"))");
+                    }
+                    else
+                    {
+                        sb.Append($"({filter.Field} != null && {filter.Field}.ToLower() {op} \"{safeValue.ToLower()}\")");
+                    }
                 }
                 else
                 {
-                    // Handle numeric vs string values? 
-                    // System.Linq.Dynamic.Core handles some auto-conversion but quoting strings is safer
-                    // Assuming string for simplicity or relying on parser
-                    // For now, let's assume string and quote it
+                    // Handle numeric/other types
+                    // Assuming value is safe or relying on parser
                     sb.Append($"{filter.Field} {op} \"{value}\"");
                 }
             }

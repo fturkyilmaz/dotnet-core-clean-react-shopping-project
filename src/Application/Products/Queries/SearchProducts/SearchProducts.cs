@@ -42,6 +42,13 @@ public class SearchProductsQueryHandler : IRequestHandler<SearchProductsQuery, I
 
         var totalCount = products.Count();
 
-        return await Task.FromResult(new Paginate<ProductDto>(paginatedProducts, request.Index, request.Size, totalCount));
+        return await Task.FromResult(new Paginate<ProductDto>
+        {
+            Items = paginatedProducts,
+            Index = request.Index,
+            Size = request.Size,
+            Count = totalCount,
+            Pages = (int)Math.Ceiling(totalCount / (double)request.Size)
+        });
     }
 }
