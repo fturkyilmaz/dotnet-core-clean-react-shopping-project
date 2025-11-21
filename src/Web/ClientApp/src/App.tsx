@@ -11,6 +11,7 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import CartsPage from './pages/CartsPage';
 import Category from './pages/CategoryPage';
+import ProductDetailPage from './pages/ProductDetailPage';
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Header />
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
             <Route path="/carts" element={<CartsPage />} />
             <Route path="/category" element={<Category />} />
           </Routes>

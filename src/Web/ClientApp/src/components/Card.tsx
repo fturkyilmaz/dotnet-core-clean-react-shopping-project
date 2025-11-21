@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useBasket } from "../hooks";
 import type { Product } from "../types";
 import type { FC } from "react";
@@ -15,30 +16,34 @@ const Card: FC<CardProps> = ({ product }) => {
 
   return (
     <div className="product-card card border-0 shadow-sm h-100" style={{ transition: "all 0.3s ease" }}>
-      <div className="position-relative overflow-hidden" style={{ height: "200px", backgroundColor: "#f8f9fa" }}>
-        <img
-          className="w-100 h-100 object-fit-contain p-3"
-          src={product.image}
-          alt={product.title}
-          style={{ transition: "transform 0.3s ease" }}
-        />
-        {product.rating && (
-          <div className="position-absolute top-0 end-0 m-2">
-            <span className="badge bg-warning text-dark">
-              ⭐ {product.rating.rate.toFixed(1)}
-            </span>
-          </div>
-        )}
-      </div>
+      <Link to={`/product/${product.id}`} className="text-decoration-none">
+        <div className="position-relative overflow-hidden" style={{ height: "200px", backgroundColor: "#f8f9fa" }}>
+          <img
+            className="w-100 h-100 object-fit-contain p-3"
+            src={product.image}
+            alt={product.title}
+            style={{ transition: "transform 0.3s ease" }}
+          />
+          {product.rating && (
+            <div className="position-absolute top-0 end-0 m-2">
+              <span className="badge bg-warning text-dark">
+                ⭐ {product.rating.rate.toFixed(1)}
+              </span>
+            </div>
+          )}
+        </div>
+      </Link>
 
       <div className="card-body d-flex flex-column">
         <span className="badge bg-secondary w-fit mb-2 text-capitalize" style={{ width: "fit-content" }}>
           {product.category}
         </span>
 
-        <h5 className="card-title fw-bold mb-2 text-truncate" title={product.title}>
-          {product.title}
-        </h5>
+        <Link to={`/product/${product.id}`} className="text-decoration-none">
+          <h5 className="card-title fw-bold mb-2 text-truncate text-dark" title={product.title}>
+            {product.title}
+          </h5>
+        </Link>
 
         <div className="mt-auto">
           <div className="d-flex justify-content-between align-items-center mb-3">
