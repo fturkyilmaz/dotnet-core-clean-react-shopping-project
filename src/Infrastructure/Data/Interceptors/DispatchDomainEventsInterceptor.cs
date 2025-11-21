@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using ShoppingProject.Application.Common.Models;
 
 namespace ShoppingProject.Infrastructure.Data.Interceptors;
 
@@ -46,7 +47,13 @@ public class DispatchDomainEventsInterceptor : SaveChangesInterceptor
 
         foreach (var domainEvent in domainEvents)
         {
-            await _mediator.Publish(domainEvent, cancellationToken);
+            await _mediator.Publish(GetNotificationCorrespondingToDomainEvent(domainEvent), cancellationToken);
         }
+    }
+
+    private INotification GetNotificationCorrespondingToDomainEvent(BaseEvent domainEvent)
+    {
+        return (INotification)Activator.CreateInstance(
+            typeof(DomainEventNotification<>).MakeGenericType(domainEvent.GetType()), domainEvent)!;
     }
 }

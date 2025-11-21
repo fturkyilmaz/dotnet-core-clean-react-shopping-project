@@ -1,10 +1,13 @@
-using ShoppingProject.Domain.Interfaces;
+using ShoppingProject.Domain.Common;
 
 namespace ShoppingProject.Domain.Events;
 
-public class ProductAddedEvent : IEventOrMessage
+public class ProductAddedEvent : BaseEvent
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public decimal Price { get; set; }
+    public ProductAddedEvent(Product item)
+    {
+        Item = item;
+    }
+
+    public Product Item { get; }
 }

@@ -7,7 +7,7 @@ namespace ShoppingProject.Infrastructure.Bus.Consumers
     {
         public Task Consume(ConsumeContext<ProductAddedEvent> context)
         {
-            Console.WriteLine($"Received Event: {context.Message.Id} - {context.Message.Name} - {context.Message.Price}");
+            Console.WriteLine($"Received Event: {context.Message.Item.Id} - {context.Message.Item.Title} - {context.Message.Item.Price}");
             return Task.CompletedTask;
         }
     }

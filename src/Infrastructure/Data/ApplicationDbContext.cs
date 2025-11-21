@@ -17,6 +17,19 @@ namespace ShoppingProject.Infrastructure.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Cart> Carts { get; set; }
 
+        IQueryable<Product> IApplicationDbContext.Products => Products;
+        IQueryable<Cart> IApplicationDbContext.Carts => Carts;
+
+        public new void Add<T>(T entity) where T : class
+        {
+            base.Add(entity);
+        }
+
+        public new void Remove<T>(T entity) where T : class
+        {
+            base.Remove(entity);
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
