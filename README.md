@@ -1,168 +1,159 @@
-# Clean Architecture .NET Solution Template
+# ShoppingProject - Clean Architecture .NET & React.js Solution
 
-## 🌟 Overview
-A modern, clean architecture template for .NET applications following domain-driven design principles and best practices. This template provides a solid foundation for building scalable, maintainable, and testable applications.
+A modern, scalable e-commerce backend built with .NET 9/10, following Clean Architecture principles, CQRS, and Domain-Driven Design (DDD).
+
+## 🚀 Technology Stack
+
+- **Core Framework**: .NET 9/10 (C#)
+- **Architecture**: Clean Architecture, CQRS (MediatR)
+- **Database**: PostgreSQL (Entity Framework Core)
+- **Caching**: Redis (Distributed Cache)
+- **Messaging**: RabbitMQ (MassTransit)
+- **Background Jobs**: Hangfire
+- **Logging & Observability**: ELK Stack (Elasticsearch, Logstash, Kibana), Serilog
+- **Monitoring**: Health Checks, Health Checks UI
+- **Validation**: FluentValidation
+- **Object Mapping**: AutoMapper
+- **API Documentation**: Swagger / OpenAPI
+- **Testing**: xUnit, Moq, FluentAssertions
 
 ## 🏗️ Architecture Overview
+
+The solution is organized into four concentric layers:
+
+1.  **Domain**: Enterprise logic, Entities, Value Objects, Domain Events, Repository Interfaces. (No dependencies)
+2.  **Application**: Business logic, Use Cases (CQRS Commands/Queries), DTOs, Validators. (Depends on Domain)
+3.  **Infrastructure**: Implementation of interfaces (EF Core, Repositories, Services), External integrations. (Depends on Application)
+4.  **WebApi**: API Controllers, Middleware, Entry Point. (Depends on Application & Infrastructure)
+
+## 📂 Project Structure
 
 ```
 ShoppingProject/
 ├── Domain/             # Enterprise/domain entities & business rules
 ├── Application/        # Business logic & use cases
 ├── Infrastructure/     # External concerns (database, file systems, etc.)
-├── WebApi/            # User interface & API endpoints
-└── UnitTests/         # Unit tests for all layers
+├── WebApi/             # User interface & API endpoints
+├── Web/                # Frontend React.js application
+└── UnitTests/          # Unit tests for all layers
 ```
 
-### Layer Details
+## ✨ Key Features
 
-#### 🎯 Domain Layer
-- Contains enterprise/business logic
-- Entities
-- Value Objects
-- Domain Events
-- Interfaces
-- Business Rules
-- No dependencies on other layers
+- **CQRS Pattern**: Separation of Read and Write operations using MediatR.
+- **Domain Events**: Decoupled business logic using event-driven architecture.
+- **Event Bus**: Asynchronous communication via RabbitMQ (e.g., Cart Created events).
+- **Centralized Logging**: Structured logging with Serilog pushing to Elasticsearch/Kibana.
+- **Health Monitoring**: Real-time health checks for Database, Redis, RabbitMQ, and APIs.
+- **Background Processing**: Reliable background jobs using Hangfire.
+- **Global Exception Handling**: Centralized error handling and standardized API responses.
+- **API Versioning**: Support for multiple API versions.
 
-#### 🔄 Application Layer
-- Contains application logic
-- Implements use cases
-- DTOs
-- Interfaces
-- Service implementations
-- Dependencies: Domain layer
+## 🗄️ Database Configuration
 
-#### 🛠️ Infrastructure Layer
-- Implementation of interfaces from Domain/Application layers
-- Database contexts
-- Repositories implementations
-- External service implementations
-- Dependencies: Domain and Application layers
+The project uses **PostgreSQL** as the primary database and **Redis** for caching.
 
-#### 🌐 WebApi Layer
-- API Controllers
-- API Models
-- Middleware
-- Dependencies: Application layer
+- **Connection Strings**: Configured in `appsettings.json`.
+- **Migrations**: Managed via Entity Framework Core.
+- **Seeding**: Automatic seeding of initial data on startup.
 
-## 🚀 Getting Started
+## 🛠️ Getting Started
 
 ### Prerequisites
-- .NET 8.0 SDK or later
-- Visual Studio 2022 or VS Code
-- SQL Server (optional - template uses InMemory database by default)
 
-### Installation
+- **Docker Desktop** (Required for infrastructure)
+- **.NET 9.0 SDK** (or later)
 
-1. Clone the repository
+### Infrastructure Setup
+
+Start all required services (PostgreSQL, Redis, RabbitMQ, Elasticsearch, Kibana) using Docker Compose:
+
 ```bash
-git clone
+docker compose up -d
 ```
 
-2. Build the solution
+### Database Migration
+
+Apply pending migrations to the PostgreSQL database:
+
 ```bash
-dotnet build
+dotnet tool install --global dotnet-ef
+dotnet ef database update --project src/Infrastructure/ShoppingProject.Infrastructure.csproj --startup-project src/API/ShoppingProject.WebApi.csproj
 ```
 
-3. Run the tests
+### Running the Application
+
+Run the Web API:
+
+```bash
+dotnet run --project src/API/ShoppingProject.WebApi.csproj
+```
+
+## 📊 Observability & Monitoring
+
+### Health Checks UI
+Monitor the status of all dependencies (DB, Cache, Broker, etc.):
+- URL: `http://localhost:5000/health-ui` (or configured port)
+
+### Kibana (Logs)
+View centralized application logs:
+- URL: `http://localhost:5601`
+- Index Pattern: `shoppingproject-logs-*`
+
+### Hangfire Dashboard
+Manage background jobs:
+- URL: `http://localhost:5000/hangfire`
+
+### Swagger Documentation
+Explore and test API endpoints:
+- URL: `http://localhost:5000/swagger`
+
+## 🔌 API Endpoints
+
+### Products (`/api/v1/Products`)
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET    | `/`      | Get all products | No |
+| GET    | `/{id}`  | Get product by ID | No |
+| POST   | `/`      | Create new product | Yes (Admin) |
+| PUT    | `/{id}`  | Update product | Yes (Admin) |
+| DELETE | `/{id}`  | Delete product | Yes (Admin) |
+| POST   | `/search`| Search products with dynamic query | No |
+
+### Carts (`/api/v1/Carts`)
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET    | `/`      | Get all carts | No |
+| GET    | `/{id}`  | Get cart by ID | No |
+| POST   | `/`      | Create new cart | Yes |
+| PUT    | `/{id}`  | Update cart | Yes |
+| DELETE | `/{id}`  | Delete cart | Yes |
+
+### Identity (`/api/v1/Identity`)
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST   | `/login` | User login | No |
+| POST   | `/register` | User registration | No |
+| POST   | `/{userId}/assign-admin-role` | Assign admin role to user | No (Dev only) |
+| POST   | `/roles/{roleName}` | Create new role | No (Dev only) |
+
+### Cache (`/api/v1/Cache`)
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET    | `/{key}` | Get value from Redis | No |
+| POST   | `/set`   | Set value in Redis | No |
+| DELETE | `/{key}` | Remove value from Redis | No |
+
+## 🧪 Testing
+
+Run unit tests:
+
 ```bash
 dotnet test
 ```
 
-4. Run the application
-```bash
-cd ShoppingProject.WebApi
-dotnet run
-```
-
-### API Endpoints
-
-#### Products API
-```
-GET     /api/products      # Get all products
-GET     /api/products/{id} # Get product by id
-POST    /api/products      # Create new product
-PUT     /api/products/{id} # Update product
-DELETE  /api/products/{id} # Delete product
-```
-
-## 🧪 Testing
-
-### Unit Tests
-The solution includes comprehensive unit tests for all layers:
-
-- **Domain Tests**: Testing business rules and entity behavior
-- **Application Tests**: Testing service implementations with mocked dependencies
-- **Infrastructure Tests**: Testing repository implementations using in-memory database
-
-Run unit tests:
-```bash
-dotnet test ShoppingProject.UnitTests/ShoppingProject.UnitTests.csproj
-```
-
-## 📝 Project Structure
-
-```
-ShoppingProject/
-├── Domain/
-│   ├── Entities/
-│   │   └── Product.cs
-│   └── Interfaces/
-│       └── IProductRepository.cs
-│
-├── Application/
-│   ├── DTOs/
-│   │   └── ProductDto.cs
-│   ├── Interfaces/
-│   │   └── IProductService.cs
-│   └── Services/
-│       └── ProductService.cs
-│
-├── Infrastructure/
-│   ├── Data/
-│   │   └── ApplicationDbContext.cs
-│   └── Repositories/
-│       └── ProductRepository.cs
-│
-├── WebApi/
-│   ├── Controllers/
-│   │   └── ProductsController.cs
-│   └── Program.cs
-│
-└── UnitTests/
-    ├── Domain/
-    │   └── ProductTests.cs
-    ├── Application/
-    │   └── ProductServiceTests.cs
-    └── Infrastructure/
-        └── ProductRepositoryTests.cs
-```
-
-## 🛠️ Technology Stack
-
-- **.NET 10.0**: Modern, high-performance framework
-- **Entity Framework Core**: ORM for data access
-- **xUnit**: Testing framework
-- **Moq**: Mocking framework for unit tests
-- **Swagger/OpenAPI**: API documentation
-- **InMemory Database**: For testing and development
-
-## 🎯 Features
-
-- ✅ Clean Architecture implementation
-- ✅ Domain-Driven Design principles
-- ✅ SOLID principles
-- ✅ Unit testing with xUnit and Moq
-- ✅ InMemory database for testing
-- ✅ Swagger documentation
-- ✅ API versioning
-- ✅ Dependency Injection
-- ✅ Async/await best practices
-
 ## 🙏 Acknowledgments
 
-- Clean Architecture by Robert C. Martin
-- Microsoft .NET Documentation
-- Entity Framework Core Documentation
-- xUnit Documentation
+- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) by Robert C. Martin
+- [Domain-Driven Design](https://www.amazon.com/Domain-Driven-Design-Tackling-Complexity-Software/dp/0321125215) by Eric Evans
+- [jasontaylordev/CleanArchitecture](https://github.com/jasontaylordev/CleanArchitecture) for inspiration.
