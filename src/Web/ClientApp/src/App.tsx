@@ -14,6 +14,8 @@ import Category from './pages/CategoryPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import AdminDashboard from './pages/AdminDashboard';
+import AddProductPage from './pages/AddProductPage';
 
 const App = () => {
   return (
@@ -28,6 +30,8 @@ const App = () => {
             <Route path="/category" element={<Category />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/products/add" element={<AddProductPage />} />
           </Routes>
           <ToastContainer position="top-right" autoClose={3000} />
         </BrowserRouter>

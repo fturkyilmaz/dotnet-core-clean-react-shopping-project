@@ -82,6 +82,12 @@ const Header: FC = () => {
                   )}
                 </NavLink>
               </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/admin">
+                  <i className="bi bi-speedometer2 me-1"></i>
+                  Admin
+                </NavLink>
+              </li>
             </ul>
 
             {/* Language & Theme Controls */}
