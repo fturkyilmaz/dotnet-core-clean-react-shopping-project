@@ -1,103 +1,123 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { FC, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
-const loginSchema = z.object({
-    email: z.string().email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
-
-export default function LoginPage() {
+const LoginPage: FC = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
-    const { login, isLoggingIn } = useAuth();
-    const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<LoginFormData>({
-        resolver: zodResolver(loginSchema),
-    });
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
 
-    useEffect(() => {
-        if (isAuthenticated) {
+        try {
+            // TODO: Implement actual login API call
+            // const response = await authApi.login({ email, password });
+
+            // Mock login for now
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            toast.success(t('loginSuccess'));
             navigate('/');
+        } catch (error) {
+            toast.error(t('loginFailed'));
+        } finally {
+            setIsLoading(false);
         }
-    }, [isAuthenticated, navigate]);
-
-    const onSubmit = (data: LoginFormData) => {
-        login(data);
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Sign in to your account
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
-                        Or{' '}
-                        <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
-                            create a new account
-                        </Link>
-                    </p>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="rounded-md shadow-sm -space-y-px">
-                        <div>
-                            <label htmlFor="email" className="sr-only">
-                                Email address
-                            </label>
-                            <input
-                                {...register('email')}
-                                id="email"
-                                type="email"
-                                autoComplete="email"
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                                placeholder="Email address"
-                            />
-                            {errors.email && (
-                                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-                            )}
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="sr-only">
-                                Password
-                            </label>
-                            <input
-                                {...register('password')}
-                                id="password"
-                                type="password"
-                                autoComplete="current-password"
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                                placeholder="Password"
-                            />
-                            {errors.password && (
-                                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-                            )}
-                        </div>
-                    </div>
+        <div className="container">
+            <div className="row justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+                <div className="col-md-6 col-lg-5">
+                    <div className="card shadow-lg border-0">
+                        <div className="card-body p-5">
+                            {/* Header */}
+                            <div className="text-center mb-4">
+                                <h2 className="fw-bold">{t('signIn')}</h2>
+                                <p className="text-muted">
+                                    {t('dontHaveAccount')}{' '}
+                                    <Link to="/register" className="text-primary text-decoration-none fw-semibold">
+                                        {t('signUp')}
+                                    </Link>
+                                </p>
+                            </div>
 
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={isLoggingIn}
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
-                        >
-                            {isLoggingIn ? 'Signing in...' : 'Sign in'}
-                        </button>
+                            {/* Login Form */}
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-3">
+                                    <label htmlFor="email" className="form-label fw-semibold">
+                                        {t('email')}
+                                    </label>
+                                    <input
+                                        type="email"
+                                        className="form-control form-control-lg"
+                                        id="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="name@example.com"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="mb-4">
+                                    <label htmlFor="password" className="form-label fw-semibold">
+                                        {t('password')}
+                                    </label>
+                                    <input
+                                        type="password"
+                                        className="form-control form-control-lg"
+                                        id="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="d-grid">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary btn-lg"
+                                        disabled={isLoading}
+                                    >
+                                        {isLoading ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                {t('loading')}...
+                                            </>
+                                        ) : (
+                                            t('signIn')
+                                        )}
+                                    </button>
+                                </div>
+                            </form>
+
+                            {/* Divider */}
+                            <div className="position-relative my-4">
+                                <hr />
+                                <span className="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">
+                                    or
+                                </span>
+                            </div>
+
+                            {/* Social Login */}
+                            <div className="d-grid gap-2">
+                                <button className="btn btn-outline-secondary">
+                                    <i className="bi bi-google me-2"></i>
+                                    Continue with Google
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );
-}
+};
+
+export default LoginPage;

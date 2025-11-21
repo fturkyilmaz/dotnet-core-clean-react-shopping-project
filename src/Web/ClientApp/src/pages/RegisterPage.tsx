@@ -1,120 +1,163 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { FC, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
-const registerSchema = z.object({
-    email: z.string().email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-});
-
-type RegisterFormData = z.infer<typeof registerSchema>;
-
-export default function RegisterPage() {
+const RegisterPage: FC = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
-    const { register: registerUser, isRegistering } = useAuth();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<RegisterFormData>({
-        resolver: zodResolver(registerSchema),
-    });
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
 
-    const onSubmit = (data: RegisterFormData) => {
-        registerUser(
-            { email: data.email, password: data.password },
-            {
-                onSuccess: () => {
-                    setTimeout(() => navigate('/login'), 2000);
-                },
-            }
-        );
+        // Validate passwords match
+        if (password !== confirmPassword) {
+            toast.error("Passwords don't match");
+            return;
+        }
+
+        // Validate password length
+        if (password.length < 6) {
+            toast.error('Password must be at least 6 characters');
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            // TODO: Implement actual register API call
+            // const response = await authApi.register({ email, password });
+
+            // Mock register for now
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            toast.success(t('registerSuccess'));
+            setTimeout(() => navigate('/login'), 2000);
+        } catch (error) {
+            toast.error(t('registerFailed'));
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Create your account
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
-                        Or{' '}
-                        <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
-                            sign in to existing account
-                        </Link>
-                    </p>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="rounded-md shadow-sm space-y-4">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Email address
-                            </label>
-                            <input
-                                {...register('email')}
-                                id="email"
-                                type="email"
-                                autoComplete="email"
-                                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                placeholder="Email address"
-                            />
-                            {errors.email && (
-                                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-                            )}
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Password
-                            </label>
-                            <input
-                                {...register('password')}
-                                id="password"
-                                type="password"
-                                autoComplete="new-password"
-                                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                placeholder="Password"
-                            />
-                            {errors.password && (
-                                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-                            )}
-                        </div>
-                        <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                                Confirm Password
-                            </label>
-                            <input
-                                {...register('confirmPassword')}
-                                id="confirmPassword"
-                                type="password"
-                                autoComplete="new-password"
-                                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                placeholder="Confirm password"
-                            />
-                            {errors.confirmPassword && (
-                                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
-                            )}
-                        </div>
-                    </div>
+        <div className="container">
+            <div className="row justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+                <div className="col-md-6 col-lg-5">
+                    <div className="card shadow-lg border-0">
+                        <div className="card-body p-5">
+                            {/* Header */}
+                            <div className="text-center mb-4">
+                                <h2 className="fw-bold">{t('createAccount')}</h2>
+                                <p className="text-muted">
+                                    {t('alreadyHaveAccount')}{' '}
+                                    <Link to="/login" className="text-primary text-decoration-none fw-semibold">
+                                        {t('signIn')}
+                                    </Link>
+                                </p>
+                            </div>
 
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={isRegistering}
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
-                        >
-                            {isRegistering ? 'Creating account...' : 'Create account'}
-                        </button>
+                            {/* Register Form */}
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-3">
+                                    <label htmlFor="email" className="form-label fw-semibold">
+                                        {t('email')}
+                                    </label>
+                                    <input
+                                        type="email"
+                                        className="form-control form-control-lg"
+                                        id="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="name@example.com"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="mb-3">
+                                    <label htmlFor="password" className="form-label fw-semibold">
+                                        {t('password')}
+                                    </label>
+                                    <input
+                                        type="password"
+                                        className="form-control form-control-lg"
+                                        id="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        required
+                                        minLength={6}
+                                    />
+                                    <small className="text-muted">Minimum 6 characters</small>
+                                </div>
+
+                                <div className="mb-4">
+                                    <label htmlFor="confirmPassword" className="form-label fw-semibold">
+                                        {t('confirmPassword')}
+                                    </label>
+                                    <input
+                                        type="password"
+                                        className="form-control form-control-lg"
+                                        id="confirmPassword"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        required
+                                        minLength={6}
+                                    />
+                                </div>
+
+                                <div className="d-grid">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary btn-lg"
+                                        disabled={isLoading}
+                                    >
+                                        {isLoading ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                {t('loading')}...
+                                            </>
+                                        ) : (
+                                            t('createAccount')
+                                        )}
+                                    </button>
+                                </div>
+                            </form>
+
+                            {/* Divider */}
+                            <div className="position-relative my-4">
+                                <hr />
+                                <span className="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">
+                                    or
+                                </span>
+                            </div>
+
+                            {/* Social Register */}
+                            <div className="d-grid gap-2">
+                                <button className="btn btn-outline-secondary">
+                                    <i className="bi bi-google me-2"></i>
+                                    Continue with Google
+                                </button>
+                            </div>
+
+                            {/* Terms */}
+                            <p className="text-center text-muted mt-4 small">
+                                By signing up, you agree to our{' '}
+                                <a href="#" className="text-primary text-decoration-none">Terms of Service</a>
+                                {' '}and{' '}
+                                <a href="#" className="text-primary text-decoration-none">Privacy Policy</a>
+                            </p>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );
-}
+};
+
+export default RegisterPage;
