@@ -28,8 +28,8 @@ public class UpdateCartCommandHandler : IRequestHandler<UpdateCartCommand>
 
     public async Task Handle(UpdateCartCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _context.Carts
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+        var entity = _context.Carts
+            .FirstOrDefault(c => c.Id == request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 

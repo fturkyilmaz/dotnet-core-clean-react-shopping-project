@@ -21,12 +21,12 @@ public class DeleteCartCommandHandler : IRequestHandler<DeleteCartCommand>
 
     public async Task Handle(DeleteCartCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _context.Carts
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+        var entity = _context.Carts
+            .FirstOrDefault(c => c.Id == request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 
-        _context.Carts.Remove(entity);
+        _context.Remove(entity);
 
         entity.AddDomainEvent(new CartDeletedEvent(entity)); // Event to be created later
 

@@ -38,7 +38,7 @@ public class CreateCartCommandHandler : IRequestHandler<CreateCartCommand, int>
 
         entity.AddDomainEvent(new CartCreatedEvent(entity)); // Event to be created later
 
-        _context.Carts.Add(entity);
+        _context.Add<Cart>(entity);
 
         await _context.SaveChangesAsync(cancellationToken);
 

@@ -1,13 +1,8 @@
-using ShoppingProject.Application.Interfaces;
 using ShoppingProject.Application;
-using ShoppingProject.Application.Services;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Infrastructure.Bus;
-using ShoppingProject.Domain.Interfaces;
 using ShoppingProject.Infrastructure.Data;
-using ShoppingProject.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
 using ShoppingProject.Infrastructure.Identity;
 using ShoppingProject.WebApi.Services;
 using Asp.Versioning;
@@ -44,18 +39,11 @@ builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 // Register dependencies And Use PostgreSQL Database
 builder.AddInfrastructureServices();
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection") ?? "localhost:6379"));   
-
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ICartRepository, CartRepository>();
-builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddApplicationServices();
 builder.Services.AddScoped<IUser, CurrentUser>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddBusExt(builder.Configuration);
-builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 
 // Add Hangfire services
 builder.Services.AddHangfire(configuration => configuration
