@@ -1,48 +1,31 @@
 import { apiClient } from '@api/axios';
+import type { LoginRequest, RegisterRequest, AuthResponse } from '@/types/auth';
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  succeeded: boolean;
-  data?: {
-    token: string;
-    refreshToken: string;
-  };
-  errors?: string;
-}
-
-export interface RefreshTokenRequest {
-  token: string;
-  refreshToken: string;
-}
+// Re-export types for backward compatibility
+export type { LoginRequest, RegisterRequest, AuthResponse };
 
 export const authApi = {
   login: async (credentials: LoginRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post('/Identity/login', credentials);
+    const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
     return response.data;
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post('/Identity/register', data);
-    return response.data;
-  },
-
-  refreshToken: async (data: RefreshTokenRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post('/Identity/refresh', data);
+    const response = await apiClient.post<AuthResponse>('/auth/register', data);
     return response.data;
   },
 
   logout: async (): Promise<void> => {
-    // Clear local storage
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
+    await apiClient.post('/auth/logout');
+  },
+
+  refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>('/auth/refresh', { refreshToken });
+    return response.data;
+  },
+
+  getCurrentUser: async (): Promise<AuthResponse['user']> => {
+    const response = await apiClient.get<AuthResponse['user']>('/auth/me');
+    return response.data;
   },
 };

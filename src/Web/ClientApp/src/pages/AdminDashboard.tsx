@@ -1,12 +1,10 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useProduct } from '@hooks';
 import { toast } from 'react-toastify';
 import Loader from '@components/Loader';
 
 const AdminDashboard: FC = () => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const { products } = useProduct();
     const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders'>('overview');
@@ -19,14 +17,14 @@ const AdminDashboard: FC = () => {
         activeUsers: 1234,
     };
 
-    const handleDeleteProduct = (id: number) => {
+    const handleDeleteProduct = (id: number): void => {
         if (window.confirm('Are you sure you want to delete this product?')) {
             // TODO: Implement delete API call
             toast.success('Product deleted successfully');
         }
     };
 
-    const handleAddProduct = () => {
+    const handleAddProduct = (): void => {
         navigate('/admin/products/add');
     };
 

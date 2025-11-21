@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '@store/slices/cartSlice';
 import { toast } from 'react-toastify';
+import type { Product } from '@/types/product';
 
 export default function ProductListPage() {
     const { data: products, isLoading, error } = useProducts();
     const dispatch = useDispatch();
 
-    const handleAddToCart = (product: any) => {
+    const handleAddToCart = (product: Product): void => {
         dispatch(addToCart({
             id: product.id,
             title: product.title,

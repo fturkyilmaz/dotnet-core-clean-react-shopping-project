@@ -1,24 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface CartItem {
-  id: number;
-  title: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
-
-interface CartState {
-  items: CartItem[];
-  total: number;
-}
+import type { CartItem, CartState, UpdateCartItemDto } from '@/types/cart';
 
 const initialState: CartState = {
   items: JSON.parse(localStorage.getItem('cart') || '[]'),
   total: 0,
 };
 
-const calculateTotal = (items: CartItem[]) => {
+const calculateTotal = (items: CartItem[]): number => {
   return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 };
 
@@ -41,7 +29,7 @@ const cartSlice = createSlice({
       state.total = calculateTotal(state.items);
       localStorage.setItem('cart', JSON.stringify(state.items));
     },
-    updateQuantity: (state, action: PayloadAction<{ id: number; quantity: number }>) => {
+    updateQuantity: (state, action: PayloadAction<UpdateCartItemDto>) => {
       const item = state.items.find(item => item.id === action.payload.id);
       if (item) {
         item.quantity = action.payload.quantity;

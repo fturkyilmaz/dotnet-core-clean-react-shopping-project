@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
-import { useBasket } from "../hooks";
-import type { Product } from "../types";
-import type { FC } from "react";
+import type { FC } from 'react';
+import { Link } from 'react-router-dom';
+import { useBasket } from '@hooks';
+import type { Product } from '@/types/product';
 
 interface CardProps {
   product: Product;

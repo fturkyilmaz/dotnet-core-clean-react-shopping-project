@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import Card from '@components/Card';
-import { Product } from '@api/products.api';
+import type { Product } from '@/types/product';
 
 const mockProduct: Product = {
     id: 1,

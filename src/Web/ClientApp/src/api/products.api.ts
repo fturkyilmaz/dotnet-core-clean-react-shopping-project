@@ -1,45 +1,32 @@
 import { apiClient } from '@api/axios';
+import type { Product, ProductsResponse, CreateProductDto } from '@/types/product';
 
-export interface Product {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: string;
-  image: string;
-  rating: {
-    rate: number;
-    count: number;
-  };
-}
-
-export interface ProductsResponse {
-  items: Product[];
-  totalCount: number;
-  pageIndex: number;
-  pageSize: number;
-}
+// Re-export types for backward compatibility
+export type { Product, ProductsResponse };
 
 export const productsApi = {
   getAll: async (): Promise<Product[]> => {
-    const response = await apiClient.get('/Products');
+    const response = await apiClient.get<Product[]>('/Products');
     return response.data;
   },
 
   getById: async (id: number): Promise<Product> => {
-    const response = await apiClient.get(`/Products/${id}`);
+    const response = await apiClient.get<Product>(`/Products/${id}`);
     return response.data;
   },
 
   search: async (query: string, page = 0, size = 10): Promise<ProductsResponse> => {
-    const response = await apiClient.post(`/Products/search?index=${page}&size=${size}`, {
-      filters: query ? [{ field: 'title', operator: 'contains', value: query }] : [],
-    });
+    const response = await apiClient.post<ProductsResponse>(
+      `/Products/search?index=${page}&size=${size}`,
+      {
+        filters: query ? [{ field: 'title', operator: 'contains', value: query }] : [],
+      }
+    );
     return response.data;
   },
 
-  create: async (product: Omit<Product, 'id'>): Promise<number> => {
-    const response = await apiClient.post('/Products', product);
+  create: async (product: CreateProductDto): Promise<number> => {
+    const response = await apiClient.post<number>('/Products', product);
     return response.data;
   },
 

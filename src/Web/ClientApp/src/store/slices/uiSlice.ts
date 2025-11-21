@@ -3,10 +3,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 type Theme = 'light' | 'dark';
 type Language = 'en' | 'tr';
 
-interface Modal {
+interface Modal<T = unknown> {
   id: string;
   isOpen: boolean;
-  data?: any;
+  data?: T;
 }
 
 interface Notification {
@@ -59,7 +59,7 @@ const uiSlice = createSlice({
     setSidebarOpen: (state, action: PayloadAction<boolean>) => {
       state.sidebarOpen = action.payload;
     },
-    openModal: (state, action: PayloadAction<{ id: string; data?: any }>) => {
+    openModal: <T = unknown>(state: UIState, action: PayloadAction<{ id: string; data?: T }>) => {
       const existingModal = state.modals.find((m) => m.id === action.payload.id);
       if (existingModal) {
         existingModal.isOpen = true;
