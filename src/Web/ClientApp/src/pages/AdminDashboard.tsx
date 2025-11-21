@@ -1,9 +1,9 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useProduct } from '../hooks';
+import { useProduct } from '@hooks';
 import { toast } from 'react-toastify';
-import Loader from '../components/Loader';
+import Loader from '@components/Loader';
 
 const AdminDashboard: FC = () => {
     const { t } = useTranslation();

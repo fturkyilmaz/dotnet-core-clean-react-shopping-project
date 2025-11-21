@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
-import { authApi, LoginRequest, RegisterRequest } from '../api/auth.api';
-import { setCredentials, logout as logoutAction } from '../store/slices/authSlice';
+import { authApi, LoginRequest, RegisterRequest } from '@api/auth.api';
+import { setCredentials, logout as logoutAction } from '@store/slices/authSlice';
 import { toast } from 'react-toastify';
 
 export const useAuth = () => {

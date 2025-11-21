@@ -1,4 +1,4 @@
-import { apiClient } from './axios';
+import { apiClient } from '@api/axios';
 
 export interface Product {
   id: number;

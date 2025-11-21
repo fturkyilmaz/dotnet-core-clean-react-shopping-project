@@ -5,17 +5,17 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './i18n/config'; // Initialize i18n
 
-import { store } from './store';
-import { queryClient } from './api/queryClient';
-import Header from './components/Header';
-import HomePage from './pages/HomePage';
-import CartsPage from './pages/CartsPage';
-import Category from './pages/CategoryPage';
-import ProductDetailPage from './pages/ProductDetailPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import AdminDashboard from './pages/AdminDashboard';
-import AddProductPage from './pages/AddProductPage';
+import { store } from '@store';
+import { queryClient } from '@api/queryClient';
+import Header from '@components/Header';
+import HomePage from '@pages/HomePage';
+import CartsPage from '@pages/CartsPage';
+import Category from '@pages/CategoryPage';
+import ProductDetailPage from '@pages/ProductDetailPage';
+import LoginPage from '@pages/LoginPage';
+import RegisterPage from '@pages/RegisterPage';
+import AdminDashboard from '@pages/AdminDashboard';
+import AddProductPage from '@pages/AddProductPage';
 
 const App = () => {
   return (

@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAppDispatch, useAppSelector } from '../hooks/useRedux';
-import { toggleTheme } from '../store/slices/uiSlice';
+import { useAppDispatch, useAppSelector } from '@hooks/useRedux';
+import { toggleTheme } from '@store/slices/uiSlice';
 import { GlobeAltIcon, MoonIcon, SunIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 
 const Header: FC = () => {

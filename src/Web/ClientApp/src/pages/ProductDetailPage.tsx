@@ -1,11 +1,11 @@
 import { FC, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useProduct, useBasket } from '../hooks';
-import { useAppDispatch } from '../hooks/useRedux';
-import { addToRecentlyViewed } from '../store/slices/productsSlice';
+import { useProduct, useBasket } from '@hooks';
+import { useAppDispatch } from '@hooks/useRedux';
+import { addToRecentlyViewed } from '@store/slices/productsSlice';
 import { toast } from 'react-toastify';
-import Loader from '../components/Loader';
+import Loader from '@components/Loader';
 
 const ProductDetailPage: FC = () => {
     const { id } = useParams<{ id: string }>();

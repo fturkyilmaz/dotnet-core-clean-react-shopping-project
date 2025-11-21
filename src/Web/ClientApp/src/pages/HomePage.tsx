@@ -1,7 +1,7 @@
 import type { FC } from "react";
-import Loader from "../components/Loader";
-import Card from "../components/Card";
-import { useProduct } from "../hooks";
+import Loader from "@components/Loader";
+import Card from "@components/Card";
+import { useProduct } from "@hooks";
 
 const HomePage: FC = () => {
   const { products, category } = useProduct();
