@@ -10,6 +10,7 @@ using ShoppingProject.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using MediatR;
 
 namespace ShoppingProject.WebApi.Controllers
 {

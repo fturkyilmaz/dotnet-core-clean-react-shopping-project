@@ -14,8 +14,7 @@
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" />
-    <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="MediatR" />
   </ItemGroup>
 
 </Project>

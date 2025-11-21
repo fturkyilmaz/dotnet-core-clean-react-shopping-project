@@ -6,7 +6,6 @@ using Ardalis.GuardClauses;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace ShoppingProject.Application.Carts.Queries.GetCartById;
 
@@ -25,9 +24,9 @@ public class GetCartByIdQueryHandler : IRequestHandler<GetCartByIdQuery, CartBri
 
     public async Task<CartBriefDto> Handle(GetCartByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _context.Carts
+        var entity = await Task.FromResult(_context.Carts
             .ProjectTo<CartBriefDto>(_mapper.ConfigurationProvider)
-            .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            .FirstOrDefault(x => x.Id == request.Id));
 
         Guard.Against.NotFound(request.Id, entity);
 

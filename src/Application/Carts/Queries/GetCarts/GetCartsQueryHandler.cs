@@ -4,7 +4,6 @@ using ShoppingProject.Domain.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace ShoppingProject.Application.Carts.Queries.GetCarts;
 
@@ -40,9 +39,9 @@ public class GetCartsQueryHandler : IRequestHandler<GetCartsQuery, List<CartBrie
 
     public async Task<List<CartBriefDto>> Handle(GetCartsQuery request, CancellationToken cancellationToken)
     {
-        return await _context.Carts
+        return await Task.FromResult(_context.Carts
             .OrderBy(x => x.Title)
             .ProjectTo<CartBriefDto>(_mapper.ConfigurationProvider)
-            .ToListAsync(cancellationToken);
+            .ToList());
     }
 }
