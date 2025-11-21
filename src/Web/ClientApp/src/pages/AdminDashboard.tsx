@@ -17,7 +17,7 @@ const AdminDashboard: FC = () => {
         activeUsers: 1234,
     };
 
-    const handleDeleteProduct = (id: number): void => {
+    const handleDeleteProduct = (_id: number): void => {
         if (window.confirm('Are you sure you want to delete this product?')) {
             // TODO: Implement delete API call
             toast.success('Product deleted successfully');

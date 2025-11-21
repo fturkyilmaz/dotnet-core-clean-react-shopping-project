@@ -1,6 +1,5 @@
 import { FC, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 interface ProductFormData {
@@ -12,7 +11,6 @@ interface ProductFormData {
 }
 
 const AddProductPage: FC = () => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<ProductFormData>({

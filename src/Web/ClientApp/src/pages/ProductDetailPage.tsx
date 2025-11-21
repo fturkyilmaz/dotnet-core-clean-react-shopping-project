@@ -25,15 +25,9 @@ const ProductDetailPage: FC = () => {
         }
     }, [id, dispatch]);
 
-    const handleAddToCart = () => {
+    const handleAddToCart = (): void => {
         if (product) {
-            addToBasket({
-                id: product.id,
-                title: product.title,
-                price: product.price,
-                image: product.image,
-                amount: 1,
-            });
+            addToBasket(product);
             toast.success(t('addedToCart'));
         }
     };
