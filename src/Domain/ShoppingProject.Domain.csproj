@@ -5,9 +5,4 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MediatR" />
-    <PackageReference Include="MassTransit.RabbitMQ" />
-  </ItemGroup>
-
 </Project>

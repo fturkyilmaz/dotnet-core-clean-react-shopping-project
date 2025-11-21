@@ -1,10 +1,6 @@
-﻿using MediatR;
-using MassTransit;
-using ShoppingProject.Domain.Events;
-using ShoppingProject.Domain.Interfaces;
+﻿namespace ShoppingProject.Domain.Common;
 
-namespace ShoppingProject.Domain.Common;
-
-public abstract class BaseEvent : INotification, IEventOrMessage
+public abstract class BaseEvent
 {
+    public DateTime DateOccurred { get; protected set; } = DateTime.UtcNow;
 }
