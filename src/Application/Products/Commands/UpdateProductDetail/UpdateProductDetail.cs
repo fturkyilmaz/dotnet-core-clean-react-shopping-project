@@ -28,8 +28,8 @@ public class UpdateProductDetailCommandHandler : IRequestHandler<UpdateProductDe
 
     public async Task Handle(UpdateProductDetailCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _context.Products
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+        var entity = _context.Products
+            .FirstOrDefault(p => p.Id == request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 

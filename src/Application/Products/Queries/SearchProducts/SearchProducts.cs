@@ -1,6 +1,13 @@
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.DTOs;
 using ShoppingProject.Domain.Common;
+using ShoppingProject.Application.Common.Extensions;
+using ShoppingProject.Application.Common.Mappings;
+using ShoppingProject.Application.Common.Models;
+using ShoppingProject.Domain.Entities;
+using MediatR;
+using AutoMapper.QueryableExtensions;
+using AutoMapper;
 
 namespace ShoppingProject.Application.Products.Queries.SearchProducts;
 

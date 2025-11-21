@@ -20,12 +20,12 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
 
     public async Task Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _context.Products
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+        var entity = _context.Products
+            .FirstOrDefault(p => p.Id == request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 
-        _context.Products.Remove(entity);
+        _context.Remove(entity);
 
         entity.AddDomainEvent(new ProductDeletedEvent(entity));
 
