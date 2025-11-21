@@ -1,63 +1,72 @@
-using ShoppingProject.Application.Common.Models;
-using ShoppingProject.Application.DTOs;
-using ShoppingProject.Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using ShoppingProject.Application.Carts.Commands.CreateCart;
+using ShoppingProject.Application.Carts.Commands.UpdateCart;
+using ShoppingProject.Application.Carts.Commands.DeleteCart;
+using ShoppingProject.Application.Carts.Queries.GetCarts;
+using ShoppingProject.Application.Carts.Queries.GetCartById;
+using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using MediatR; // Added this using statement for ISender
 
 namespace ShoppingProject.WebApi.Controllers
 {
+    [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [ApiController]
     public class CartsController : ControllerBase
     {
-        private readonly ICartService _cartService;
+        private readonly ISender _sender;
 
-        public CartsController(ICartService cartService)
+        public CartsController(ISender sender)
         {
-            _cartService = cartService;
+            _sender = sender;
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<ServiceResult<IEnumerable<CartDto>>>> GetAll()
+        public async Task<ActionResult<List<CartBriefDto>>> GetAll()
         {
-            var result = await _cartService.GetAllAsync();
-            return StatusCode((int)result.StatusCode, result);
+            var carts = await _sender.Send(new GetCartsQuery());
+            return Ok(carts);
         }
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ServiceResult<CartDto>>> GetById(int id)
+        public async Task<ActionResult<CartBriefDto>> GetById(int id)
         {
-            var result = await _cartService.GetByIdAsync(id);
-            return StatusCode((int)result.StatusCode, result);
+            var cart = await _sender.Send(new GetCartByIdQuery(id));
+            return Ok(cart);
         }
 
         [HttpPost]
         [Authorize(Policy = Policies.CanPurge)]
-        public async Task<ActionResult<ServiceResult<CartDto>>> Create(CreateCartDto dto)
+        public async Task<ActionResult<int>> Create(CreateCartCommand command)
         {
-            var result = await _cartService.CreateAsync(dto);
-            return StatusCode((int)result.StatusCode, result);
+            var id = await _sender.Send(command);
+            return CreatedAtAction(nameof(GetById), new { id }, id);
         }
 
         [HttpPut("{id}")]
         [Authorize(Policy = Policies.CanPurge)]
-        public async Task<ActionResult<ServiceResult<bool>>> Update(int id, UpdateCartDto dto)
+        public async Task<IActionResult> Update(int id, UpdateCartCommand command)
         {
-            var result = await _cartService.UpdateAsync(id, dto);
-            return StatusCode((int)result.StatusCode, result);
+            if (id != command.Id)
+            {
+                return BadRequest();
+            }
+
+            await _sender.Send(command);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         [Authorize(Policy = Policies.CanPurge)]
-        public async Task<ActionResult<ServiceResult<bool>>> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var result = await _cartService.DeleteAsync(id);
-            return StatusCode((int)result.StatusCode, result);
+            await _sender.Send(new DeleteCartCommand(id));
+            return NoContent();
         }
     }
 }
