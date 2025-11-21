@@ -48,6 +48,22 @@ builder.Services.AddApplicationServices();
 builder.Services.AddScoped<IUser, CurrentUser>();
 builder.Services.AddHttpContextAccessor();
 
+// Add CORS for React frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "AllowReactApp",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173") // Vite default port
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        }
+    );
+});
+
 builder.Services.AddBusExt(builder.Configuration);
 
 // Add Hangfire services
@@ -114,6 +130,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
 
