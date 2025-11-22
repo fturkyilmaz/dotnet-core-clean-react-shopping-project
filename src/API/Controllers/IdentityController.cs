@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
-using Asp.Versioning;
 
 namespace ShoppingProject.WebApi.Controllers;
 
@@ -21,25 +21,45 @@ public class IdentityController : ControllerBase
 
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<ActionResult<ServiceResult<string>>> Login(LoginRequest request)
+    public async Task<ActionResult<ServiceResult<AuthResponse>>> Login(LoginRequest request)
     {
-        var (result, token) = await _identityService.LoginAsync(request.Email, request.Password);
+        var (result, response) = await _identityService.LoginAsync(request.Email, request.Password);
 
         if (!result.Succeeded)
         {
-            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
+            return BadRequest(ServiceResult<AuthResponse>.Fail(string.Join(", ", result.Errors)));
         }
 
-        return Ok(ServiceResult<string>.Success(token));
+        return Ok(ServiceResult<AuthResponse>.Success(response!));
+    }
+
+    [HttpPost("refresh-token")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ServiceResult<AuthResponse>>> RefreshToken(
+        RefreshTokenRequest request
+    )
+    {
+        var (result, response) = await _identityService.RefreshTokenAsync(
+            request.AccessToken,
+            request.RefreshToken
+        );
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(ServiceResult<AuthResponse>.Fail(string.Join(", ", result.Errors)));
+        }
+
+        return Ok(ServiceResult<AuthResponse>.Success(response!));
     }
 
     [HttpPost("register")]
     [AllowAnonymous]
     public async Task<ActionResult<ServiceResult<string>>> Register(RegisterRequest request)
     {
-       var (result, userId) = await _identityService.CreateUserAsync(
-            request.Email, 
-            request.Password);
+        var (result, userId) = await _identityService.CreateUserAsync(
+            request.Email,
+            request.Password
+        );
 
         if (!result.Succeeded)
         {
@@ -88,4 +108,10 @@ public class RegisterRequest
 {
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
+}
+
+public class RefreshTokenRequest
+{
+    public string AccessToken { get; set; } = string.Empty;
+    public string RefreshToken { get; set; } = string.Empty;
 }

@@ -53,6 +53,11 @@ public static class DependencyInjection
             ShoppingProject.Infrastructure.Services.CacheService
         >();
 
+        builder.Services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+        });
+
         builder
             .Services.AddAuthentication(options =>
             {
