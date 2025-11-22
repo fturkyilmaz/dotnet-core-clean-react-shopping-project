@@ -84,12 +84,5 @@ namespace ShoppingProject.WebApi.Controllers
             var result = await _sender.Send(new SearchProductsQuery(dynamicQuery, index, size));
             return Ok(result);
         }
-
-        [HttpGet("secure-test")]
-        [ShoppingProject.WebApi.Attributes.ApiKey]
-        public IActionResult SecureTest()
-        {
-            return Ok("Authenticated with API Key");
-        }
     }
 }
