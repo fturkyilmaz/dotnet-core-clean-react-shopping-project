@@ -1,18 +1,16 @@
 import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCart } from '@/store/slices/cartSlice';
-import { AppDispatch, RootState } from '@/store';
-import { CartItem } from '@/types';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/services/api';
+import { Cart, CartItem } from '@/types';
 
 export default function CartScreen() {
-    const dispatch = useDispatch<AppDispatch>();
-    const { cart, loading } = useSelector((state: RootState) => state.cart);
-
-    useEffect(() => {
-        // TODO: Get username from auth state
-        dispatch(fetchCart('testuser'));
-    }, []);
+    const { data: cart, isLoading } = useQuery({
+        queryKey: ['cart', 'testuser'],
+        queryFn: async () => {
+            const response = await api.get<Cart>('/carts/testuser');
+            return response.data;
+        },
+    });
 
     const renderCartItem = ({ item }: { item: CartItem }) => (
         <View className="bg-white rounded-xl p-4 mb-3 flex-row shadow-sm">
@@ -42,7 +40,7 @@ export default function CartScreen() {
         </View>
     );
 
-    if (loading) {
+    if (isLoading) {
         return (
             <View className="flex-1 items-center justify-center bg-gray-50">
                 <ActivityIndicator size="large" color="#2563eb" />

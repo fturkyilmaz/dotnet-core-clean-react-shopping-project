@@ -1,17 +1,9 @@
 import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '@/store/slices/productsSlice';
-import { AppDispatch, RootState } from '@/store';
+import { useProducts } from '@/hooks/useProducts';
 import { Product } from '@/types';
 
 export default function ProductsScreen() {
-    const dispatch = useDispatch<AppDispatch>();
-    const { items, loading } = useSelector((state: RootState) => state.products);
-
-    useEffect(() => {
-        dispatch(fetchProducts());
-    }, []);
+    const { data: products, isLoading, error } = useProducts();
 
     const renderProduct = ({ item }: { item: Product }) => (
         <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
@@ -40,7 +32,7 @@ export default function ProductsScreen() {
         </View>
     );
 
-    if (loading) {
+    if (isLoading) {
         return (
             <View className="flex-1 items-center justify-center bg-gray-50">
                 <ActivityIndicator size="large" color="#2563eb" />
@@ -49,10 +41,18 @@ export default function ProductsScreen() {
         );
     }
 
+    if (error) {
+        return (
+            <View className="flex-1 items-center justify-center bg-gray-50">
+                <Text className="text-red-600 text-lg">Error loading products</Text>
+            </View>
+        );
+    }
+
     return (
         <View className="flex-1 bg-gray-50">
             <FlatList
-                data={items}
+                data={products}
                 renderItem={renderProduct}
                 keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={{ padding: 16 }}

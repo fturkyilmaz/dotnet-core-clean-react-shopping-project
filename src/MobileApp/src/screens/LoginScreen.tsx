@@ -1,21 +1,31 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useState } from 'react';
-import { useRouter } from 'expo-router';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '@/store/slices/authSlice';
 import { AppDispatch, RootState } from '@/store';
 
-export default function LoginScreen() {
+type RootStackParamList = {
+    Home: undefined;
+    Login: undefined;
+    Products: undefined;
+    Cart: undefined;
+};
+
+type LoginScreenProps = {
+    navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
+};
+
+export default function LoginScreen({ navigation }: LoginScreenProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const dispatch = useDispatch<AppDispatch>();
-    const router = useRouter();
     const { loading, error } = useSelector((state: RootState) => state.auth);
 
     const handleLogin = async () => {
         const result = await dispatch(login({ email, password }));
         if (login.fulfilled.match(result)) {
-            router.replace('/products');
+            navigation.replace('Products');
         }
     };
 
