@@ -41,6 +41,24 @@ public static class DependencyInjection
             provider.GetRequiredService<ApplicationDbContext>()
         );
 
+        var readOnlyConnectionString =
+            builder.Configuration.GetConnectionString("DefaultConnection_ReadOnly")
+            ?? connectionString; // Fallback to default if not set
+
+        builder.Services.AddDbContext<ReadOnlyApplicationDbContext>(
+            (sp, options) =>
+            {
+                options.UseNpgsql(readOnlyConnectionString);
+                options.ConfigureWarnings(warnings =>
+                    warnings.Ignore(RelationalEventId.PendingModelChangesWarning)
+                );
+            }
+        );
+
+        builder.Services.AddScoped<IReadOnlyApplicationDbContext>(provider =>
+            provider.GetRequiredService<ReadOnlyApplicationDbContext>()
+        );
+
         builder
             .Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()

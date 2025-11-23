@@ -6,6 +6,8 @@ using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using RabbitMQ.Client;
 using Serilog;
 using ShoppingProject.Application;
@@ -14,6 +16,7 @@ using ShoppingProject.Infrastructure.Bus;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Identity;
 using ShoppingProject.WebApi;
+using ShoppingProject.WebApi.Extensions;
 using ShoppingProject.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +24,25 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog(
     (context, configuration) => configuration.ReadFrom.Configuration(context.Configuration)
 );
+
+// Add OpenTelemetry
+builder
+    .Services.AddOpenTelemetry()
+    .WithMetrics(metrics =>
+    {
+        metrics.AddAspNetCoreInstrumentation().AddPrometheusExporter();
+
+        metrics.AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Server.Kestrel");
+    })
+    .WithTracing(tracing =>
+    {
+        tracing.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation();
+
+        tracing.AddOtlpExporter(options =>
+        {
+            options.Endpoint = new Uri("http://localhost:4317");
+        });
+    });
 
 // Add Rate Limiting
 builder.Services.AddMemoryCache();
@@ -55,6 +77,7 @@ builder.Services.AddOutputCache(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -98,6 +121,8 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddBusExt(builder.Configuration);
 
+builder.Services.AddConsulConfig(builder.Configuration);
+
 // Add Hangfire services
 builder.Services.AddHangfire(configuration =>
     configuration
@@ -136,7 +161,12 @@ builder
 
 builder.Services.AddHealthChecksUI().AddInMemoryStorage();
 
+// ... (existing code)
+
 var app = builder.Build();
+
+// Register with Consul
+app.UseConsul(builder.Configuration);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -158,6 +188,13 @@ if (app.Environment.IsDevelopment())
     // Add Hangfire Dashboard
     app.UseHangfireDashboard(
         builder.Configuration.GetValue<string>("Hangfire:DashboardPath", "/hangfire")
+    );
+
+    // Schedule Recurring Job
+    RecurringJob.AddOrUpdate<ShoppingProject.Infrastructure.Jobs.DatabaseBackupJob>(
+        "database-backup",
+        job => job.RunAsync(),
+        Cron.Daily
     );
 }
 
@@ -208,6 +245,8 @@ app.UseIpRateLimiting();
 app.UseResponseCaching();
 app.UseOutputCache();
 
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
 app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -221,6 +260,11 @@ app.MapHealthChecks(
     }
 );
 app.MapHealthChecksUI(options => options.UIPath = "/health-ui");
+
+app.UseWebSockets();
+app.UseMiddleware<ShoppingProject.WebApi.Middleware.WebSocketEchoMiddleware>();
+
+app.MapHub<ShoppingProject.WebApi.Hubs.NotificationHub>("/hubs/notifications");
 
 app.MapControllers();
 app.Run();
