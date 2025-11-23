@@ -1,0 +1,63 @@
+import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProducts } from '@/store/slices/productsSlice';
+import { AppDispatch, RootState } from '@/store';
+import { Product } from '@/types';
+
+export default function ProductsScreen() {
+    const dispatch = useDispatch<AppDispatch>();
+    const { items, loading } = useSelector((state: RootState) => state.products);
+
+    useEffect(() => {
+        dispatch(fetchProducts());
+    }, []);
+
+    const renderProduct = ({ item }: { item: Product }) => (
+        <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+            <Image
+                source={{ uri: item.image }}
+                className="w-full h-48 rounded-lg mb-3"
+                resizeMode="contain"
+            />
+            <Text className="text-lg font-bold text-gray-800 mb-1" numberOfLines={2}>
+                {item.title}
+            </Text>
+            <View className="flex-row items-center justify-between mb-2">
+                <Text className="text-2xl font-bold text-blue-600">${item.price}</Text>
+                <View className="flex-row items-center">
+                    <Text className="text-yellow-500 mr-1">★</Text>
+                    <Text className="text-gray-600 font-medium">{item.rating.rate}</Text>
+                    <Text className="text-gray-400 ml-1">({item.rating.count})</Text>
+                </View>
+            </View>
+            <Text className="text-gray-600 text-sm mb-3" numberOfLines={2}>
+                {item.description}
+            </Text>
+            <TouchableOpacity className="bg-blue-600 rounded-lg py-3 items-center">
+                <Text className="text-white font-semibold">Add to Cart</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
+    if (loading) {
+        return (
+            <View className="flex-1 items-center justify-center bg-gray-50">
+                <ActivityIndicator size="large" color="#2563eb" />
+                <Text className="text-gray-600 mt-4">Loading products...</Text>
+            </View>
+        );
+    }
+
+    return (
+        <View className="flex-1 bg-gray-50">
+            <FlatList
+                data={items}
+                renderItem={renderProduct}
+                keyExtractor={(item) => item.id.toString()}
+                contentContainerStyle={{ padding: 16 }}
+                showsVerticalScrollIndicator={false}
+            />
+        </View>
+    );
+}
