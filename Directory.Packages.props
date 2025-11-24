@@ -95,5 +95,7 @@
     <PackageVersion Include="xunit" Version="2.5.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
     <PackageVersion Include="Yarp.ReverseProxy" Version="2.2.0" />
+      <PackageVersion Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="$(AspnetVersion)" />
+    <PackageVersion Include="RabbitMQ.Client" Version="7.0.0" />
   </ItemGroup>
 </Project>

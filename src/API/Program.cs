@@ -264,7 +264,10 @@ app.MapHealthChecksUI(options => options.UIPath = "/health-ui");
 app.UseWebSockets();
 app.UseMiddleware<ShoppingProject.WebApi.Middleware.WebSocketEchoMiddleware>();
 
-app.MapHub<ShoppingProject.WebApi.Hubs.NotificationHub>("/hubs/notifications");
+// Map SignalR Hubs
+app.MapHub<ShoppingProject.Infrastructure.Hubs.NotificationHub>("/hubs/notifications");
+app.MapHub<ShoppingProject.Infrastructure.Hubs.CartHub>("/hubs/cart");
+app.MapHub<ShoppingProject.Infrastructure.Hubs.OrderHub>("/hubs/orders");
 
 app.MapControllers();
 app.Run();
