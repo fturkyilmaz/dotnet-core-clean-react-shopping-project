@@ -23,11 +23,26 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials: any, { rejectWithValue }) => {
     try {
-      const response = await api.post<AuthResponse>('/identity/login', credentials);
-      await AsyncStorage.setItem('token', response.data.token);
-      return response.data;
+      const response = await api.post<any>('/identity/login', credentials);
+      console.log('Full response:', response.data);
+      
+      // Axios wraps the API response in response.data
+      // API response structure: { data: { accessToken, refreshToken, ... }, isSuccess: true, ... }
+      const accessToken = response.data.data.accessToken;
+      const refreshToken = response.data.data.refreshToken;
+      
+      // Save tokens to AsyncStorage
+      await AsyncStorage.setItem('token', accessToken);
+      await AsyncStorage.setItem('refreshToken', refreshToken);
+      
+      return {
+        token: accessToken,
+        refreshToken,
+        ...response.data.data
+      };
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Login failed');
+      console.error('Login error:', error);
+      return rejectWithValue(error.response?.data?.message || 'Login failed');
     }
   }
 );

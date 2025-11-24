@@ -19,13 +19,14 @@ type LoginScreenProps = {
 
 export default function LoginScreen({ navigation }: LoginScreenProps) {
     const { t } = useTranslation();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('admin@test.com');
+    const [password, setPassword] = useState('Admin123!');
     const dispatch = useDispatch<AppDispatch>();
     const { loading, error } = useSelector((state: RootState) => state.auth);
 
     const handleLogin = async () => {
         const result = await dispatch(login({ email, password }));
+        console.log(result, login);
         if (login.fulfilled.match(result)) {
             navigation.replace('Products');
         }

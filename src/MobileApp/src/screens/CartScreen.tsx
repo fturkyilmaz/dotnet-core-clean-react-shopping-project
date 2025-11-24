@@ -2,14 +2,14 @@ import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import api from '@/services/api';
-import { Cart, CartItem } from '@/types';
+import { CartItem } from '@/types';
 
 export default function CartScreen() {
     const { t } = useTranslation();
-    const { data: cart, isLoading } = useQuery({
-        queryKey: ['cart', 'testuser'],
+    const { data: cartItems, isLoading } = useQuery({
+        queryKey: ['cart'],
         queryFn: async () => {
-            const response = await api.get<Cart>('/carts/testuser');
+            const response = await api.get<CartItem[]>('/carts');
             return response.data;
         },
     });
@@ -23,7 +23,7 @@ export default function CartScreen() {
             />
             <View className="flex-1">
                 <Text className="text-base font-semibold text-gray-800 mb-1" numberOfLines={2}>
-                    {item.productName}
+                    {item.title}
                 </Text>
                 <Text className="text-lg font-bold text-blue-600 mb-2">${item.price}</Text>
                 <View className="flex-row items-center">
@@ -51,12 +51,16 @@ export default function CartScreen() {
         );
     }
 
+    // Calculate total price from cart items
+    const totalPrice = cartItems?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
+    const itemsWithQuantity = cartItems?.filter(item => item.quantity > 0) || [];
+
     return (
         <View className="flex-1 bg-gray-50">
             <FlatList
-                data={cart?.items || []}
+                data={itemsWithQuantity}
                 renderItem={renderCartItem}
-                keyExtractor={(item) => item.productId.toString()}
+                keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={{ padding: 16 }}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
@@ -65,11 +69,11 @@ export default function CartScreen() {
                     </View>
                 }
             />
-            {cart && cart.items.length > 0 && (
+            {itemsWithQuantity.length > 0 && (
                 <View className="bg-white p-6 border-t border-gray-200">
                     <View className="flex-row justify-between mb-4">
                         <Text className="text-gray-600 text-lg">{t('cart.total')}</Text>
-                        <Text className="text-2xl font-bold text-gray-800">${cart.totalPrice}</Text>
+                        <Text className="text-2xl font-bold text-gray-800">${totalPrice.toFixed(2)}</Text>
                     </View>
                     <TouchableOpacity className="bg-blue-600 rounded-lg py-4 items-center">
                         <Text className="text-white font-bold text-lg">{t('cart.checkout')}</Text>

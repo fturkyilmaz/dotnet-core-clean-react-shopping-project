@@ -5,9 +5,9 @@ export interface User {
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;
   refreshToken: string;
-  expiryTime: string;
+  refreshTokenExpiryTime: string;
 }
 
 export interface Product {
@@ -24,11 +24,11 @@ export interface Product {
 }
 
 export interface CartItem {
-  productId: number;
-  productName: string;
-  quantity: number;
+  id: number;
+  title: string;
   price: number;
   image: string;
+  quantity: number;
 }
 
 export interface Cart {
