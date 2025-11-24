@@ -1,0 +1,97 @@
+using Ardalis.GuardClauses;
+using FluentAssertions;
+using Moq;
+using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Application.Products.Commands.DeleteProduct;
+using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.Events;
+
+namespace ShoppingProject.UnitTests.Application.Commands;
+
+public class DeleteProductCommandTests
+{
+    private readonly Mock<IApplicationDbContext> _mockContext;
+    private readonly DeleteProductCommandHandler _handler;
+
+    public DeleteProductCommandTests()
+    {
+        _mockContext = new Mock<IApplicationDbContext>();
+        _handler = new DeleteProductCommandHandler(_mockContext.Object);
+    }
+
+    [Fact]
+    public async Task Handle_ValidCommand_ShouldDeleteProduct()
+    {
+        // Arrange
+        var existingProduct = new Product
+        {
+            Id = 1,
+            Title = "Test Product",
+            Description = "Test",
+            Price = 10m,
+            Category = "test",
+            Image = "test.jpg",
+        };
+
+        var products = new List<Product> { existingProduct }.AsQueryable();
+        _mockContext.Setup(x => x.Products).Returns(products);
+        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+        var command = new DeleteProductCommand(1);
+
+        // Act
+        await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        _mockContext.Verify(x => x.Remove(existingProduct), Times.Once);
+        _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_ValidCommand_ShouldRaiseDomainEvent()
+    {
+        // Arrange
+        var existingProduct = new Product
+        {
+            Id = 1,
+            Title = "Test Product",
+            Description = "Test",
+            Price = 10m,
+            Category = "test",
+            Image = "test.jpg",
+        };
+
+        var products = new List<Product> { existingProduct }.AsQueryable();
+        _mockContext.Setup(x => x.Products).Returns(products);
+        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+        var command = new DeleteProductCommand(1);
+
+        // Act
+        await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        existingProduct.DomainEvents.Should().ContainSingle();
+        existingProduct.DomainEvents.First().Should().BeOfType<ProductDeletedEvent>();
+
+        var domainEvent = existingProduct.DomainEvents.First() as ProductDeletedEvent;
+        domainEvent!.Item.Should().Be(existingProduct);
+    }
+
+    [Fact]
+    public async Task Handle_NonExistentProduct_ShouldThrowNotFoundException()
+    {
+        // Arrange
+        var products = new List<Product>().AsQueryable();
+        _mockContext.Setup(x => x.Products).Returns(products);
+
+        var command = new DeleteProductCommand(999);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            _handler.Handle(command, CancellationToken.None)
+        );
+
+        _mockContext.Verify(x => x.Remove(It.IsAny<Product>()), Times.Never);
+    }
+}

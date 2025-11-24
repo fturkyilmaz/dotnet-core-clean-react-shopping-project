@@ -1,5 +1,10 @@
 # ShoppingProject - Clean Architecture .NET & React.js Solution
 
+[![.NET CI/CD](https://github.com/YOUR_USERNAME/ShoppingProject/actions/workflows/dotnet-ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/ShoppingProject/actions/workflows/dotnet-ci.yml)
+[![Docker Build](https://github.com/YOUR_USERNAME/ShoppingProject/actions/workflows/docker-build.yml/badge.svg)](https://github.com/YOUR_USERNAME/ShoppingProject/actions/workflows/docker-build.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ShoppingProject&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ShoppingProject)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ShoppingProject&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ShoppingProject)
+
 A modern, scalable e-commerce backend built with .NET 9/10, following Clean Architecture principles, CQRS, and Domain-Driven Design (DDD).
 
 ## 🚀 Technology Stack
@@ -146,11 +151,48 @@ Explore and test API endpoints:
 
 ## 🧪 Testing
 
-Run unit tests:
+The project includes comprehensive unit tests and integration tests with **80%+ code coverage** target.
 
+### Run All Tests
 ```bash
 dotnet test
 ```
+
+### Run Tests with Code Coverage
+```bash
+dotnet test --collect:"XPlat Code Coverage" --results-directory ./coverage
+```
+
+### Generate Coverage Report
+```bash
+# Install report generator tool
+dotnet tool install -g dotnet-reportgenerator-globaltool
+
+# Generate HTML report
+reportgenerator -reports:"./coverage/**/coverage.cobertura.xml" -targetdir:"./coverage/report" -reporttypes:Html
+
+# Open report
+open ./coverage/report/index.html  # macOS
+# or
+start ./coverage/report/index.html  # Windows
+```
+
+### Test Structure
+- **Domain Tests**: Entity and value object tests
+- **Application Tests**: Command, Query, and Validator tests
+- **Infrastructure Tests**: Repository and service tests
+- **Integration Tests**: End-to-end API tests
+
+## 📊 CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration and deployment:
+
+- **Build & Test**: Runs on every push and pull request
+- **Code Coverage**: Automatically calculated and reported
+- **SonarQube Analysis**: Code quality and security analysis
+- **Docker Build**: Automated container image builds
+
+View the [CI/CD workflows](.github/workflows/) for more details.
 
 ## 🙏 Acknowledgments
 

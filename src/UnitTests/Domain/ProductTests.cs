@@ -1,49 +1,133 @@
-﻿
+﻿using FluentAssertions;
 using ShoppingProject.Domain.Entities;
 
-namespace ShoppingProject.UnitTests.Domain
+namespace ShoppingProject.UnitTests.Domain;
+
+public class ProductTests
 {
-    public class ProductTests
+    [Fact]
+    public void CreateProduct_WithValidData_ShouldSucceed()
     {
-        [Fact]
-        public void CreateProduct_WithValidData_ShouldSucceed()
+        // Arrange
+        string title = "Test Product";
+        string description = "Test Description";
+        decimal price = 19.99m;
+        string category = "electronics";
+        string image = "https://example.com/image.jpg";
+
+        // Act
+        var product = new Product
         {
-            // Arrange
-            string title = "Test Product";
-            string description = "Test Description";
-            decimal price = 19.99m;
+            Title = title,
+            Description = description,
+            Price = price,
+            Category = category,
+            Image = image,
+        };
 
-            // Act
-            var product = new Product
-            {
-                Title = title,
-                Description = description,
-                Price = price
-            };
+        // Assert
+        product.Title.Should().Be(title);
+        product.Description.Should().Be(description);
+        product.Price.Should().Be(price);
+        product.Category.Should().Be(category);
+        product.Image.Should().Be(image);
+    }
 
-            // Assert
-            Assert.Equal(title, product.Title);
-            Assert.Equal(description, product.Description);
-            Assert.Equal(price, product.Price);
-        }
+    [Fact]
+    public void CreateProduct_WithRating_ShouldSucceed()
+    {
+        // Arrange
+        var rating = new Rating { Rate = 4.5, Count = 120 };
 
-        [Theory]
-        [InlineData("", "Description", 19.99)]
-        [InlineData("Title", "Description", 0)]
-        [InlineData("Title", "Description", -1)]
-        public void CreateProduct_WithInvalidData_ShouldThrowException(string title, string description, decimal price)
+        // Act
+        var product = new Product
         {
-            // Act
-            var product = new Product
-            {
-                Title = title,
-                Description = description,
-                Price = price
-            };
+            Title = "Test Product",
+            Description = "Test Description",
+            Price = 29.99m,
+            Rating = rating,
+        };
 
-            // Assert - Product is a simple POCO without validation
-            // In a real scenario, you would validate these values
-            Assert.NotNull(product);
-        }
+        // Assert
+        product.Rating.Should().NotBeNull();
+        product.Rating.Rate.Should().Be(4.5);
+        product.Rating.Count.Should().Be(120);
+    }
+
+    [Fact]
+    public void CreateProduct_DefaultRating_ShouldBeInitialized()
+    {
+        // Act
+        var product = new Product
+        {
+            Title = "Test",
+            Price = 10m,
+            Description = "Test",
+        };
+
+        // Assert
+        product.Rating.Should().NotBeNull();
+        product.Rating.Rate.Should().Be(0.0);
+        product.Rating.Count.Should().Be(0);
+    }
+
+    [Theory]
+    [InlineData("electronics", 99.99)]
+    [InlineData("clothing", 29.99)]
+    [InlineData("books", 14.99)]
+    public void CreateProduct_WithDifferentCategories_ShouldSucceed(string category, decimal price)
+    {
+        // Act
+        var product = new Product
+        {
+            Title = "Test Product",
+            Description = "Test Description",
+            Price = price,
+            Category = category,
+            Image = "test.jpg",
+        };
+
+        // Assert
+        product.Category.Should().Be(category);
+        product.Price.Should().Be(price);
+    }
+
+    [Fact]
+    public void Product_ShouldInheritFromBaseAuditableEntity()
+    {
+        // Arrange & Act
+        var product = new Product();
+
+        // Assert
+        product.Should().BeAssignableTo<ShoppingProject.Domain.Common.BaseAuditableEntity>();
+    }
+
+    [Fact]
+    public void Product_ShouldHaveIdProperty()
+    {
+        // Arrange & Act
+        var product = new Product
+        {
+            Title = "Test",
+            Price = 10m,
+            Description = "Test",
+        };
+        product.Id = 42;
+
+        // Assert
+        product.Id.Should().Be(42);
+    }
+
+    [Fact]
+    public void Product_AllStringProperties_ShouldDefaultToEmpty()
+    {
+        // Act
+        var product = new Product();
+
+        // Assert
+        product.Title.Should().BeEmpty();
+        product.Description.Should().BeEmpty();
+        product.Category.Should().BeEmpty();
+        product.Image.Should().BeEmpty();
     }
 }
