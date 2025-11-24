@@ -1,13 +1,13 @@
-import { NavigationContainer } from '@react-navigation/native';
+import './global.css';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { store } from './src/store';
-import HomeScreen from './src/screens/HomeScreen';
-import LoginScreen from './src/screens/LoginScreen';
-import ProductsScreen from './src/screens/ProductsScreen';
-import CartScreen from './src/screens/CartScreen';
-
+import { store } from '@/store';
+import HomeScreen from '@/screens/HomeScreen';
+import LoginScreen from '@/screens/LoginScreen';
+import ProductsScreen from '@/screens/ProductsScreen';
+import CartScreen from '@/screens/CartScreen';
 const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
 
@@ -18,13 +18,13 @@ export default function App() {
                 <NavigationContainer>
                     <Stack.Navigator
                         screenOptions={{
-                            headerStyle: {
-                                backgroundColor: '#2563EB',
-                            },
-                            headerTintColor: '#fff',
-                            headerTitleStyle: {
-                                fontWeight: 'bold',
-                            },
+                            // headerStyle: {
+                            //     backgroundColor: '#2563EB',
+                            // },
+                            // headerTintColor: '#fff',
+                            // headerTitleStyle: {
+                            //     fontWeight: 'bold',
+                            // },
                         }}
                     >
                         <Stack.Screen
