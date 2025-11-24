@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useSignalRConnection } from '@/hooks/useSignalRConnection';
-import { useCartSignal } from '@/hooks/useCartSignal';
-import { useOrderSignal } from '@/hooks/useOrderSignal';
-import { useNotificationSignal } from '@/hooks/useNotificationSignal';
+import { useSignalRConnection } from '@hooks/useSignalRConnection';
+import { useCartSignal } from '@hooks/useCartSignal';
+import { useOrderSignal } from '@hooks/useOrderSignal';
+import { useNotificationSignal } from '@hooks/useNotificationSignal';
 
 export default function NotificationsScreen() {
     const { t } = useTranslation();

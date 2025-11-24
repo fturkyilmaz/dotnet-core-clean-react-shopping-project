@@ -24,8 +24,8 @@ export const useSignalRConnection = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [expoPushToken, setExpoPushToken] = useState<string>('');
   
-  const notificationListener = useRef<any>();
-  const responseListener = useRef<any>();
+  const notificationListener = useRef<any>(null);
+  const responseListener = useRef<any>(null);
 
   // Register for push notifications
   async function registerForPushNotificationsAsync() {
