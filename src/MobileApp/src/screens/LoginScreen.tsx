@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'reac
 import { useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { login } from '@/store/slices/authSlice';
 import { AppDispatch, RootState } from '@/store';
 
@@ -17,6 +18,7 @@ type LoginScreenProps = {
 };
 
 export default function LoginScreen({ navigation }: LoginScreenProps) {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const dispatch = useDispatch<AppDispatch>();
@@ -32,8 +34,8 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     return (
         <View className="flex-1 bg-gray-50 px-6 justify-center">
             <View className="bg-white rounded-2xl p-8 shadow-lg">
-                <Text className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</Text>
-                <Text className="text-gray-500 mb-8">Sign in to continue</Text>
+                <Text className="text-3xl font-bold text-gray-800 mb-2">{t('auth.welcome')}</Text>
+                <Text className="text-gray-500 mb-8">{t('auth.login')}</Text>
 
                 {error && (
                     <View className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
@@ -42,10 +44,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                 )}
 
                 <View className="mb-4">
-                    <Text className="text-gray-700 font-medium mb-2">Email</Text>
+                    <Text className="text-gray-700 font-medium mb-2">{t('auth.email')}</Text>
                     <TextInput
                         className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-800"
-                        placeholder="Enter your email"
+                        placeholder={t('auth.email')}
                         value={email}
                         onChangeText={setEmail}
                         keyboardType="email-address"
@@ -54,10 +56,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                 </View>
 
                 <View className="mb-6">
-                    <Text className="text-gray-700 font-medium mb-2">Password</Text>
+                    <Text className="text-gray-700 font-medium mb-2">{t('auth.password')}</Text>
                     <TextInput
                         className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-800"
-                        placeholder="Enter your password"
+                        placeholder={t('auth.password')}
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry
@@ -72,12 +74,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                     {loading ? (
                         <ActivityIndicator color="white" />
                     ) : (
-                        <Text className="text-white font-semibold text-lg">Sign In</Text>
+                        <Text className="text-white font-semibold text-lg">{t('auth.loginButton')}</Text>
                     )}
                 </TouchableOpacity>
 
                 <TouchableOpacity className="items-center">
-                    <Text className="text-blue-600 font-medium">Forgot Password?</Text>
+                    <Text className="text-blue-600 font-medium">{t('auth.dontHaveAccount')}</Text>
                 </TouchableOpacity>
             </View>
         </View>

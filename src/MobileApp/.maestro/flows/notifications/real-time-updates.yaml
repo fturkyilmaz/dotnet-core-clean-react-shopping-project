@@ -1,0 +1,34 @@
+appId: ${APP_ID}
+name: Real-time Notifications Test
+tags:
+  - notifications
+  - signalr
+
+---
+# Launch and login
+- runFlow: ../auth/login.yaml
+
+# Navigate to notifications screen
+- tapOn: "Notifications"
+
+# Verify SignalR connection
+- assertVisible: "Connected"
+
+# Test notification
+- tapOn: "Test SignalR Notification"
+
+# Wait for notification to appear
+- assertVisible:
+    text: "test notification"
+    timeout: 5000
+
+# Test local notification
+- tapOn: "Test Local Notification"
+
+# Verify notification appeared
+- assertVisible:
+    text: "Local Notification"
+    timeout: 3000
+
+# Take screenshot
+- takeScreenshot: notifications-test

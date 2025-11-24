@@ -1,0 +1,42 @@
+appId: ${APP_ID}
+name: Browse Products Flow Test
+tags:
+  - products
+  - browsing
+
+---
+# Launch and login first
+- runFlow: ../auth/login.yaml
+
+# Verify products screen
+- assertVisible: "Products"
+
+# Scroll through products
+- scrollUntilVisible:
+    element: "Product"
+    direction: DOWN
+    timeout: 3000
+
+# Tap on first product
+- tapOn: 
+    text: "Product"
+    index: 0
+
+# Verify product details screen
+- assertVisible: "Product Details"
+- assertVisible: "Price"
+- assertVisible: "Add to Cart"
+
+# Take screenshot
+- takeScreenshot: product-details
+
+# Go back to products list
+- back
+
+# Test search functionality
+- tapOn: "Search"
+- inputText: "test"
+- assertVisible: "Search Results"
+
+# Take screenshot
+- takeScreenshot: search-results

@@ -1,0 +1,29 @@
+appId: ${APP_ID}
+name: Update Cart Flow Test
+tags:
+  - cart
+  - update
+
+---
+# Add item to cart first
+- runFlow: add-to-cart.yaml
+
+# Already on cart screen
+- assertVisible: "Cart"
+
+# Increase quantity
+- tapOn: "+"
+- assertVisible: "2"
+
+# Decrease quantity
+- tapOn: "-"
+- assertVisible: "1"
+
+# Remove item
+- tapOn: "Remove"
+
+# Verify cart is empty
+- assertVisible: "Your cart is empty"
+
+# Take screenshot
+- takeScreenshot: empty-cart

@@ -1,0 +1,64 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "retry": "Retry",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "search": "Search",
+        "filter": "Filter",
+        "sort": "Sort"
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Register",
+        "email": "Email",
+        "password": "Password",
+        "fullName": "Full Name",
+        "confirmPassword": "Confirm Password",
+        "loginButton": "Sign In",
+        "registerButton": "Create Account",
+        "dontHaveAccount": "Don't have an account? Register",
+        "alreadyHaveAccount": "Already have an account? Login",
+        "logout": "Logout",
+        "welcome": "Welcome back!"
+    },
+    "products": {
+        "title": "Products",
+        "addToCart": "Add to Cart",
+        "outOfStock": "Out of Stock",
+        "price": "Price",
+        "rating": "Rating",
+        "reviews": "reviews",
+        "description": "Description",
+        "category": "Category"
+    },
+    "cart": {
+        "title": "Shopping Cart",
+        "empty": "Your cart is empty",
+        "total": "Total",
+        "checkout": "Checkout",
+        "remove": "Remove",
+        "quantity": "Quantity",
+        "summary": "Order Summary",
+        "subtotal": "Subtotal",
+        "shipping": "Shipping",
+        "placeOrder": "Place Order"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "empty": "No notifications",
+        "permissionRequired": "Notification permission required",
+        "enable": "Enable Notifications"
+    },
+    "profile": {
+        "title": "Profile",
+        "settings": "Settings",
+        "language": "Language",
+        "theme": "Theme",
+        "darkMode": "Dark Mode",
+        "lightMode": "Light Mode"
+    }
+}

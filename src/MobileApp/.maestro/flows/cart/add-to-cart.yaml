@@ -1,0 +1,39 @@
+appId: ${APP_ID}
+name: Add to Cart Flow Test
+tags:
+  - cart
+  - add-item
+
+---
+# Launch and login
+- runFlow: ../auth/login.yaml
+
+# Navigate to products
+- tapOn: "Products"
+
+# Select first product
+- tapOn:
+    text: "Product"
+    index: 0
+
+# Add to cart
+- tapOn: "Add to Cart"
+
+# Verify success message
+- assertVisible:
+    text: "Added to cart"
+    timeout: 3000
+
+# Verify cart badge updated
+- assertVisible: "1"
+
+# Navigate to cart
+- tapOn: "Cart"
+
+# Verify item in cart
+- assertVisible: "Cart"
+- assertVisible: "Product"
+- assertVisible: "Quantity"
+
+# Take screenshot
+- takeScreenshot: cart-with-item

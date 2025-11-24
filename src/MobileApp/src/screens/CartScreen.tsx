@@ -1,9 +1,11 @@
 import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import api from '@/services/api';
 import { Cart, CartItem } from '@/types';
 
 export default function CartScreen() {
+    const { t } = useTranslation();
     const { data: cart, isLoading } = useQuery({
         queryKey: ['cart', 'testuser'],
         queryFn: async () => {
@@ -35,7 +37,7 @@ export default function CartScreen() {
                 </View>
             </View>
             <TouchableOpacity className="justify-center">
-                <Text className="text-red-500 font-semibold">Remove</Text>
+                <Text className="text-red-500 font-semibold">{t('cart.remove')}</Text>
             </TouchableOpacity>
         </View>
     );
@@ -44,7 +46,7 @@ export default function CartScreen() {
         return (
             <View className="flex-1 items-center justify-center bg-gray-50">
                 <ActivityIndicator size="large" color="#2563eb" />
-                <Text className="text-gray-600 mt-4">Loading cart...</Text>
+                <Text className="text-gray-600 mt-4">{t('common.loading')}</Text>
             </View>
         );
     }
@@ -59,18 +61,18 @@ export default function CartScreen() {
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
                     <View className="items-center justify-center py-20">
-                        <Text className="text-gray-400 text-lg">Your cart is empty</Text>
+                        <Text className="text-gray-400 text-lg">{t('cart.empty')}</Text>
                     </View>
                 }
             />
             {cart && cart.items.length > 0 && (
                 <View className="bg-white p-6 border-t border-gray-200">
                     <View className="flex-row justify-between mb-4">
-                        <Text className="text-gray-600 text-lg">Total</Text>
+                        <Text className="text-gray-600 text-lg">{t('cart.total')}</Text>
                         <Text className="text-2xl font-bold text-gray-800">${cart.totalPrice}</Text>
                     </View>
                     <TouchableOpacity className="bg-blue-600 rounded-lg py-4 items-center">
-                        <Text className="text-white font-bold text-lg">Checkout</Text>
+                        <Text className="text-white font-bold text-lg">{t('cart.checkout')}</Text>
                     </TouchableOpacity>
                 </View>
             )}

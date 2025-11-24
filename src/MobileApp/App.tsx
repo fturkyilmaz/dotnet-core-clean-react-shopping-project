@@ -1,4 +1,5 @@
 import './global.css';
+import './i18n';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
@@ -8,6 +9,8 @@ import HomeScreen from '@/screens/HomeScreen';
 import LoginScreen from '@/screens/LoginScreen';
 import ProductsScreen from '@/screens/ProductsScreen';
 import CartScreen from '@/screens/CartScreen';
+import ProfileScreen from '@/screens/ProfileScreen';
+import NotificationsScreen from '@/screens/NotificationsScreen';
 const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
 
@@ -46,6 +49,16 @@ export default function App() {
                             name="Cart"
                             component={CartScreen}
                             options={{ title: 'Shopping Cart' }}
+                        />
+                        <Stack.Screen
+                            name="Profile"
+                            component={ProfileScreen}
+                            options={{ title: 'Profile' }}
+                        />
+                        <Stack.Screen
+                            name="Notifications"
+                            component={NotificationsScreen}
+                            options={{ title: 'Notifications' }}
                         />
                     </Stack.Navigator>
                 </NavigationContainer>

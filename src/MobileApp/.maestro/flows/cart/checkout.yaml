@@ -1,0 +1,50 @@
+appId: ${APP_ID}
+name: Checkout Flow Test
+tags:
+  - cart
+  - checkout
+  - order
+
+---
+# Add item to cart
+- runFlow: add-to-cart.yaml
+
+# Proceed to checkout
+- tapOn: "Checkout"
+
+# Fill shipping information
+- tapOn: "Full Name"
+- inputText: "John Doe"
+
+- tapOn: "Address"
+- inputText: "123 Main St"
+
+- tapOn: "City"
+- inputText: "New York"
+
+- tapOn: "Postal Code"
+- inputText: "10001"
+
+- tapOn: "Phone"
+- inputText: "+1234567890"
+
+# Review order
+- tapOn: "Continue"
+
+# Verify order summary
+- assertVisible: "Order Summary"
+- assertVisible: "Total"
+
+# Place order
+- tapOn: "Place Order"
+
+# Wait for confirmation
+- assertVisible:
+    text: "Order placed successfully"
+    timeout: 5000
+
+# Verify order number
+- assertVisible: "Order #"
+
+# Take screenshot
+- takeScreenshot: order-confirmation

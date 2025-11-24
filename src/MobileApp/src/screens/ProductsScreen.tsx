@@ -1,8 +1,10 @@
 import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/hooks/useProducts';
 import { Product } from '@/types';
 
 export default function ProductsScreen() {
+    const { t } = useTranslation();
     const { data: products, isLoading, error } = useProducts();
 
     const renderProduct = ({ item }: { item: Product }) => (
@@ -27,7 +29,7 @@ export default function ProductsScreen() {
                 {item.description}
             </Text>
             <TouchableOpacity className="bg-blue-600 rounded-lg py-3 items-center">
-                <Text className="text-white font-semibold">Add to Cart</Text>
+                <Text className="text-white font-semibold">{t('products.addToCart')}</Text>
             </TouchableOpacity>
         </View>
     );
@@ -36,7 +38,7 @@ export default function ProductsScreen() {
         return (
             <View className="flex-1 items-center justify-center bg-gray-50">
                 <ActivityIndicator size="large" color="#2563eb" />
-                <Text className="text-gray-600 mt-4">Loading products...</Text>
+                <Text className="text-gray-600 mt-4">{t('common.loading')}</Text>
             </View>
         );
     }
@@ -44,7 +46,7 @@ export default function ProductsScreen() {
     if (error) {
         return (
             <View className="flex-1 items-center justify-center bg-gray-50">
-                <Text className="text-red-600 text-lg">Error loading products</Text>
+                <Text className="text-red-600 text-lg">{t('common.error')}</Text>
             </View>
         );
     }

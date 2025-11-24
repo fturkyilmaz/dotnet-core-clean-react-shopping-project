@@ -1,8 +1,13 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { useSignalR, useCartNotifications, useOrderNotifications, useGeneralNotifications } from '../hooks/useSignalR';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useSignalRConnection } from '@/hooks/useSignalRConnection';
+import { useCartSignal } from '@/hooks/useCartSignal';
+import { useOrderSignal } from '@/hooks/useOrderSignal';
+import { useNotificationSignal } from '@/hooks/useNotificationSignal';
 
 export default function NotificationsScreen() {
+    const { t } = useTranslation();
     const {
         notificationConnection,
         cartConnection,
@@ -10,12 +15,12 @@ export default function NotificationsScreen() {
         isConnected,
         expoPushToken,
         sendLocalNotification,
-    } = useSignalR();
+    } = useSignalRConnection();
 
     // Setup notification listeners
-    useCartNotifications(cartConnection);
-    useOrderNotifications(orderConnection);
-    useGeneralNotifications(notificationConnection);
+    useCartSignal(cartConnection);
+    useOrderSignal(orderConnection);
+    useNotificationSignal(notificationConnection);
 
     const testNotification = async () => {
         if (notificationConnection) {
@@ -37,7 +42,7 @@ export default function NotificationsScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Notifications</Text>
+            <Text style={styles.title}>{t('notifications.title')}</Text>
 
             <View style={styles.statusContainer}>
                 <Text style={styles.statusLabel}>SignalR Status:</Text>

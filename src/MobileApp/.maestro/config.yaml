@@ -1,0 +1,17 @@
+appId: com.shoppingapp.mobile
+name: Shopping App E2E Tests
+
+env:
+  API_URL: http://localhost:5000
+  TEST_USER_EMAIL: test@example.com
+  TEST_USER_PASSWORD: Test123!
+  
+tags:
+  - mobile
+  - e2e
+  - shopping
+
+# Global settings
+settings:
+  timeout: 30000
+  retries: 2

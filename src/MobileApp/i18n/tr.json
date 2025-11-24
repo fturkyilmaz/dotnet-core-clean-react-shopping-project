@@ -1,0 +1,64 @@
+{
+    "common": {
+        "loading": "Yükleniyor...",
+        "error": "Bir hata oluştu",
+        "retry": "Tekrar Dene",
+        "save": "Kaydet",
+        "cancel": "İptal",
+        "delete": "Sil",
+        "edit": "Düzenle",
+        "search": "Ara",
+        "filter": "Filtrele",
+        "sort": "Sırala"
+    },
+    "auth": {
+        "login": "Giriş Yap",
+        "register": "Kayıt Ol",
+        "email": "E-posta",
+        "password": "Şifre",
+        "fullName": "Ad Soyad",
+        "confirmPassword": "Şifre Tekrar",
+        "loginButton": "Giriş Yap",
+        "registerButton": "Hesap Oluştur",
+        "dontHaveAccount": "Hesabınız yok mu? Kayıt Olun",
+        "alreadyHaveAccount": "Zaten hesabınız var mı? Giriş Yapın",
+        "logout": "Çıkış Yap",
+        "welcome": "Hoş geldiniz!"
+    },
+    "products": {
+        "title": "Ürünler",
+        "addToCart": "Sepete Ekle",
+        "outOfStock": "Stokta Yok",
+        "price": "Fiyat",
+        "rating": "Puan",
+        "reviews": "değerlendirme",
+        "description": "Açıklama",
+        "category": "Kategori"
+    },
+    "cart": {
+        "title": "Alışveriş Sepeti",
+        "empty": "Sepetiniz boş",
+        "total": "Toplam",
+        "checkout": "Ödeme Yap",
+        "remove": "Kaldır",
+        "quantity": "Adet",
+        "summary": "Sipariş Özeti",
+        "subtotal": "Ara Toplam",
+        "shipping": "Kargo",
+        "placeOrder": "Siparişi Tamamla"
+    },
+    "notifications": {
+        "title": "Bildirimler",
+        "empty": "Bildirim yok",
+        "permissionRequired": "Bildirim izni gerekiyor",
+        "enable": "Bildirimleri Aç"
+    },
+    "profile": {
+        "title": "Profil",
+        "settings": "Ayarlar",
+        "language": "Dil",
+        "theme": "Tema",
+        "darkMode": "Karanlık Mod",
+        "lightMode": "Aydınlık Mod"
+    }
+}

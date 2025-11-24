@@ -1,0 +1,170 @@
+name: Mobile E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/MobileApp/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/MobileApp/**'
+  workflow_dispatch:
+
+jobs:
+  e2e-ios:
+    name: E2E Tests (iOS)
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: src/MobileApp/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: src/MobileApp
+        run: npm ci
+        
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+          
+      - name: Verify Maestro installation
+        run: maestro --version
+        
+      - name: Setup iOS Simulator
+        run: |
+          xcrun simctl list devices
+          xcrun simctl boot "iPhone 15" || true
+          
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+        
+      - name: Prebuild iOS app
+        working-directory: src/MobileApp
+        run: npx expo prebuild --platform ios --clean
+        
+      - name: Build iOS app
+        working-directory: src/MobileApp/ios
+        run: |
+          xcodebuild -workspace ShoppingApp.xcworkspace \
+            -scheme ShoppingApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -derivedDataPath build
+            
+      - name: Install app on simulator
+        working-directory: src/MobileApp/ios/build/Build/Products/Debug-iphonesimulator
+        run: |
+          xcrun simctl install booted ShoppingApp.app
+          
+      - name: Run Maestro tests
+        working-directory: src/MobileApp
+        run: |
+          maestro test .maestro/flows \
+            --format junit \
+            --output test-results.xml
+        continue-on-error: true
+        
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-test-results-ios
+          path: |
+            src/MobileApp/test-results.xml
+            src/MobileApp/.maestro/screenshots/
+            
+      - name: Publish test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action/macos@v2
+        with:
+          files: src/MobileApp/test-results.xml
+          check_name: E2E Test Results (iOS)
+
+  e2e-android:
+    name: E2E Tests (Android)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: src/MobileApp/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: src/MobileApp
+        run: npm ci
+        
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+          
+      - name: Verify Maestro installation
+        run: maestro --version
+        
+      - name: Setup Android Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          script: echo "Emulator started"
+          
+      - name: Prebuild Android app
+        working-directory: src/MobileApp
+        run: npx expo prebuild --platform android --clean
+        
+      - name: Build Android app
+        working-directory: src/MobileApp/android
+        run: ./gradlew assembleDebug
+        
+      - name: Run Maestro tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          script: |
+            cd src/MobileApp
+            maestro test .maestro/flows \
+              --format junit \
+              --output test-results.xml
+        continue-on-error: true
+        
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-test-results-android
+          path: |
+            src/MobileApp/test-results.xml
+            src/MobileApp/.maestro/screenshots/
+            
+      - name: Publish test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: src/MobileApp/test-results.xml
+          check_name: E2E Test Results (Android)

@@ -1,0 +1,36 @@
+appId: ${APP_ID}
+name: Register Flow Test
+tags:
+  - auth
+  - register
+
+---
+# Launch the app
+- launchApp
+
+# Navigate to register screen
+- tapOn: "Register"
+
+# Fill registration form
+- tapOn: "Email"
+- inputText: "newuser@example.com"
+
+- tapOn: "Password"
+- inputText: "NewUser123!"
+
+- tapOn: "Confirm Password"
+- inputText: "NewUser123!"
+
+- tapOn: "Full Name"
+- inputText: "Test User"
+
+# Submit registration
+- tapOn: "Create Account"
+
+# Wait for success message
+- assertVisible:
+    text: "Registration successful"
+    timeout: 5000
+
+# Take screenshot
+- takeScreenshot: register-success

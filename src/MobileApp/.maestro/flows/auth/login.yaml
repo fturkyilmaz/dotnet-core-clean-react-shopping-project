@@ -1,0 +1,37 @@
+appId: ${APP_ID}
+name: Login Flow Test
+tags:
+  - auth
+  - login
+
+---
+# Launch the app
+- launchApp
+
+# Wait for app to load
+- assertVisible: "Welcome"
+
+# Navigate to login if needed
+- tapOn: "Login"
+
+# Enter email
+- tapOn: "Email"
+- inputText: "${TEST_USER_EMAIL}"
+
+# Enter password
+- tapOn: "Password"
+- inputText: "${TEST_USER_PASSWORD}"
+
+# Submit login
+- tapOn: "Sign In"
+
+# Wait for successful login
+- assertVisible: 
+    text: "Products"
+    timeout: 5000
+
+# Verify we're on home screen
+- assertVisible: "Shopping"
+
+# Take screenshot for verification
+- takeScreenshot: login-success
