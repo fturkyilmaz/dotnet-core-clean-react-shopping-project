@@ -14,9 +14,13 @@ const initialState: ProductsState = {
   error: null,
 };
 
-export const fetchProducts = createAsyncThunk('products/fetchProducts', async () => {
-  const response = await api.get<Product[]>('/products');
-  return response.data;
+export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_, { rejectWithValue }) => {
+  try {
+    const response = await api.get<Product[]>('/products');
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch products');
+  }
 });
 
 const productsSlice = createSlice({
@@ -35,7 +39,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch products';
+        state.error = (action.payload as string) || action.error.message || 'Failed to fetch products';
       });
   },
 });

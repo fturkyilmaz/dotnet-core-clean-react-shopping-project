@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '@/services/api';
-import { AuthResponse, User } from '@/types';
+import { AuthResponse, User, LoginRequest, ApiResponse } from '@/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface AuthState {
@@ -21,28 +21,28 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk(
   'auth/login',
-  async (credentials: any, { rejectWithValue }) => {
+  async (credentials: LoginRequest, { rejectWithValue }) => {
     try {
-      const response = await api.post<any>('/identity/login', credentials);
+      const response = await api.post<ApiResponse<AuthResponse>>('/identity/login', credentials);
       console.log('Full response:', response.data);
       
-      // Axios wraps the API response in response.data
-      // API response structure: { data: { accessToken, refreshToken, ... }, isSuccess: true, ... }
-      const accessToken = response.data.data.accessToken;
-      const refreshToken = response.data.data.refreshToken;
+      if (!response.data.isSuccess) {
+        return rejectWithValue(response.data.message || 'Login failed');
+      }
+
+      const { accessToken, refreshToken } = response.data.data;
       
       // Save tokens to AsyncStorage
       await AsyncStorage.setItem('token', accessToken);
       await AsyncStorage.setItem('refreshToken', refreshToken);
       
-      return {
-        token: accessToken,
-        refreshToken,
-        ...response.data.data
-      };
+      return response.data.data;
     } catch (error: any) {
       console.error('Login error:', error);
-      return rejectWithValue(error.response?.data?.message || 'Login failed');
+      if (error.response && error.response.data) {
+         return rejectWithValue(error.response.data.message || error.message || 'Login failed');
+      }
+      return rejectWithValue(error.message || 'Login failed');
     }
   }
 );

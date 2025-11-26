@@ -6,7 +6,8 @@ import { Suspense, lazy } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import './i18n/config'; // Initialize i18n
 
-import { store } from '@store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from '@store';
 import { queryClient } from '@api/queryClient';
 import Header from '@components/Header';
 import ProtectedRoute from '@components/ProtectedRoute';
@@ -35,27 +36,29 @@ const PageLoader = () => (
 const App = () => {
   return (
     <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <ErrorBoundary>
-            <Header />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/product/:id" element={<ProductDetailPage />} />
-                <Route path="/carts" element={<CartsPage />} />
-                <Route path="/category" element={<Category />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
-                <Route path="/admin/products/add" element={<ProtectedRoute requireAdmin><AddProductPage /></ProtectedRoute>} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </Suspense>
-            <ToastContainer position="top-right" autoClose={3000} />
-          </ErrorBoundary>
-        </BrowserRouter>
-      </QueryClientProvider>
+      <PersistGate loading={<PageLoader />} persistor={persistor}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <ErrorBoundary>
+              <Header />
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/product/:id" element={<ProductDetailPage />} />
+                  <Route path="/carts" element={<CartsPage />} />
+                  <Route path="/category" element={<Category />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+                  <Route path="/admin/products/add" element={<ProtectedRoute requireAdmin><AddProductPage /></ProtectedRoute>} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Suspense>
+              <ToastContainer position="top-right" autoClose={3000} />
+            </ErrorBoundary>
+          </BrowserRouter>
+        </QueryClientProvider>
+      </PersistGate>
     </Provider>
   );
 };

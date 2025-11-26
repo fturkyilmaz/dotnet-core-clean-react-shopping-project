@@ -36,3 +36,15 @@ export interface Cart {
   items: CartItem[];
   totalPrice: number;
 }
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  isSuccess: boolean;
+  message: string | null;
+  errors: string[] | null;
+}

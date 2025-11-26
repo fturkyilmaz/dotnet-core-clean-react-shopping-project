@@ -21,11 +21,13 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (username: str
 
 export const addToCart = createAsyncThunk(
   'cart/addToCart',
-  async ({ username, productId, quantity }: { username: string; productId: number; quantity: number }) => {
-    // Assuming API structure for adding to cart
-    // This might need adjustment based on actual API implementation
-    const response = await api.post('/carts', { username, items: [{ productId, quantity }] });
-    return response.data;
+  async ({ username, productId, quantity }: { username: string; productId: number; quantity: number }, { rejectWithValue }) => {
+    try {
+      const response = await api.post<Cart>('/carts', { username, items: [{ productId, quantity }] });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message || 'Failed to add to cart');
+    }
   }
 );
 
@@ -45,7 +47,19 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch cart';
+        state.error = (action.payload as string) || action.error.message || 'Failed to fetch cart';
+      })
+      .addCase(addToCart.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addToCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cart = action.payload;
+      })
+      .addCase(addToCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = (action.payload as string) || action.error.message || 'Failed to add to cart';
       });
   },
 });
