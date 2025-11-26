@@ -50,16 +50,16 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
 
                         <View className="mb-8">
                             <Text className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
-                                Create Account
+                                {t('auth.createAccountTitle')}
                             </Text>
                             <Text className="text-lg text-slate-500 dark:text-slate-400">
-                                Sign up to get started
+                                {t('auth.signUpSubtitle')}
                             </Text>
                         </View>
 
                         <View className="space-y-5">
                             <View>
-                                <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">Full Name</Text>
+                                <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">{t('auth.fullName')}</Text>
                                 <TextInput
                                     className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
                                     placeholder="John Doe"
@@ -95,10 +95,10 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                             </View>
 
                             <View>
-                                <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">Confirm Password</Text>
+                                <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">{t('auth.confirmPassword')}</Text>
                                 <TextInput
                                     className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
-                                    placeholder="Confirm your password"
+                                    placeholder={t('auth.confirmPassword')}
                                     placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                     value={confirmPassword}
                                     onChangeText={setConfirmPassword}
@@ -114,15 +114,15 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                                 {loading ? (
                                     <ActivityIndicator color="white" />
                                 ) : (
-                                    <Text className="text-white font-bold text-lg">Sign Up</Text>
+                                    <Text className="text-white font-bold text-lg">{t('auth.signUp')}</Text>
                                 )}
                             </TouchableOpacity>
                         </View>
 
                         <View className="flex-row justify-center mt-8 mb-8">
-                            <Text className="text-slate-500 dark:text-slate-400">Already have an account? </Text>
+                            <Text className="text-slate-500 dark:text-slate-400">{t('auth.alreadyHaveAccountQuestion')} </Text>
                             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                                <Text className="text-blue-600 dark:text-blue-400 font-bold">Log In</Text>
+                                <Text className="text-blue-600 dark:text-blue-400 font-bold">{t('auth.logIn')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

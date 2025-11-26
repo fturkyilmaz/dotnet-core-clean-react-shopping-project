@@ -48,10 +48,10 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
 
                         <View className="mb-8">
                             <Text className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
-                                Forgot Password?
+                                {t('auth.forgotPasswordTitle')}
                             </Text>
                             <Text className="text-lg text-slate-500 dark:text-slate-400">
-                                Don't worry! It happens. Please enter the address associated with your account.
+                                {t('auth.forgotPasswordSubtitle')}
                             </Text>
                         </View>
 
@@ -78,7 +78,7 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
                                     {loading ? (
                                         <ActivityIndicator color="white" />
                                     ) : (
-                                        <Text className="text-white font-bold text-lg">Submit</Text>
+                                        <Text className="text-white font-bold text-lg">{t('auth.submit')}</Text>
                                     )}
                                 </TouchableOpacity>
                             </View>
@@ -87,15 +87,15 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
                                 <View className="w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full items-center justify-center mb-4">
                                     <Ionicons name="checkmark" size={40} color="#16a34a" />
                                 </View>
-                                <Text className="text-xl font-bold text-slate-900 dark:text-white mb-2">Check your email</Text>
+                                <Text className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t('auth.checkEmail')}</Text>
                                 <Text className="text-slate-500 dark:text-slate-400 text-center mb-8">
-                                    We have sent a password recover instructions to your email.
+                                    {t('auth.recoverySent')}
                                 </Text>
                                 <TouchableOpacity
                                     className="bg-slate-900 dark:bg-slate-800 rounded-xl py-4 px-8 items-center"
                                     onPress={() => navigation.navigate('Login')}
                                 >
-                                    <Text className="text-white font-bold text-lg">Back to Login</Text>
+                                    <Text className="text-white font-bold text-lg">{t('auth.backToLogin')}</Text>
                                 </TouchableOpacity>
                             </View>
                         )}

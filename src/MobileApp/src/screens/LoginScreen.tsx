@@ -83,7 +83,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                                 className="items-end my-4"
                                 onPress={() => navigation.navigate('ForgotPassword')}
                             >
-                                <Text className="text-blue-600 dark:text-blue-400 font-semibold">Forgot Password?</Text>
+                                <Text className="text-blue-600 dark:text-blue-400 font-semibold">{t('auth.forgotPassword')}</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
@@ -102,7 +102,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                         <View className="flex-row justify-center mt-8">
                             <Text className="text-slate-500 dark:text-slate-400">{t('auth.dontHaveAccount')} </Text>
                             <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                                <Text className="text-blue-600 dark:text-blue-400 font-bold">Sign Up</Text>
+                                <Text className="text-blue-600 dark:text-blue-400 font-bold">{t('auth.signUp')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

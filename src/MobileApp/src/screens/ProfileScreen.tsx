@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/store/slices/authSlice';
@@ -23,7 +22,7 @@ const ProfileScreen = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-900">
+        <View className="flex-1 bg-slate-50 dark:bg-slate-900">
             <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
                 {/* Header Section */}
                 <View className="bg-white dark:bg-slate-800 px-6 pt-6 pb-8 rounded-b-3xl shadow-sm border-b border-slate-100 dark:border-slate-700 mb-6">
@@ -83,7 +82,7 @@ const ProfileScreen = () => {
                         </View>
                     </View>
 
-                    <Text className="text-slate-900 dark:text-white font-bold text-lg mb-4">Account</Text>
+                    <Text className="text-slate-900 dark:text-white font-bold text-lg mb-4">{t('profile.account')}</Text>
 
                     <View className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
                         <TouchableOpacity className="flex-row items-center justify-between py-3 border-b border-slate-50 dark:border-slate-700">
@@ -91,7 +90,7 @@ const ProfileScreen = () => {
                                 <View className="w-10 h-10 bg-slate-50 dark:bg-slate-700 rounded-full items-center justify-center">
                                     <Ionicons name="notifications-outline" size={20} color={theme === 'dark' ? '#e2e8f0' : '#334155'} />
                                 </View>
-                                <Text className="text-slate-700 dark:text-slate-200 font-semibold text-base">Notifications</Text>
+                                <Text className="text-slate-700 dark:text-slate-200 font-semibold text-base">{t('profile.notifications')}</Text>
                             </View>
                             <Ionicons name="chevron-forward" size={20} color={theme === 'dark' ? '#64748b' : '#cbd5e1'} />
                         </TouchableOpacity>
@@ -101,7 +100,7 @@ const ProfileScreen = () => {
                                 <View className="w-10 h-10 bg-slate-50 dark:bg-slate-700 rounded-full items-center justify-center">
                                     <Ionicons name="shield-checkmark-outline" size={20} color={theme === 'dark' ? '#e2e8f0' : '#334155'} />
                                 </View>
-                                <Text className="text-slate-700 dark:text-slate-200 font-semibold text-base">Privacy & Security</Text>
+                                <Text className="text-slate-700 dark:text-slate-200 font-semibold text-base">{t('profile.privacySecurity')}</Text>
                             </View>
                             <Ionicons name="chevron-forward" size={20} color={theme === 'dark' ? '#64748b' : '#cbd5e1'} />
                         </TouchableOpacity>
@@ -114,13 +113,13 @@ const ProfileScreen = () => {
                                 <View className="w-10 h-10 bg-red-50 dark:bg-red-900/20 rounded-full items-center justify-center">
                                     <Ionicons name="log-out-outline" size={20} color="#ef4444" />
                                 </View>
-                                <Text className="text-red-600 font-semibold text-base">Log Out</Text>
+                                <Text className="text-red-600 font-semibold text-base">{t('auth.logout')}</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 };
 

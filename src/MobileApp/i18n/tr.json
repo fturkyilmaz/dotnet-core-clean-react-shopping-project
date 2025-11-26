@@ -23,7 +23,19 @@
         "dontHaveAccount": "Hesabınız yok mu? Kayıt Olun",
         "alreadyHaveAccount": "Zaten hesabınız var mı? Giriş Yapın",
         "logout": "Çıkış Yap",
-        "welcome": "Hoş geldiniz!"
+        "welcome": "Hoş geldiniz!",
+        "forgotPassword": "Şifremi Unuttum?",
+        "signUp": "Kayıt Ol",
+        "createAccountTitle": "Hesap Oluştur",
+        "signUpSubtitle": "Başlamak için kayıt olun",
+        "alreadyHaveAccountQuestion": "Zaten hesabınız var mı?",
+        "logIn": "Giriş Yap",
+        "forgotPasswordTitle": "Şifrenizi mi Unuttunuz?",
+        "forgotPasswordSubtitle": "Endişelenmeyin! Olur böyle şeyler. Lütfen hesabınızla ilişkili adresi girin.",
+        "submit": "Gönder",
+        "checkEmail": "E-postanızı kontrol edin",
+        "recoverySent": "E-postanıza şifre kurtarma talimatlarını gönderdik.",
+        "backToLogin": "Girişe Dön"
     },
     "products": {
         "title": "Ürünler",
@@ -33,7 +45,8 @@
         "rating": "Puan",
         "reviews": "değerlendirme",
         "description": "Açıklama",
-        "category": "Kategori"
+        "category": "Kategori",
+        "addedToCart": "Sepete başarıyla eklendi!"
     },
     "cart": {
         "title": "Alışveriş Sepeti",
@@ -45,7 +58,11 @@
         "summary": "Sipariş Özeti",
         "subtotal": "Ara Toplam",
         "shipping": "Kargo",
-        "placeOrder": "Siparişi Tamamla"
+        "placeOrder": "Siparişi Tamamla",
+        "emptyMessage": "Henüz sepetinize bir şey eklememişsiniz gibi görünüyor.",
+        "clearCart": "Sepeti Boşalt",
+        "itemRemoved": "Ürün sepetten kaldırıldı",
+        "cartCleared": "Sepet başarıyla boşaltıldı"
     },
     "notifications": {
         "title": "Bildirimler",
@@ -59,6 +76,28 @@
         "language": "Dil",
         "theme": "Tema",
         "darkMode": "Karanlık Mod",
-        "lightMode": "Aydınlık Mod"
+        "lightMode": "Aydınlık Mod",
+        "orders": "Siparişler",
+        "reviews": "Değerlendirmeler",
+        "account": "Hesap",
+        "notifications": "Bildirimler",
+        "privacySecurity": "Gizlilik ve Güvenlik"
+    },
+    "home": {
+        "newCollection": "Yeni Koleksiyon",
+        "discoverTrends": "En Son Trendleri Keşfet",
+        "discountOffer": "İlk alışverişinde %20 indirim kazan",
+        "shopNow": "Şimdi Alışveriş Yap",
+        "categories": "Kategoriler",
+        "seeAll": "Tümünü Gör",
+        "featuredProducts": "Öne Çıkan Ürünler",
+        "electronics": "Elektronik",
+        "jewelery": "Mücevher",
+        "mensClothing": "Erkek Giyim",
+        "womensClothing": "Kadın Giyim"
+    },
+    "category": {
+        "browse": "Kategorilere Göz At",
+        "explore": "Geniş ürün yelpazemizi keşfedin"
     }
 }

@@ -1,36 +1,49 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, Dimensions, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
-import { useProducts } from '@/hooks/useProducts';
+import { useFeaturedProducts } from '@/hooks/useProducts';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
+// Helper function to convert category names to camelCase
+const toCamelCase = (str: string): string => {
+    return str
+        .split(/['s\s]+/) // Split by apostrophe+s or spaces
+        .map((word, index) => {
+            if (index === 0) {
+                return word.toLowerCase(); // First word lowercase
+            }
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(); // Capitalize first letter of subsequent words
+        })
+        .join('');
+};
+
 export default function HomeScreen({ navigation }: any) {
     const { theme } = useTheme();
-    const { data: products } = useProducts();
+    const { t } = useTranslation();
+    const { data: featuredProducts, isLoading: isFeaturedLoading } = useFeaturedProducts();
 
-    // Get top rated products
-    const featuredProducts = products?.filter(p => p.rating.rate > 4.5).slice(0, 5) || [];
-
+    console.log("X", featuredProducts);
     return (
         <ScrollView className="flex-1 bg-slate-50 dark:bg-slate-900">
             {/* Hero Section */}
             <View className="p-6 pt-2">
                 <View className="bg-blue-600 dark:bg-blue-700 rounded-3xl p-6 shadow-lg shadow-blue-200 dark:shadow-none overflow-hidden relative">
                     <View className="z-10">
-                        <Text className="text-blue-100 font-semibold mb-2 uppercase tracking-wider">New Collection</Text>
+                        <Text className="text-blue-100 font-semibold mb-2 uppercase tracking-wider">{t('home.newCollection')}</Text>
                         <Text className="text-3xl font-bold text-white mb-2 w-2/3">
-                            Discover the Latest Trends
+                            {t('home.discoverTrends')}
                         </Text>
                         <Text className="text-blue-100 mb-6 w-2/3">
-                            Get 20% off on your first purchase
+                            {t('home.discountOffer')}
                         </Text>
 
                         <TouchableOpacity
                             className="bg-white px-6 py-3 rounded-xl self-start"
                             onPress={() => navigation.navigate('Products')}
                         >
-                            <Text className="text-blue-600 font-bold">Shop Now</Text>
+                            <Text className="text-blue-600 font-bold">{t('home.shopNow')}</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -43,9 +56,9 @@ export default function HomeScreen({ navigation }: any) {
             {/* Categories Preview */}
             <View className="px-6 mb-8">
                 <View className="flex-row justify-between items-center mb-4">
-                    <Text className="text-xl font-bold text-slate-900 dark:text-white">Categories</Text>
+                    <Text className="text-xl font-bold text-slate-900 dark:text-white">{t('home.categories')}</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Categories')}>
-                        <Text className="text-blue-600 dark:text-blue-400 font-semibold">See All</Text>
+                        <Text className="text-blue-600 dark:text-blue-400 font-semibold">{t('home.seeAll')}</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -64,7 +77,7 @@ export default function HomeScreen({ navigation }: any) {
                                 />
                             </View>
                             <Text className="text-xs font-medium text-slate-600 dark:text-slate-400 capitalize">
-                                {cat.split(' ')[0]}
+                                {t(`home.${toCamelCase(cat)}` as any) || cat}
                             </Text>
                         </TouchableOpacity>
                     ))}
@@ -73,29 +86,35 @@ export default function HomeScreen({ navigation }: any) {
 
             {/* Featured Products */}
             <View className="px-6 mb-8">
-                <Text className="text-xl font-bold text-slate-900 dark:text-white mb-4">Featured Products</Text>
+                <Text className="text-xl font-bold text-slate-900 dark:text-white mb-4">{t('home.featuredProducts')}</Text>
 
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    {featuredProducts.map((item) => (
-                        <TouchableOpacity
-                            key={item.id}
-                            className="bg-white dark:bg-slate-800 w-48 p-4 rounded-2xl mr-4 shadow-sm border border-slate-100 dark:border-slate-700"
-                            onPress={() => { }}
-                        >
-                            <Image
-                                source={{ uri: item.image }}
-                                className="w-full h-32 mb-3"
-                                resizeMode="contain"
-                            />
-                            <Text className="text-slate-900 dark:text-white font-semibold mb-1" numberOfLines={1}>
-                                {item.title}
-                            </Text>
-                            <Text className="text-blue-600 dark:text-blue-400 font-bold">
-                                ${item.price}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
+                {isFeaturedLoading ? (
+                    <View className="items-center justify-center py-8">
+                        <ActivityIndicator size="large" color={theme === 'dark' ? '#60a5fa' : '#2563eb'} />
+                    </View>
+                ) : (
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {featuredProducts?.map((item) => (
+                            <TouchableOpacity
+                                key={item.id}
+                                className="bg-white dark:bg-slate-800 w-48 p-4 rounded-2xl mr-4 shadow-sm border border-slate-100 dark:border-slate-700"
+                                onPress={() => { }}
+                            >
+                                <Image
+                                    source={{ uri: item.image }}
+                                    className="w-full h-32 mb-3"
+                                    resizeMode="contain"
+                                />
+                                <Text className="text-slate-900 dark:text-white font-semibold mb-1" numberOfLines={1}>
+                                    {item.title}
+                                </Text>
+                                <Text className="text-blue-600 dark:text-blue-400 font-bold">
+                                    ${item.price}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                )}
             </View>
         </ScrollView>
     );

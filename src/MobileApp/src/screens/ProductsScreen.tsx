@@ -2,13 +2,24 @@ import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/hooks/useProducts';
 import { Product } from '@/types';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeContext';
+import Toast from 'react-native-toast-message';
 
 export default function ProductsScreen() {
     const { t } = useTranslation();
     const { data: products, isLoading, error } = useProducts();
     const { theme } = useTheme();
+
+    const handleAddToCart = (product: Product) => {
+        // TODO: Implement actual add to cart logic here
+        Toast.show({
+            type: 'success',
+            text1: t('products.addedToCart'),
+            text2: product.title,
+            position: 'top',
+            visibilityTime: 2000,
+        });
+    };
 
     const renderProduct = ({ item }: { item: Product }) => (
         <View className="bg-white dark:bg-slate-800 rounded-2xl p-4 mb-4 shadow-sm border border-slate-100 dark:border-slate-700">
@@ -34,7 +45,7 @@ export default function ProductsScreen() {
             <View className="flex-row items-center mb-3">
                 <Text className="text-yellow-400 mr-1 text-sm">★</Text>
                 <Text className="text-slate-700 dark:text-slate-300 font-semibold text-sm">{item.rating.rate}</Text>
-                <Text className="text-slate-400 dark:text-slate-500 text-sm ml-1">({item.rating.count} reviews)</Text>
+                <Text className="text-slate-400 dark:text-slate-500 text-sm ml-1">({item.rating.count} {t('products.reviews')})</Text>
             </View>
 
             <Text className="text-slate-500 dark:text-slate-400 text-sm mb-4 leading-5" numberOfLines={2}>
@@ -43,6 +54,7 @@ export default function ProductsScreen() {
 
             <TouchableOpacity
                 className="bg-slate-900 dark:bg-blue-600 rounded-xl py-3.5 items-center active:bg-slate-800 dark:active:bg-blue-700"
+                onPress={() => handleAddToCart(item)}
             >
                 <Text className="text-white font-semibold">{t('products.addToCart')}</Text>
             </TouchableOpacity>
@@ -66,7 +78,7 @@ export default function ProductsScreen() {
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-900" edges={['top']}>
+        <View className="flex-1 bg-slate-50 dark:bg-slate-900">
             <FlatList
                 data={products}
                 renderItem={renderProduct}
@@ -74,6 +86,6 @@ export default function ProductsScreen() {
                 contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
                 showsVerticalScrollIndicator={false}
             />
-        </SafeAreaView>
+        </View>
     );
 }

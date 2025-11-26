@@ -1,22 +1,89 @@
-import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
+import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import api from '@/services/api';
 import { CartItem } from '@/types';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
+import Toast from 'react-native-toast-message';
+import { useState } from 'react';
 
 export default function CartScreen() {
     const { t } = useTranslation();
     const { theme } = useTheme();
+    const queryClient = useQueryClient();
+    const [localCartItems, setLocalCartItems] = useState<CartItem[]>([]);
+
     const { data: cartItems, isLoading } = useQuery({
         queryKey: ['cart'],
         queryFn: async () => {
             const response = await api.get<CartItem[]>('/carts');
+            setLocalCartItems(response.data);
             return response.data;
         },
     });
+
+    const handleIncreaseQuantity = (item: CartItem) => {
+        const updatedItems = localCartItems.map(cartItem =>
+            cartItem.id === item.id
+                ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                : cartItem
+        );
+        setLocalCartItems(updatedItems);
+        // TODO: Call API to update quantity
+    };
+
+    const handleDecreaseQuantity = (item: CartItem) => {
+        if (item.quantity > 1) {
+            const updatedItems = localCartItems.map(cartItem =>
+                cartItem.id === item.id
+                    ? { ...cartItem, quantity: cartItem.quantity - 1 }
+                    : cartItem
+            );
+            setLocalCartItems(updatedItems);
+            // TODO: Call API to update quantity
+        }
+    };
+
+    const handleRemoveItem = (item: CartItem) => {
+        const updatedItems = localCartItems.filter(cartItem => cartItem.id !== item.id);
+        setLocalCartItems(updatedItems);
+        Toast.show({
+            type: 'success',
+            text1: t('cart.itemRemoved'),
+            text2: item.title,
+            position: 'top',
+            visibilityTime: 2000,
+        });
+        // TODO: Call API to remove item
+    };
+
+    const handleClearCart = () => {
+        Alert.alert(
+            t('cart.clearCart'),
+            'Are you sure you want to clear your cart?',
+            [
+                {
+                    text: t('common.cancel'),
+                    style: 'cancel',
+                },
+                {
+                    text: t('cart.clearCart'),
+                    style: 'destructive',
+                    onPress: () => {
+                        setLocalCartItems([]);
+                        Toast.show({
+                            type: 'success',
+                            text1: t('cart.cartCleared'),
+                            position: 'top',
+                            visibilityTime: 2000,
+                        });
+                        // TODO: Call API to clear cart
+                    },
+                },
+            ]
+        );
+    };
 
     const renderCartItem = ({ item }: { item: CartItem }) => (
         <View className="bg-white dark:bg-slate-800 rounded-2xl p-4 mb-4 flex-row shadow-sm border border-slate-100 dark:border-slate-700">
@@ -40,16 +107,25 @@ export default function CartScreen() {
 
                 <View className="flex-row items-center justify-between mt-2">
                     <View className="flex-row items-center bg-slate-100 dark:bg-slate-700 rounded-lg">
-                        <TouchableOpacity className="px-3 py-1">
+                        <TouchableOpacity
+                            className="px-3 py-1"
+                            onPress={() => handleDecreaseQuantity(item)}
+                        >
                             <Text className="text-slate-600 dark:text-slate-300 font-bold text-lg">-</Text>
                         </TouchableOpacity>
                         <Text className="px-2 text-slate-900 dark:text-white font-semibold">{item.quantity}</Text>
-                        <TouchableOpacity className="px-3 py-1">
+                        <TouchableOpacity
+                            className="px-3 py-1"
+                            onPress={() => handleIncreaseQuantity(item)}
+                        >
                             <Text className="text-slate-600 dark:text-slate-300 font-bold text-lg">+</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity className="bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
+                    <TouchableOpacity
+                        className="bg-red-50 dark:bg-red-900/20 p-2 rounded-lg"
+                        onPress={() => handleRemoveItem(item)}
+                    >
                         <Ionicons name="trash-outline" size={20} color="#ef4444" />
                     </TouchableOpacity>
                 </View>
@@ -65,11 +141,12 @@ export default function CartScreen() {
         );
     }
 
-    const totalPrice = cartItems?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
-    const itemsWithQuantity = cartItems?.filter(item => item.quantity > 0) || [];
+    const displayItems = localCartItems.length > 0 ? localCartItems : cartItems || [];
+    const totalPrice = displayItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const itemsWithQuantity = displayItems.filter(item => item.quantity > 0);
 
     return (
-        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-900" edges={['top']}>
+        <View className="flex-1 bg-slate-50 dark:bg-slate-900">
             <FlatList
                 data={itemsWithQuantity}
                 renderItem={renderCartItem}
@@ -81,9 +158,9 @@ export default function CartScreen() {
                         <View className="bg-slate-100 dark:bg-slate-800 w-20 h-20 rounded-full items-center justify-center mb-4">
                             <Ionicons name="cart-outline" size={40} color={theme === 'dark' ? '#94a3b8' : '#94a3b8'} />
                         </View>
-                        <Text className="text-slate-900 dark:text-white text-xl font-bold mb-2">Your cart is empty</Text>
+                        <Text className="text-slate-900 dark:text-white text-xl font-bold mb-2">{t('cart.empty')}</Text>
                         <Text className="text-slate-500 dark:text-slate-400 text-center px-10">
-                            Looks like you haven't added anything to your cart yet.
+                            {t('cart.emptyMessage')}
                         </Text>
                     </View>
                 }
@@ -91,19 +168,25 @@ export default function CartScreen() {
 
             {itemsWithQuantity.length > 0 && (
                 <View className="absolute bottom-0 left-0 right-0 bg-white dark:bg-slate-800 p-6 rounded-t-3xl shadow-lg border-t border-slate-100 dark:border-slate-700">
-                    <View className="flex-row justify-between items-end mb-6">
+                    <View className="flex-row justify-between items-center mb-4">
                         <View>
                             <Text className="text-slate-500 dark:text-slate-400 text-sm mb-1">{t('cart.total')}</Text>
                             <Text className="text-3xl font-bold text-slate-900 dark:text-white">
                                 ${totalPrice.toFixed(2)}
                             </Text>
                         </View>
+                        <TouchableOpacity
+                            className="bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-xl"
+                            onPress={handleClearCart}
+                        >
+                            <Text className="text-red-600 dark:text-red-400 font-semibold">{t('cart.clearCart')}</Text>
+                        </TouchableOpacity>
                     </View>
                     <TouchableOpacity className="bg-slate-900 dark:bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-slate-200 dark:shadow-none active:bg-slate-800 dark:active:bg-blue-700">
                         <Text className="text-white font-bold text-lg">{t('cart.checkout')}</Text>
                     </TouchableOpacity>
                 </View>
             )}
-        </SafeAreaView>
+        </View>
     );
 }

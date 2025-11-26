@@ -4,9 +4,11 @@ import { externalApi } from '@/services/api';
 import { useTheme } from '@/context/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function CategoryScreen({ navigation }: any) {
     const { theme } = useTheme();
+    const { t } = useTranslation();
 
     const { data: categories, isLoading } = useQuery({
         queryKey: ['categories'],
@@ -56,10 +58,10 @@ export default function CategoryScreen({ navigation }: any) {
                 ListHeaderComponent={
                     <View className="mb-6">
                         <Text className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                            Browse Categories
+                            {t('category.browse')}
                         </Text>
                         <Text className="text-slate-500 dark:text-slate-400">
-                            Explore our wide range of products
+                            {t('category.explore')}
                         </Text>
                     </View>
                 }

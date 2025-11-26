@@ -23,7 +23,19 @@
         "dontHaveAccount": "Don't have an account? Register",
         "alreadyHaveAccount": "Already have an account? Login",
         "logout": "Logout",
-        "welcome": "Welcome back!"
+        "welcome": "Welcome back!",
+        "forgotPassword": "Forgot Password?",
+        "signUp": "Sign Up",
+        "createAccountTitle": "Create Account",
+        "signUpSubtitle": "Sign up to get started",
+        "alreadyHaveAccountQuestion": "Already have an account?",
+        "logIn": "Log In",
+        "forgotPasswordTitle": "Forgot Password?",
+        "forgotPasswordSubtitle": "Don't worry! It happens. Please enter the address associated with your account.",
+        "submit": "Submit",
+        "checkEmail": "Check your email",
+        "recoverySent": "We have sent a password recover instructions to your email.",
+        "backToLogin": "Back to Login"
     },
     "products": {
         "title": "Products",
@@ -33,7 +45,8 @@
         "rating": "Rating",
         "reviews": "reviews",
         "description": "Description",
-        "category": "Category"
+        "category": "Category",
+        "addedToCart": "Added to cart successfully!"
     },
     "cart": {
         "title": "Shopping Cart",
@@ -45,7 +58,11 @@
         "summary": "Order Summary",
         "subtotal": "Subtotal",
         "shipping": "Shipping",
-        "placeOrder": "Place Order"
+        "placeOrder": "Place Order",
+        "emptyMessage": "Looks like you haven't added anything to your cart yet.",
+        "clearCart": "Clear Cart",
+        "itemRemoved": "Item removed from cart",
+        "cartCleared": "Cart cleared successfully"
     },
     "notifications": {
         "title": "Notifications",
@@ -59,6 +76,28 @@
         "language": "Language",
         "theme": "Theme",
         "darkMode": "Dark Mode",
-        "lightMode": "Light Mode"
+        "lightMode": "Light Mode",
+        "orders": "Orders",
+        "reviews": "Reviews",
+        "account": "Account",
+        "notifications": "Notifications",
+        "privacySecurity": "Privacy & Security"
+    },
+    "home": {
+        "newCollection": "New Collection",
+        "discoverTrends": "Discover the Latest Trends",
+        "discountOffer": "Get 20% off on your first purchase",
+        "shopNow": "Shop Now",
+        "categories": "Categories",
+        "seeAll": "See All",
+        "featuredProducts": "Featured Products",
+        "electronics": "Electronics",
+        "jewelery": "Jewelery",
+        "mensClothing": "Men's Clothing",
+        "womensClothing": "Women's Clothing"
+    },
+    "category": {
+        "browse": "Browse Categories",
+        "explore": "Explore our wide range of products"
     }
 }
