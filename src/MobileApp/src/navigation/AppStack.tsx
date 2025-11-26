@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import HomeScreen from '@/screens/HomeScreen';
 import ProductsScreen from '@/screens/ProductsScreen';
 import CartScreen from '@/screens/CartScreen';
@@ -12,6 +13,7 @@ const Tab = createBottomTabNavigator();
 
 export default function AppStack() {
     const { theme } = useTheme();
+    const { t } = useTranslation();
     const isDark = theme === 'dark';
 
     return (
@@ -36,6 +38,8 @@ export default function AppStack() {
                 name="Home"
                 component={HomeScreen}
                 options={{
+                    title: t('navigation.home'),
+                    tabBarLabel: t('navigation.home'),
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="home-outline" size={size} color={color} />
                     ),
@@ -45,6 +49,8 @@ export default function AppStack() {
                 name="Categories"
                 component={CategoryScreen}
                 options={{
+                    title: t('navigation.categories'),
+                    tabBarLabel: t('navigation.categories'),
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="grid-outline" size={size} color={color} />
                     ),
@@ -54,6 +60,8 @@ export default function AppStack() {
                 name="Products"
                 component={ProductsScreen}
                 options={{
+                    title: t('navigation.products'),
+                    tabBarLabel: t('navigation.products'),
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="bag-handle-outline" size={size} color={color} />
                     ),
@@ -63,7 +71,8 @@ export default function AppStack() {
                 name="Cart"
                 component={CartScreen}
                 options={{
-                    title: 'Shopping Cart',
+                    title: t('navigation.cart'),
+                    tabBarLabel: t('navigation.cart'),
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="cart-outline" size={size} color={color} />
                     ),
@@ -73,6 +82,8 @@ export default function AppStack() {
                 name="Profile"
                 component={ProfileScreen}
                 options={{
+                    title: t('navigation.profile'),
+                    tabBarLabel: t('navigation.profile'),
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="person-outline" size={size} color={color} />
                     ),

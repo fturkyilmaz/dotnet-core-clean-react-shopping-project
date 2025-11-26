@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/store/slices/authSlice';
 import { AppDispatch, RootState } from '@/store';
 import { useTheme } from '@/context/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileScreen = () => {
     const { t, i18n } = useTranslation();
@@ -13,8 +14,13 @@ const ProfileScreen = () => {
     const { user } = useSelector((state: RootState) => state.auth);
     const { theme } = useTheme();
 
-    const changeLanguage = (lang: string) => {
-        i18n.changeLanguage(lang);
+    const changeLanguage = async (lang: string) => {
+        try {
+            await AsyncStorage.setItem('user-language', lang);
+            await i18n.changeLanguage(lang);
+        } catch (error) {
+            console.error('Error changing language:', error);
+        }
     };
 
     const handleLogout = () => {

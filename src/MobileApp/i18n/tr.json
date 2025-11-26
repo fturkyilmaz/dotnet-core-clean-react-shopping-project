@@ -99,5 +99,12 @@
     "category": {
         "browse": "Kategorilere Göz At",
         "explore": "Geniş ürün yelpazemizi keşfedin"
+    },
+    "navigation": {
+        "home": "Ana Sayfa",
+        "categories": "Kategoriler",
+        "products": "Ürünler",
+        "cart": "Sepet",
+        "profile": "Profil"
     }
 }

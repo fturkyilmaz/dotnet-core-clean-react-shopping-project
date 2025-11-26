@@ -99,5 +99,12 @@
     "category": {
         "browse": "Browse Categories",
         "explore": "Explore our wide range of products"
+    },
+    "navigation": {
+        "home": "Home",
+        "categories": "Categories",
+        "products": "Products",
+        "cart": "Cart",
+        "profile": "Profile"
     }
 }
