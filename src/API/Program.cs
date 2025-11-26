@@ -1,5 +1,7 @@
 using Asp.Versioning;
 using AspNetCoreRateLimit;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Hangfire;
 using Hangfire.PostgreSql;
 using HealthChecks.UI.Client;
@@ -77,6 +79,8 @@ builder.Services.AddOutputCache(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -110,11 +114,10 @@ builder.Services.AddCors(options =>
         "AllowReactApp",
         policy =>
         {
-            policy
-                .WithOrigins("http://localhost:5173") // Vite default port
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
+            var allowedOrigins =
+                builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+                ?? Array.Empty<string>();
+            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
         }
     );
 });
