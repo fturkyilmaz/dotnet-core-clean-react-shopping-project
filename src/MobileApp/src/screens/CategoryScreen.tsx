@@ -1,0 +1,69 @@
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
+import { externalApi } from '@/services/api';
+import { useTheme } from '@/context/ThemeContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+
+export default function CategoryScreen({ navigation }: any) {
+    const { theme } = useTheme();
+
+    const { data: categories, isLoading } = useQuery({
+        queryKey: ['categories'],
+        queryFn: async () => {
+            const response = await externalApi.get<string[]>('/products/categories');
+            return response.data;
+        },
+    });
+
+    const renderCategory = ({ item, index }: { item: string, index: number }) => (
+        <TouchableOpacity
+            className="bg-white dark:bg-slate-800 rounded-2xl p-4 mb-4 shadow-sm border border-slate-100 dark:border-slate-700 flex-row items-center justify-between"
+            onPress={() => navigation.navigate('Products', { category: item })}
+        >
+            <View className="flex-row items-center gap-4">
+                <View className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl items-center justify-center">
+                    <Ionicons
+                        name={index === 0 ? "hardware-chip-outline" : index === 1 ? "diamond-outline" : "shirt-outline"}
+                        size={24}
+                        color={theme === 'dark' ? '#60a5fa' : '#2563eb'}
+                    />
+                </View>
+                <Text className="text-lg font-semibold text-slate-900 dark:text-white capitalize">
+                    {item}
+                </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={theme === 'dark' ? '#94a3b8' : '#cbd5e1'} />
+        </TouchableOpacity>
+    );
+
+    if (isLoading) {
+        return (
+            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-900">
+                <ActivityIndicator size="large" color={theme === 'dark' ? '#60a5fa' : '#2563eb'} />
+            </View>
+        );
+    }
+
+    return (
+        <View className="flex-1 bg-slate-50 dark:bg-slate-900">
+            <FlatList
+                data={categories}
+                renderItem={renderCategory}
+                keyExtractor={(item) => item}
+                contentContainerStyle={{ padding: 16 }}
+                showsVerticalScrollIndicator={false}
+                ListHeaderComponent={
+                    <View className="mb-6">
+                        <Text className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                            Browse Categories
+                        </Text>
+                        <Text className="text-slate-500 dark:text-slate-400">
+                            Explore our wide range of products
+                        </Text>
+                    </View>
+                }
+            />
+        </View>
+    );
+}

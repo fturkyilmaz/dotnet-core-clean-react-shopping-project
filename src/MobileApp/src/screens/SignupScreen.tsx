@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/context/ThemeContext';
 
 type AuthStackParamList = {
     Login: undefined;
@@ -16,6 +17,7 @@ type SignupScreenProps = {
 
 export default function SignupScreen({ navigation }: SignupScreenProps) {
     const { t } = useTranslation();
+    const { theme } = useTheme();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -32,7 +34,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 className="flex-1"
@@ -41,38 +43,38 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                     <View className="px-6 pt-4">
                         <TouchableOpacity
                             onPress={() => navigation.goBack()}
-                            className="w-10 h-10 bg-slate-50 rounded-full items-center justify-center mb-6"
+                            className="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-full items-center justify-center mb-6"
                         >
-                            <Ionicons name="arrow-back" size={24} color="#334155" />
+                            <Ionicons name="arrow-back" size={24} color={theme === 'dark' ? '#e2e8f0' : '#334155'} />
                         </TouchableOpacity>
 
                         <View className="mb-8">
-                            <Text className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">
+                            <Text className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
                                 Create Account
                             </Text>
-                            <Text className="text-lg text-slate-500">
+                            <Text className="text-lg text-slate-500 dark:text-slate-400">
                                 Sign up to get started
                             </Text>
                         </View>
 
                         <View className="space-y-5">
                             <View>
-                                <Text className="text-slate-700 font-semibold mb-2 ml-1">Full Name</Text>
+                                <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">Full Name</Text>
                                 <TextInput
-                                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 text-base focus:border-blue-500 focus:bg-white"
+                                    className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
                                     placeholder="John Doe"
-                                    placeholderTextColor="#94a3b8"
+                                    placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                     value={name}
                                     onChangeText={setName}
                                 />
                             </View>
 
                             <View>
-                                <Text className="text-slate-700 font-semibold mb-2 ml-1">{t('auth.email')}</Text>
+                                <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">{t('auth.email')}</Text>
                                 <TextInput
-                                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 text-base focus:border-blue-500 focus:bg-white"
+                                    className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
                                     placeholder={t('auth.email')}
-                                    placeholderTextColor="#94a3b8"
+                                    placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                     value={email}
                                     onChangeText={setEmail}
                                     keyboardType="email-address"
@@ -81,11 +83,11 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                             </View>
 
                             <View>
-                                <Text className="text-slate-700 font-semibold mb-2 ml-1">{t('auth.password')}</Text>
+                                <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">{t('auth.password')}</Text>
                                 <TextInput
-                                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 text-base focus:border-blue-500 focus:bg-white"
+                                    className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
                                     placeholder={t('auth.password')}
-                                    placeholderTextColor="#94a3b8"
+                                    placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                     value={password}
                                     onChangeText={setPassword}
                                     secureTextEntry
@@ -93,11 +95,11 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                             </View>
 
                             <View>
-                                <Text className="text-slate-700 font-semibold mb-2 ml-1">Confirm Password</Text>
+                                <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">Confirm Password</Text>
                                 <TextInput
-                                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 text-base focus:border-blue-500 focus:bg-white"
+                                    className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
                                     placeholder="Confirm your password"
-                                    placeholderTextColor="#94a3b8"
+                                    placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                     value={confirmPassword}
                                     onChangeText={setConfirmPassword}
                                     secureTextEntry
@@ -105,7 +107,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                             </View>
 
                             <TouchableOpacity
-                                className="bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-blue-200 active:bg-blue-700 mt-4"
+                                className="bg-blue-600 dark:bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-blue-200 dark:shadow-none active:bg-blue-700 dark:active:bg-blue-700 mt-4"
                                 onPress={handleSignup}
                                 disabled={loading}
                             >
@@ -118,9 +120,9 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                         </View>
 
                         <View className="flex-row justify-center mt-8 mb-8">
-                            <Text className="text-slate-500">Already have an account? </Text>
+                            <Text className="text-slate-500 dark:text-slate-400">Already have an account? </Text>
                             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                                <Text className="text-blue-600 font-bold">Log In</Text>
+                                <Text className="text-blue-600 dark:text-blue-400 font-bold">Log In</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

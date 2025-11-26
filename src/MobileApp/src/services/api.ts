@@ -14,6 +14,13 @@ const api = axios.create({
   },
 });
 
+export const externalApi = axios.create({
+  baseURL: "https://fakestoreapi.com",
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 api.interceptors.request.use(
   async (config) => {
     // Get token from AsyncStorage

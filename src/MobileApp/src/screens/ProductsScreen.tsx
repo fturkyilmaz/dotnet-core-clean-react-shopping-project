@@ -3,14 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/hooks/useProducts';
 import { Product } from '@/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function ProductsScreen() {
     const { t } = useTranslation();
     const { data: products, isLoading, error } = useProducts();
+    const { theme } = useTheme();
 
     const renderProduct = ({ item }: { item: Product }) => (
-        <View className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-slate-100">
-            <View className="bg-white rounded-xl overflow-hidden mb-4 p-2">
+        <View className="bg-white dark:bg-slate-800 rounded-2xl p-4 mb-4 shadow-sm border border-slate-100 dark:border-slate-700">
+            <View className="bg-white dark:bg-white rounded-xl overflow-hidden mb-4 p-2">
                 <Image
                     source={{ uri: item.image }}
                     className="w-full h-48"
@@ -19,11 +21,11 @@ export default function ProductsScreen() {
             </View>
 
             <View className="flex-row justify-between items-start mb-2">
-                <Text className="text-slate-900 font-bold text-lg flex-1 mr-2" numberOfLines={2}>
+                <Text className="text-slate-900 dark:text-white font-bold text-lg flex-1 mr-2" numberOfLines={2}>
                     {item.title}
                 </Text>
-                <View className="bg-blue-50 px-2 py-1 rounded-lg">
-                    <Text className="text-blue-700 font-bold text-sm">
+                <View className="bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
+                    <Text className="text-blue-700 dark:text-blue-400 font-bold text-sm">
                         ${item.price}
                     </Text>
                 </View>
@@ -31,16 +33,16 @@ export default function ProductsScreen() {
 
             <View className="flex-row items-center mb-3">
                 <Text className="text-yellow-400 mr-1 text-sm">★</Text>
-                <Text className="text-slate-700 font-semibold text-sm">{item.rating.rate}</Text>
-                <Text className="text-slate-400 text-sm ml-1">({item.rating.count} reviews)</Text>
+                <Text className="text-slate-700 dark:text-slate-300 font-semibold text-sm">{item.rating.rate}</Text>
+                <Text className="text-slate-400 dark:text-slate-500 text-sm ml-1">({item.rating.count} reviews)</Text>
             </View>
 
-            <Text className="text-slate-500 text-sm mb-4 leading-5" numberOfLines={2}>
+            <Text className="text-slate-500 dark:text-slate-400 text-sm mb-4 leading-5" numberOfLines={2}>
                 {item.description}
             </Text>
 
             <TouchableOpacity
-                className="bg-slate-900 rounded-xl py-3.5 items-center active:bg-slate-800"
+                className="bg-slate-900 dark:bg-blue-600 rounded-xl py-3.5 items-center active:bg-slate-800 dark:active:bg-blue-700"
             >
                 <Text className="text-white font-semibold">{t('products.addToCart')}</Text>
             </TouchableOpacity>
@@ -49,22 +51,22 @@ export default function ProductsScreen() {
 
     if (isLoading) {
         return (
-            <View className="flex-1 items-center justify-center bg-slate-50">
-                <ActivityIndicator size="large" color="#0f172a" />
+            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-900">
+                <ActivityIndicator size="large" color={theme === 'dark' ? '#60a5fa' : '#0f172a'} />
             </View>
         );
     }
 
     if (error) {
         return (
-            <View className="flex-1 items-center justify-center bg-slate-50">
+            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-900">
                 <Text className="text-red-600 text-lg font-medium">{t('common.error')}</Text>
             </View>
         );
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-slate-50" edges={['top']}>
+        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-900" edges={['top']}>
             <FlatList
                 data={products}
                 renderItem={renderProduct}
