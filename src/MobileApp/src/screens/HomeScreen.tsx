@@ -1,5 +1,8 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useDispatch } from 'react-redux';
+import { logout } from '@/store/slices/authSlice';
+import { AppDispatch } from '@/store';
 
 type RootStackParamList = {
     Home: undefined;
@@ -13,6 +16,7 @@ type HomeScreenProps = {
 };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
+    const dispatch = useDispatch<AppDispatch>();
     return (
         <View className="flex-1 items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-6">
             <View className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-md">
@@ -24,11 +28,11 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                 </Text>
 
                 <TouchableOpacity
-                    className="bg-blue-600 px-6 py-4 rounded-xl mb-4 shadow-lg"
-                    onPress={() => navigation.navigate('Login')}
+                    className="bg-red-500 px-6 py-4 rounded-xl mb-4 shadow-lg"
+                    onPress={() => dispatch(logout())}
                 >
                     <Text className="text-white font-bold text-center text-lg">
-                        Sign In
+                        Logout
                     </Text>
                 </TouchableOpacity>
 

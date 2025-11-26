@@ -1,16 +1,14 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { login } from '@/store/slices/authSlice';
 import { AppDispatch, RootState } from '@/store';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type RootStackParamList = {
-    Home: undefined;
     Login: undefined;
-    Products: undefined;
-    Cart: undefined;
 };
 
 type LoginScreenProps = {
@@ -25,64 +23,84 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     const { loading, error } = useSelector((state: RootState) => state.auth);
 
     const handleLogin = async () => {
-        const result = await dispatch(login({ email, password }));
-        console.log(result, login);
-        if (login.fulfilled.match(result)) {
-            navigation.replace('Products');
-        }
+        await dispatch(login({ email, password }));
     };
 
     return (
-        <View className="flex-1 bg-gray-50 px-6 justify-center">
-            <View className="bg-white rounded-2xl p-8 shadow-lg">
-                <Text className="text-3xl font-bold text-gray-800 mb-2">{t('auth.welcome')}</Text>
-                <Text className="text-gray-500 mb-8">{t('auth.login')}</Text>
+        <SafeAreaView className="flex-1 bg-white">
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                className="flex-1"
+            >
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <View className="flex-1 px-8 justify-center">
+                        <View className="mb-10">
+                            <Text className="text-4xl font-bold text-slate-900 mb-3 tracking-tight">
+                                {t('auth.welcome')}
+                            </Text>
+                            <Text className="text-lg text-slate-500">
+                                {t('auth.login')}
+                            </Text>
+                        </View>
 
-                {error && (
-                    <View className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-                        <Text className="text-red-600 text-sm">{error}</Text>
+                        {error && (
+                            <View className="bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
+                                <Text className="text-red-600 text-sm font-medium">{error}</Text>
+                            </View>
+                        )}
+
+                        <View className="space-y-6">
+                            <View>
+                                <Text className="text-slate-700 font-semibold mb-2 ml-1">{t('auth.email')}</Text>
+                                <TextInput
+                                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 text-base focus:border-blue-500 focus:bg-white"
+                                    placeholder={t('auth.email')}
+                                    placeholderTextColor="#94a3b8"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                />
+                            </View>
+
+                            <View>
+                                <Text className="text-slate-700 font-semibold mb-2 ml-1 mt-4">{t('auth.password')}</Text>
+                                <TextInput
+                                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 text-base focus:border-blue-500 focus:bg-white"
+                                    placeholder={t('auth.password')}
+                                    placeholderTextColor="#94a3b8"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry
+                                />
+                            </View>
+
+                            <TouchableOpacity className="items-end my-4">
+                                <Text className="text-blue-600 font-semibold">Forgot Password?</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                className="bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-blue-200 active:bg-blue-700"
+                                onPress={handleLogin}
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <ActivityIndicator color="white" />
+                                ) : (
+                                    <Text className="text-white font-bold text-lg">{t('auth.loginButton')}</Text>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View className="flex-row justify-center mt-8">
+                            <Text className="text-slate-500">{t('auth.dontHaveAccount')} </Text>
+                            <TouchableOpacity>
+                                <Text className="text-blue-600 font-bold">Sign Up</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                )}
-
-                <View className="mb-4">
-                    <Text className="text-gray-700 font-medium mb-2">{t('auth.email')}</Text>
-                    <TextInput
-                        className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-800"
-                        placeholder={t('auth.email')}
-                        value={email}
-                        onChangeText={setEmail}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                    />
-                </View>
-
-                <View className="mb-6">
-                    <Text className="text-gray-700 font-medium mb-2">{t('auth.password')}</Text>
-                    <TextInput
-                        className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-800"
-                        placeholder={t('auth.password')}
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                    />
-                </View>
-
-                <TouchableOpacity
-                    className="bg-blue-600 rounded-lg py-4 items-center mb-4"
-                    onPress={handleLogin}
-                    disabled={loading}
-                >
-                    {loading ? (
-                        <ActivityIndicator color="white" />
-                    ) : (
-                        <Text className="text-white font-semibold text-lg">{t('auth.loginButton')}</Text>
-                    )}
-                </TouchableOpacity>
-
-                <TouchableOpacity className="items-center">
-                    <Text className="text-blue-600 font-medium">{t('auth.dontHaveAccount')}</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
