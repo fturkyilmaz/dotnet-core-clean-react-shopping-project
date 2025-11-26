@@ -1,0 +1,105 @@
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { useState } from 'react';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+
+type AuthStackParamList = {
+    Login: undefined;
+    ForgotPassword: undefined;
+};
+
+type ForgotPasswordScreenProps = {
+    navigation: NativeStackNavigationProp<AuthStackParamList, 'ForgotPassword'>;
+};
+
+export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScreenProps) {
+    const { t } = useTranslation();
+    const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [sent, setSent] = useState(false);
+
+    const handleResetPassword = async () => {
+        // TODO: Implement reset password logic
+        setLoading(true);
+        setTimeout(() => {
+            setLoading(false);
+            setSent(true);
+        }, 1500);
+    };
+
+    return (
+        <SafeAreaView className="flex-1 bg-white">
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                className="flex-1"
+            >
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <View className="px-6 pt-4">
+                        <TouchableOpacity
+                            onPress={() => navigation.goBack()}
+                            className="w-10 h-10 bg-slate-50 rounded-full items-center justify-center mb-6"
+                        >
+                            <Ionicons name="arrow-back" size={24} color="#334155" />
+                        </TouchableOpacity>
+
+                        <View className="mb-8">
+                            <Text className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">
+                                Forgot Password?
+                            </Text>
+                            <Text className="text-lg text-slate-500">
+                                Don't worry! It happens. Please enter the address associated with your account.
+                            </Text>
+                        </View>
+
+                        {!sent ? (
+                            <View className="space-y-6">
+                                <View>
+                                    <Text className="text-slate-700 font-semibold mb-2 ml-1">{t('auth.email')}</Text>
+                                    <TextInput
+                                        className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 text-base focus:border-blue-500 focus:bg-white"
+                                        placeholder={t('auth.email')}
+                                        placeholderTextColor="#94a3b8"
+                                        value={email}
+                                        onChangeText={setEmail}
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                    />
+                                </View>
+
+                                <TouchableOpacity
+                                    className="bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-blue-200 active:bg-blue-700"
+                                    onPress={handleResetPassword}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <ActivityIndicator color="white" />
+                                    ) : (
+                                        <Text className="text-white font-bold text-lg">Submit</Text>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            <View className="items-center py-8">
+                                <View className="w-20 h-20 bg-green-100 rounded-full items-center justify-center mb-4">
+                                    <Ionicons name="checkmark" size={40} color="#16a34a" />
+                                </View>
+                                <Text className="text-xl font-bold text-slate-900 mb-2">Check your email</Text>
+                                <Text className="text-slate-500 text-center mb-8">
+                                    We have sent a password recover instructions to your email.
+                                </Text>
+                                <TouchableOpacity
+                                    className="bg-slate-900 rounded-xl py-4 px-8 items-center"
+                                    onPress={() => navigation.navigate('Login')}
+                                >
+                                    <Text className="text-white font-bold text-lg">Back to Login</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
+    );
+}

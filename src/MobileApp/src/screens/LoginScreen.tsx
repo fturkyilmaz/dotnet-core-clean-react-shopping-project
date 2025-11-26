@@ -9,6 +9,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 type RootStackParamList = {
     Login: undefined;
+    Signup: undefined;
+    ForgotPassword: undefined;
 };
 
 type LoginScreenProps = {
@@ -75,7 +77,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                                 />
                             </View>
 
-                            <TouchableOpacity className="items-end my-4">
+                            <TouchableOpacity
+                                className="items-end my-4"
+                                onPress={() => navigation.navigate('ForgotPassword')}
+                            >
                                 <Text className="text-blue-600 font-semibold">Forgot Password?</Text>
                             </TouchableOpacity>
 
@@ -94,7 +99,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
                         <View className="flex-row justify-center mt-8">
                             <Text className="text-slate-500">{t('auth.dontHaveAccount')} </Text>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
                                 <Text className="text-blue-600 font-bold">Sign Up</Text>
                             </TouchableOpacity>
                         </View>
