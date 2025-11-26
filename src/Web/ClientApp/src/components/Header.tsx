@@ -1,21 +1,32 @@
 import { FC } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@hooks/useRedux';
 import { toggleTheme } from '@store/slices/uiSlice';
-import { GlobeAltIcon, MoonIcon, SunIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
+import { logout } from '@store/slices/authSlice';
+import { GlobeAltIcon, MoonIcon, SunIcon, ShoppingCartIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 
 const Header: FC = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const theme = useAppSelector((state) => state.ui.theme);
   const cartItems = useAppSelector((state) => state.cart.items);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const isAdmin = user?.roles?.some(role =>
+    role.toLowerCase() === 'admin' || role.toLowerCase() === 'administrator'
+  );
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
     localStorage.setItem('language', lng);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/');
   };
 
   const currentLanguage = i18n.language || 'en';
@@ -82,12 +93,14 @@ const Header: FC = () => {
                   )}
                 </NavLink>
               </li>
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/admin">
-                  <i className="bi bi-speedometer2 me-1"></i>
-                  Admin
-                </NavLink>
-              </li>
+              {isAdmin && (
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/admin">
+                    <i className="bi bi-speedometer2 me-1"></i>
+                    Admin
+                  </NavLink>
+                </li>
+              )}
             </ul>
 
             {/* Language & Theme Controls */}
@@ -135,6 +148,41 @@ const Header: FC = () => {
                   <MoonIcon style={{ width: '18px', height: '18px' }} />
                 )}
               </button>
+
+              {/* Auth Navigation */}
+              {isAuthenticated ? (
+                <div className="dropdown">
+                  <button
+                    className="btn btn-outline-primary btn-sm dropdown-toggle d-flex align-items-center gap-1"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <UserCircleIcon style={{ width: '18px', height: '18px' }} />
+                    <span>{user?.email}</span>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={handleLogout}
+                      >
+                        <i className="bi bi-box-arrow-right me-2"></i>
+                        {t('logout')}
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              ) : (
+                <div className="d-flex gap-2">
+                  <Link to="/login" className="btn btn-outline-primary btn-sm">
+                    {t('signIn')}
+                  </Link>
+                  <Link to="/register" className="btn btn-primary btn-sm">
+                    {t('signUp')}
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

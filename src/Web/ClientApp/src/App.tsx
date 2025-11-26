@@ -8,6 +8,7 @@ import './i18n/config'; // Initialize i18n
 import { store } from '@store';
 import { queryClient } from '@api/queryClient';
 import Header from '@components/Header';
+import ProtectedRoute from '@components/ProtectedRoute';
 import HomePage from '@pages/HomePage';
 import CartsPage from '@pages/CartsPage';
 import Category from '@pages/CategoryPage';
@@ -30,8 +31,8 @@ const App = () => {
             <Route path="/category" element={<Category />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/products/add" element={<AddProductPage />} />
+            <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/products/add" element={<ProtectedRoute requireAdmin><AddProductPage /></ProtectedRoute>} />
           </Routes>
           <ToastContainer position="top-right" autoClose={3000} />
         </BrowserRouter>

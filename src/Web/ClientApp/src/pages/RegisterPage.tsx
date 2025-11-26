@@ -2,6 +2,7 @@ import { FC, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import { authApi } from '@api/authApi';
 
 const RegisterPage: FC = () => {
     const { t } = useTranslation();
@@ -29,16 +30,13 @@ const RegisterPage: FC = () => {
         setIsLoading(true);
 
         try {
-            // TODO: Implement actual register API call
-            // const response = await authApi.register({ email, password });
-
-            // Mock register for now
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await authApi.register({ email, password });
 
             toast.success(t('registerSuccess'));
             setTimeout(() => navigate('/login'), 2000);
-        } catch (error) {
-            toast.error(t('registerFailed'));
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || t('registerFailed');
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }

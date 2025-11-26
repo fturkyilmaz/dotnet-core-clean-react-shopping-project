@@ -1,11 +1,16 @@
 import { FC, FormEvent, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import { useAppDispatch } from '@hooks/useRedux';
+import { setCredentials } from '@store/slices/authSlice';
+import { authApi } from '@api/authApi';
 
 const LoginPage: FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const location = useLocation();
+    const dispatch = useAppDispatch();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -15,16 +20,32 @@ const LoginPage: FC = () => {
         setIsLoading(true);
 
         try {
-            // TODO: Implement actual login API call
-            // const response = await authApi.login({ email, password });
+            const response = await authApi.login({ email, password });
 
-            // Mock login for now
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Decode JWT to get user info
+            if (!response.accessToken) {
+                throw new Error('No token received');
+            }
+
+            const tokenPayload = JSON.parse(atob(response.accessToken.split('.')[1]));
+            const user = {
+                id: tokenPayload.nameid,
+                email: tokenPayload.email,
+                roles: tokenPayload.role ? (Array.isArray(tokenPayload.role) ? tokenPayload.role : [tokenPayload.role]) : [],
+            };
+
+            // Save to Redux and localStorage
+            dispatch(setCredentials({ user, token: response.accessToken }));
+            localStorage.setItem('refreshToken', response.refreshToken);
 
             toast.success(t('loginSuccess'));
-            navigate('/');
-        } catch (error) {
-            toast.error(t('loginFailed'));
+
+            // Navigate to return URL or home
+            const from = (location.state as any)?.from?.pathname || '/';
+            navigate(from, { replace: true });
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || error.message || t('loginFailed');
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }
