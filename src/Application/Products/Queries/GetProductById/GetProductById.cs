@@ -31,22 +31,25 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
     {
         var key = $"product-{request.Id}";
 
-        return await _cacheService.GetOrSetAsync(
+        var product = await _cacheService.GetOrSetAsync(
             key,
             async () =>
             {
-                var product = await _context
+                var entity = await _context
                     .Products
-                    .Where(p => p.Id == request.Id)
-                    .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
-                    .FirstOrDefaultAsync(cancellationToken);
+                    .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
 
-                Guard.Against.NotFound(request.Id, product);
+                if (entity == null)
+                    return null;
 
-                return product;
+                return _mapper.Map<ProductDto>(entity);
             },
             TimeSpan.FromMinutes(10),
             cancellationToken
         );
+
+        Guard.Against.NotFound(request.Id, product);
+
+        return product;
     }
 }
