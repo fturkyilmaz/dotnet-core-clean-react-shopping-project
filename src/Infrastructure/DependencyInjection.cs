@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Constants;
+using ShoppingProject.Infrastructure.Constants;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Data.Interceptors;
 using ShoppingProject.Infrastructure.Identity;
@@ -16,7 +17,9 @@ public static class DependencyInjection
 {
     public static void AddInfrastructureServices(this IHostApplicationBuilder builder)
     {
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        var connectionString = builder.Configuration.GetConnectionString(
+            ConfigurationConstants.ConnectionStrings.DefaultConnection
+        );
         Guard.Against.Null(
             connectionString,
             message: "Connection string 'DefaultConnection' not found."
@@ -42,8 +45,9 @@ public static class DependencyInjection
         );
 
         var readOnlyConnectionString =
-            builder.Configuration.GetConnectionString("DefaultConnection_ReadOnly")
-            ?? connectionString; // Fallback to default if not set
+            builder.Configuration.GetConnectionString(
+                ConfigurationConstants.ConnectionStrings.DefaultConnectionReadOnly
+            ) ?? connectionString; // Fallback to default if not set
 
         builder.Services.AddDbContext<ReadOnlyApplicationDbContext>(
             (sp, options) =>
@@ -73,7 +77,9 @@ public static class DependencyInjection
 
         builder.Services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+            options.Configuration = builder.Configuration.GetConnectionString(
+                ConfigurationConstants.ConnectionStrings.RedisConnection
+            );
         });
 
         builder
@@ -101,11 +107,15 @@ public static class DependencyInjection
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-                        ValidAudience = builder.Configuration["JwtSettings:Audience"],
+                        ValidIssuer = builder.Configuration[
+                            ConfigurationConstants.JwtSettings.Issuer
+                        ],
+                        ValidAudience = builder.Configuration[
+                            ConfigurationConstants.JwtSettings.Audience
+                        ],
                         IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
                             System.Text.Encoding.UTF8.GetBytes(
-                                builder.Configuration["JwtSettings:Secret"]!
+                                builder.Configuration[ConfigurationConstants.JwtSettings.Secret]!
                             )
                         ),
                     };

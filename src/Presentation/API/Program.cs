@@ -15,6 +15,7 @@ using Serilog;
 using ShoppingProject.Application;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Infrastructure.Bus;
+using ShoppingProject.Infrastructure.Constants;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Identity;
 using ShoppingProject.WebApi;
@@ -49,7 +50,7 @@ builder
 // Add Rate Limiting
 builder.Services.AddMemoryCache();
 builder.Services.Configure<AspNetCoreRateLimit.IpRateLimitOptions>(
-    builder.Configuration.GetSection("IpRateLimiting")
+    builder.Configuration.GetSection(ConfigurationConstants.RateLimiting.IpRateLimiting)
 );
 builder.Services.AddInMemoryRateLimiting();
 builder.Services.AddSingleton<
@@ -115,7 +116,9 @@ builder.Services.AddCors(options =>
         policy =>
         {
             var allowedOrigins =
-                builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+                builder
+                    .Configuration.GetSection(ConfigurationConstants.Cors.AllowedOrigins)
+                    .Get<string[]>()
                 ?? Array.Empty<string>();
             policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
         }
@@ -134,25 +137,38 @@ builder.Services.AddHangfire(configuration =>
         .UseRecommendedSerializerSettings()
         .UsePostgreSqlStorage(options =>
             options.UseNpgsqlConnection(
-                builder.Configuration.GetSection("Hangfire:ConnectionString").Value
+                builder
+                    .Configuration.GetSection(ConfigurationConstants.Hangfire.ConnectionString)
+                    .Value
             )
         )
 );
 
 builder.Services.AddHangfireServer(options =>
 {
-    options.WorkerCount = builder.Configuration.GetValue<int>("Hangfire:WorkerCount", 5);
+    options.WorkerCount = builder.Configuration.GetValue<int>(
+        ConfigurationConstants.Hangfire.WorkerCount,
+        5
+    );
 });
 
 builder
     .Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection")!)
-    .AddRedis(builder.Configuration.GetConnectionString("RedisConnection")!)
+    .AddNpgSql(
+        builder.Configuration.GetConnectionString(
+            ConfigurationConstants.ConnectionStrings.DefaultConnection
+        )!
+    )
+    .AddRedis(
+        builder.Configuration.GetConnectionString(
+            ConfigurationConstants.ConnectionStrings.RedisConnection
+        )!
+    )
     .AddRabbitMQ(sp =>
     {
         var factory = new ConnectionFactory()
         {
-            Uri = new Uri(builder.Configuration["ServiceBusOption:Url"]!),
+            Uri = new Uri(builder.Configuration[ConfigurationConstants.ServiceBus.Url]!),
         };
         return factory.CreateConnectionAsync().GetAwaiter().GetResult();
     })
@@ -190,7 +206,10 @@ if (app.Environment.IsDevelopment())
 
     // Add Hangfire Dashboard
     app.UseHangfireDashboard(
-        builder.Configuration.GetValue<string>("Hangfire:DashboardPath", "/hangfire")
+        builder.Configuration.GetValue<string>(
+            ConfigurationConstants.Hangfire.DashboardPath,
+            "/hangfire"
+        )
     );
 
     // Schedule Recurring Job
