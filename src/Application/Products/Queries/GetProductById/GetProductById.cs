@@ -36,8 +36,10 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             async () =>
             {
                 var product = await _context
-                    .Products.ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
-                    .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+                    .Products
+                    .Where(p => p.Id == request.Id)
+                    .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
+                    .FirstOrDefaultAsync(cancellationToken);
 
                 Guard.Against.NotFound(request.Id, product);
 

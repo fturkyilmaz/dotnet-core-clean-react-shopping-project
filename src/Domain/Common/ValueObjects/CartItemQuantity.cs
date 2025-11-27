@@ -30,7 +30,7 @@ public sealed class CartItemQuantity : ValueObject
     public CartItemQuantity Increase()
     {
         if (Value >= MaxValue)
-            throw new InvalidOperationException($"Cannot increase quantity beyond {MaxValue}");
+            throw new System.InvalidOperationException($"Cannot increase quantity beyond {MaxValue}");
 
         return new CartItemQuantity(Value + 1);
     }
@@ -38,7 +38,7 @@ public sealed class CartItemQuantity : ValueObject
     public CartItemQuantity Decrease()
     {
         if (Value <= MinValue)
-            throw new InvalidOperationException($"Cannot decrease quantity below {MinValue}");
+            throw new System.InvalidOperationException($"Cannot decrease quantity below {MinValue}");
 
         return new CartItemQuantity(Value - 1);
     }

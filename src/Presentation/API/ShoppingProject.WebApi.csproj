@@ -48,8 +48,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Application\ShoppingProject.Application.csproj" />
-    <ProjectReference Include="..\Infrastructure\ShoppingProject.Infrastructure.csproj" />
+    <ProjectReference Include="../../Application/ShoppingProject.Application.csproj" />
+    <ProjectReference Include="../../Domain/ShoppingProject.Domain.csproj" />
+    <ProjectReference Include="../../Infrastructure/ShoppingProject.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
