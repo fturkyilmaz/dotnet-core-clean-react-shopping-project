@@ -1,6 +1,8 @@
-﻿namespace ShoppingProject.Domain.Common;
+﻿using System.Diagnostics.CodeAnalysis;
 
-public abstract class ValueObject
+namespace ShoppingProject.Domain.Common;
+
+public abstract class ValueObject : IEquatable<ValueObject>
 {
     protected static bool EqualOperator(ValueObject left, ValueObject right)
     {
@@ -30,6 +32,11 @@ public abstract class ValueObject
         return GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());
     }
 
+    public bool Equals(ValueObject? other)
+    {
+        return Equals((object?)other);
+    }
+
     public override int GetHashCode()
     {
         var hash = new HashCode();
@@ -40,5 +47,15 @@ public abstract class ValueObject
         }
 
         return hash.ToHashCode();
+    }
+
+    public static bool operator ==(ValueObject? left, ValueObject? right)
+    {
+        return EqualOperator(left, right);
+    }
+
+    public static bool operator !=(ValueObject? left, ValueObject? right)
+    {
+        return NotEqualOperator(left, right);
     }
 }
