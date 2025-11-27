@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Constants;
+using ShoppingProject.Infrastructure.Configuration;
 using ShoppingProject.Infrastructure.Constants;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Data.Interceptors;
@@ -53,6 +54,8 @@ public static class DependencyInjection
             (sp, options) =>
             {
                 options.UseNpgsql(readOnlyConnectionString);
+                // Disable change tracking for read-only context to improve performance
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
                 options.ConfigureWarnings(warnings =>
                     warnings.Ignore(RelationalEventId.PendingModelChangesWarning)
                 );
@@ -100,6 +103,14 @@ public static class DependencyInjection
             })
             .AddJwtBearer(options =>
             {
+                // Configure JWT options using strongly-typed configuration
+                var jwtOptions = new JwtOptions();
+                builder.Configuration.GetSection(JwtOptions.SectionName).Bind(jwtOptions);
+
+                Guard.Against.Null(jwtOptions.Issuer, nameof(jwtOptions.Issuer));
+                Guard.Against.Null(jwtOptions.Audience, nameof(jwtOptions.Audience));
+                Guard.Against.Null(jwtOptions.Secret, nameof(jwtOptions.Secret));
+
                 options.TokenValidationParameters =
                     new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
@@ -107,16 +118,10 @@ public static class DependencyInjection
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = builder.Configuration[
-                            ConfigurationConstants.JwtSettings.Issuer
-                        ],
-                        ValidAudience = builder.Configuration[
-                            ConfigurationConstants.JwtSettings.Audience
-                        ],
+                        ValidIssuer = jwtOptions.Issuer,
+                        ValidAudience = jwtOptions.Audience,
                         IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-                            System.Text.Encoding.UTF8.GetBytes(
-                                builder.Configuration[ConfigurationConstants.JwtSettings.Secret]!
-                            )
+                            System.Text.Encoding.UTF8.GetBytes(jwtOptions.Secret)
                         ),
                     };
             });

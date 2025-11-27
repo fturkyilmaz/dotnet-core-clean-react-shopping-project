@@ -15,6 +15,7 @@ using Serilog;
 using ShoppingProject.Application;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Infrastructure.Bus;
+using ShoppingProject.Infrastructure.Configuration;
 using ShoppingProject.Infrastructure.Constants;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Identity;
@@ -82,6 +83,8 @@ builder.Services.AddOutputCache(options =>
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddExceptionHandler<ShoppingProject.WebApi.Handlers.GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -130,26 +133,31 @@ builder.Services.AddBusExt(builder.Configuration);
 builder.Services.AddConsulConfig(builder.Configuration);
 
 // Add Hangfire services
+builder.Services.Configure<HangfireOptions>(
+    builder.Configuration.GetSection(HangfireOptions.SectionName)
+);
 builder.Services.AddHangfire(configuration =>
     configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
         .UsePostgreSqlStorage(options =>
-            options.UseNpgsqlConnection(
-                builder
-                    .Configuration.GetSection(ConfigurationConstants.Hangfire.ConnectionString)
-                    .Value
-            )
-        )
+        {
+            var hangfireOptions = builder.Configuration
+                .GetSection(HangfireOptions.SectionName)
+                .Get<HangfireOptions>()
+                ?? throw new InvalidOperationException("Hangfire options not configured");
+            options.UseNpgsqlConnection(hangfireOptions.ConnectionString);
+        })
 );
 
 builder.Services.AddHangfireServer(options =>
 {
-    options.WorkerCount = builder.Configuration.GetValue<int>(
-        ConfigurationConstants.Hangfire.WorkerCount,
-        5
-    );
+    var hangfireOptions = builder.Configuration
+        .GetSection(HangfireOptions.SectionName)
+        .Get<HangfireOptions>()
+        ?? throw new InvalidOperationException("Hangfire options not configured");
+    options.WorkerCount = hangfireOptions.WorkerCount;
 });
 
 builder
@@ -164,13 +172,21 @@ builder
             ConfigurationConstants.ConnectionStrings.RedisConnection
         )!
     )
-    .AddRabbitMQ(sp =>
+    .AddRabbitMQ(async sp =>
     {
+        var serviceBusOptions = builder.Configuration
+            .GetSection(ServiceBusOptions.SectionName)
+            .Get<ServiceBusOptions>()
+            ?? throw new InvalidOperationException("ServiceBus options not configured");
+
+        if (string.IsNullOrEmpty(serviceBusOptions.Url))
+            throw new InvalidOperationException("ServiceBus URL is not configured");
+
         var factory = new ConnectionFactory()
         {
-            Uri = new Uri(builder.Configuration[ConfigurationConstants.ServiceBus.Url]!),
+            Uri = new Uri(serviceBusOptions.Url),
         };
-        return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+        return await factory.CreateConnectionAsync();
     })
     .AddUrlGroup(
         new Uri("http://localhost:9200"),
@@ -183,6 +199,9 @@ builder.Services.AddHealthChecksUI().AddInMemoryStorage();
 // ... (existing code)
 
 var app = builder.Build();
+
+// Add global exception handling middleware (RFC 7807 ProblemDetails)
+app.UseExceptionHandler();
 
 // Register with Consul
 app.UseConsul(builder.Configuration);
