@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
+import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -72,18 +73,20 @@ const ProfileScreen = () => {
                             </View>
 
                             <View className="flex-row bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
-                                <TouchableOpacity
+                                <AccessibleTouchable
+                                    accessibilityLabel={t('profile.languageEnglish')}
                                     className={`px-3 py-1.5 rounded-md ${i18n.language === 'en' ? 'bg-white dark:bg-slate-600 shadow-sm' : ''}`}
                                     onPress={() => changeLanguage('en')}
                                 >
                                     <Text className={`text-sm font-semibold ${i18n.language === 'en' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>EN</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
+                                </AccessibleTouchable>
+                                <AccessibleTouchable
+                                    accessibilityLabel={t('profile.languageTurkish')}
                                     className={`px-3 py-1.5 rounded-md ${i18n.language === 'tr' ? 'bg-white dark:bg-slate-600 shadow-sm' : ''}`}
                                     onPress={() => changeLanguage('tr')}
                                 >
                                     <Text className={`text-sm font-semibold ${i18n.language === 'tr' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>TR</Text>
-                                </TouchableOpacity>
+                                </AccessibleTouchable>
                             </View>
                         </View>
                     </View>
@@ -91,7 +94,7 @@ const ProfileScreen = () => {
                     <Text className="text-slate-900 dark:text-white font-bold text-lg mb-4">{t('profile.account')}</Text>
 
                     <View className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
-                        <TouchableOpacity className="flex-row items-center justify-between py-3 border-b border-slate-50 dark:border-slate-700">
+                        <AccessibleTouchable accessibilityLabel={t('profile.notifications')} className="flex-row items-center justify-between py-3 border-b border-slate-50 dark:border-slate-700">
                             <View className="flex-row items-center gap-3">
                                 <View className="w-10 h-10 bg-slate-50 dark:bg-slate-700 rounded-full items-center justify-center">
                                     <Ionicons name="notifications-outline" size={20} color={theme === 'dark' ? '#e2e8f0' : '#334155'} />
@@ -99,9 +102,9 @@ const ProfileScreen = () => {
                                 <Text className="text-slate-700 dark:text-slate-200 font-semibold text-base">{t('profile.notifications')}</Text>
                             </View>
                             <Ionicons name="chevron-forward" size={20} color={theme === 'dark' ? '#64748b' : '#cbd5e1'} />
-                        </TouchableOpacity>
+                        </AccessibleTouchable>
 
-                        <TouchableOpacity className="flex-row items-center justify-between py-3 border-b border-slate-50 dark:border-slate-700">
+                        <AccessibleTouchable accessibilityLabel={t('profile.privacySecurity')} className="flex-row items-center justify-between py-3 border-b border-slate-50 dark:border-slate-700">
                             <View className="flex-row items-center gap-3">
                                 <View className="w-10 h-10 bg-slate-50 dark:bg-slate-700 rounded-full items-center justify-center">
                                     <Ionicons name="shield-checkmark-outline" size={20} color={theme === 'dark' ? '#e2e8f0' : '#334155'} />
@@ -109,9 +112,10 @@ const ProfileScreen = () => {
                                 <Text className="text-slate-700 dark:text-slate-200 font-semibold text-base">{t('profile.privacySecurity')}</Text>
                             </View>
                             <Ionicons name="chevron-forward" size={20} color={theme === 'dark' ? '#64748b' : '#cbd5e1'} />
-                        </TouchableOpacity>
+                        </AccessibleTouchable>
 
-                        <TouchableOpacity
+                        <AccessibleTouchable
+                            accessibilityLabel={t('auth.logout')}
                             className="flex-row items-center justify-between py-3 mt-2"
                             onPress={handleLogout}
                         >
@@ -121,7 +125,7 @@ const ProfileScreen = () => {
                                 </View>
                                 <Text className="text-red-600 font-semibold text-base">{t('auth.logout')}</Text>
                             </View>
-                        </TouchableOpacity>
+                        </AccessibleTouchable>
                     </View>
                 </View>
             </ScrollView>

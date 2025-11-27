@@ -1,4 +1,5 @@
-import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, FlatList, Image, ActivityIndicator, Alert } from 'react-native';
+import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import api from '@/services/api';
@@ -107,27 +108,30 @@ export default function CartScreen() {
 
                 <View className="flex-row items-center justify-between mt-2">
                     <View className="flex-row items-center bg-slate-100 dark:bg-slate-700 rounded-lg">
-                        <TouchableOpacity
+                        <AccessibleTouchable
+                            accessibilityLabel={t('cart.decrease')}
                             className="px-3 py-1"
                             onPress={() => handleDecreaseQuantity(item)}
                         >
                             <Text className="text-slate-600 dark:text-slate-300 font-bold text-lg">-</Text>
-                        </TouchableOpacity>
+                        </AccessibleTouchable>
                         <Text className="px-2 text-slate-900 dark:text-white font-semibold">{item.quantity}</Text>
-                        <TouchableOpacity
+                        <AccessibleTouchable
+                            accessibilityLabel={t('cart.increase')}
                             className="px-3 py-1"
                             onPress={() => handleIncreaseQuantity(item)}
                         >
                             <Text className="text-slate-600 dark:text-slate-300 font-bold text-lg">+</Text>
-                        </TouchableOpacity>
+                        </AccessibleTouchable>
                     </View>
 
-                    <TouchableOpacity
+                    <AccessibleTouchable
+                        accessibilityLabel={t('cart.removeItem')}
                         className="bg-red-50 dark:bg-red-900/20 p-2 rounded-lg"
                         onPress={() => handleRemoveItem(item)}
                     >
                         <Ionicons name="trash-outline" size={20} color="#ef4444" />
-                    </TouchableOpacity>
+                    </AccessibleTouchable>
                 </View>
             </View>
         </View>
@@ -175,16 +179,20 @@ export default function CartScreen() {
                                 ${totalPrice.toFixed(2)}
                             </Text>
                         </View>
-                        <TouchableOpacity
+                        <AccessibleTouchable
+                            accessibilityLabel={t('cart.clearCart')}
                             className="bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-xl"
                             onPress={handleClearCart}
                         >
                             <Text className="text-red-600 dark:text-red-400 font-semibold">{t('cart.clearCart')}</Text>
-                        </TouchableOpacity>
+                        </AccessibleTouchable>
                     </View>
-                    <TouchableOpacity className="bg-slate-900 dark:bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-slate-200 dark:shadow-none active:bg-slate-800 dark:active:bg-blue-700">
+                    <AccessibleTouchable
+                        accessibilityLabel={t('cart.checkout')}
+                        className="bg-slate-900 dark:bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-slate-200 dark:shadow-none active:bg-slate-800 dark:active:bg-blue-700"
+                    >
                         <Text className="text-white font-bold text-lg">{t('cart.checkout')}</Text>
-                    </TouchableOpacity>
+                    </AccessibleTouchable>
                 </View>
             )}
         </View>

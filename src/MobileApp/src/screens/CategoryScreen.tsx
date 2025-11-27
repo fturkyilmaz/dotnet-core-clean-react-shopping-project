@@ -1,4 +1,5 @@
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, Image } from 'react-native';
+import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useQuery } from '@tanstack/react-query';
 import { externalApi } from '@/services/api';
 import { useTheme } from '@/context/ThemeContext';
@@ -19,10 +20,10 @@ export default function CategoryScreen({ navigation }: any) {
     });
 
     const renderCategory = ({ item, index }: { item: string, index: number }) => (
-        <TouchableOpacity
+        <AccessibleTouchable
+            accessibilityLabel={item}
             className="bg-white dark:bg-slate-800 rounded-2xl p-4 mb-4 shadow-sm border border-slate-100 dark:border-slate-700 flex-row items-center justify-between"
-            onPress={() => navigation.navigate('Products', { category: item })}
-        >
+            onPress={() => navigation.navigate('Products', { category: item })}>
             <View className="flex-row items-center gap-4">
                 <View className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl items-center justify-center">
                     <Ionicons
@@ -36,7 +37,7 @@ export default function CategoryScreen({ navigation }: any) {
                 </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={theme === 'dark' ? '#94a3b8' : '#cbd5e1'} />
-        </TouchableOpacity>
+        </AccessibleTouchable>
     );
 
     if (isLoading) {

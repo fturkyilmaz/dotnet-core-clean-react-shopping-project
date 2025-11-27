@@ -1,10 +1,9 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Image, Dimensions, ActivityIndicator } from 'react-native';
+import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeaturedProducts } from '@/hooks/useProducts';
 import { useTranslation } from 'react-i18next';
-
-const { width } = Dimensions.get('window');
 
 // Helper function to convert category names to camelCase
 const toCamelCase = (str: string): string => {
@@ -39,12 +38,13 @@ export default function HomeScreen({ navigation }: any) {
                             {t('home.discountOffer')}
                         </Text>
 
-                        <TouchableOpacity
+                        <AccessibleTouchable
+                            accessibilityLabel={t('home.shopNow')}
                             className="bg-white px-6 py-3 rounded-xl self-start"
                             onPress={() => navigation.navigate('Products')}
                         >
                             <Text className="text-blue-600 font-bold">{t('home.shopNow')}</Text>
-                        </TouchableOpacity>
+                        </AccessibleTouchable>
                     </View>
 
                     {/* Decorative Circle */}
@@ -57,14 +57,18 @@ export default function HomeScreen({ navigation }: any) {
             <View className="px-6 mb-8">
                 <View className="flex-row justify-between items-center mb-4">
                     <Text className="text-xl font-bold text-slate-900 dark:text-white">{t('home.categories')}</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Categories')}>
+                    <AccessibleTouchable
+                        accessibilityLabel={t('home.seeAll')}
+                        onPress={() => navigation.navigate('Categories')}
+                    >
                         <Text className="text-blue-600 dark:text-blue-400 font-semibold">{t('home.seeAll')}</Text>
-                    </TouchableOpacity>
+                    </AccessibleTouchable>
                 </View>
 
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
                     {['electronics', 'jewelery', 'men\'s clothing', 'women\'s clothing'].map((cat, index) => (
-                        <TouchableOpacity
+                        <AccessibleTouchable
+                            accessibilityLabel={t(`home.${toCamelCase(cat)}`) || cat}
                             key={index}
                             className="mr-4 items-center"
                             onPress={() => navigation.navigate('Products', { category: cat })}
@@ -77,9 +81,9 @@ export default function HomeScreen({ navigation }: any) {
                                 />
                             </View>
                             <Text className="text-xs font-medium text-slate-600 dark:text-slate-400 capitalize">
-                                {t(`home.${toCamelCase(cat)}` as any) || cat}
+                                {t(`home.${toCamelCase(cat)}`) || cat}
                             </Text>
-                        </TouchableOpacity>
+                        </AccessibleTouchable>
                     ))}
                 </ScrollView>
             </View>
@@ -95,7 +99,8 @@ export default function HomeScreen({ navigation }: any) {
                 ) : (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         {featuredProducts?.map((item) => (
-                            <TouchableOpacity
+                            <AccessibleTouchable
+                                accessibilityLabel={item.title}
                                 key={item.id}
                                 className="bg-white dark:bg-slate-800 w-48 p-4 rounded-2xl mr-4 shadow-sm border border-slate-100 dark:border-slate-700"
                                 onPress={() => { }}
@@ -111,7 +116,7 @@ export default function HomeScreen({ navigation }: any) {
                                 <Text className="text-blue-600 dark:text-blue-400 font-bold">
                                     ${item.price}
                                 </Text>
-                            </TouchableOpacity>
+                            </AccessibleTouchable>
                         ))}
                     </ScrollView>
                 )}

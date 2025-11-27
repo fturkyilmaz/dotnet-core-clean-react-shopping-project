@@ -1,4 +1,5 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
@@ -79,14 +80,16 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                                 />
                             </View>
 
-                            <TouchableOpacity
+                            <AccessibleTouchable
+                                accessibilityLabel={t('auth.forgotPassword')}
                                 className="items-end my-4"
                                 onPress={() => navigation.navigate('ForgotPassword')}
                             >
                                 <Text className="text-blue-600 dark:text-blue-400 font-semibold">{t('auth.forgotPassword')}</Text>
-                            </TouchableOpacity>
+                            </AccessibleTouchable>
 
-                            <TouchableOpacity
+                            <AccessibleTouchable
+                                accessibilityLabel={t('auth.loginButton')}
                                 className="bg-blue-600 dark:bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-blue-200 dark:shadow-none active:bg-blue-700 dark:active:bg-blue-700"
                                 onPress={handleLogin}
                                 disabled={loading}
@@ -96,14 +99,17 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                                 ) : (
                                     <Text className="text-white font-bold text-lg">{t('auth.loginButton')}</Text>
                                 )}
-                            </TouchableOpacity>
+                            </AccessibleTouchable>
                         </View>
 
                         <View className="flex-row justify-center mt-8">
                             <Text className="text-slate-500 dark:text-slate-400">{t('auth.dontHaveAccount')} </Text>
-                            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+                            <AccessibleTouchable
+                                accessibilityLabel={t('auth.signUp')}
+                                onPress={() => navigation.navigate('Signup')}
+                            >
                                 <Text className="text-blue-600 dark:text-blue-400 font-bold">{t('auth.signUp')}</Text>
-                            </TouchableOpacity>
+                            </AccessibleTouchable>
                         </View>
                     </View>
                 </ScrollView>

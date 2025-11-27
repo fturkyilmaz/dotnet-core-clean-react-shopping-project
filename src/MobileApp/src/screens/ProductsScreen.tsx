@@ -1,4 +1,5 @@
-import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, Image, ActivityIndicator } from 'react-native';
+import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/hooks/useProducts';
 import { Product } from '@/types';
@@ -52,12 +53,13 @@ export default function ProductsScreen() {
                 {item.description}
             </Text>
 
-            <TouchableOpacity
+            <AccessibleTouchable
+                accessibilityLabel={t('products.addToCart')}
                 className="bg-slate-900 dark:bg-blue-600 rounded-xl py-3.5 items-center active:bg-slate-800 dark:active:bg-blue-700"
                 onPress={() => handleAddToCart(item)}
             >
                 <Text className="text-white font-semibold">{t('products.addToCart')}</Text>
-            </TouchableOpacity>
+            </AccessibleTouchable>
         </View>
     );
 
