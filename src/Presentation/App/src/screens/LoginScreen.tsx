@@ -3,7 +3,7 @@ import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'node_modules/react-i18next';
 import { login } from '@/store/slices/authSlice';
 import { AppDispatch, RootState } from '@/store';
 import { SafeAreaView } from 'react-native-safe-area-context';

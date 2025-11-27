@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'node_modules/react-i18next';
 import HomeScreen from '@/screens/HomeScreen';
 import ProductsScreen from '@/screens/ProductsScreen';
 import CartScreen from '@/screens/CartScreen';

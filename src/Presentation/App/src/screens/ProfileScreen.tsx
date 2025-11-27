@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import AccessibleTouchable from '@/components/AccessibleTouchable';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'node_modules/react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/store/slices/authSlice';

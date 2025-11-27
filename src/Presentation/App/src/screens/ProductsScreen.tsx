@@ -1,6 +1,6 @@
 import { View, Text, FlatList, Image, ActivityIndicator } from 'react-native';
 import AccessibleTouchable from '@/components/AccessibleTouchable';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'node_modules/react-i18next';
 import { useProducts } from '@/hooks/useProducts';
 import { Product } from '@/types';
 import { useTheme } from '@/context/ThemeContext';

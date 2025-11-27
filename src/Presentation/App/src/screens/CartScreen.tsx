@@ -1,7 +1,7 @@
 import { View, Text, FlatList, Image, ActivityIndicator, Alert } from 'react-native';
 import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'node_modules/react-i18next';
 import api from '@/services/api';
 import { CartItem } from '@/types';
 import { Ionicons } from '@expo/vector-icons';

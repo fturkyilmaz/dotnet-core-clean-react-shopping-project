@@ -3,7 +3,7 @@ import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeaturedProducts } from '@/hooks/useProducts';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'node_modules/react-i18next';
 
 // Helper function to convert category names to camelCase
 const toCamelCase = (str: string): string => {

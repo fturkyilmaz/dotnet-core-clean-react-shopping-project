@@ -5,7 +5,7 @@ import { externalApi } from '@/services/api';
 import { useTheme } from '@/context/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'node_modules/react-i18next';
 
 export default function CategoryScreen({ navigation }: any) {
     const { theme } = useTheme();

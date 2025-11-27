@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'node_modules/react-i18next';
 import { useSignalRConnection } from '@hooks/useSignalRConnection';
 import { useCartSignal } from '@hooks/useCartSignal';
 import { useOrderSignal } from '@hooks/useOrderSignal';
