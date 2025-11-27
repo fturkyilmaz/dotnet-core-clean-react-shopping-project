@@ -19,6 +19,11 @@ public class Result
     public static Result Failure(string error, ErrorType errorType = ErrorType.Validation) =>
         new(false, error, errorType);
 
+    public static Result<T> Success<T>(T value) => Result<T>.Success(value);
+
+    public static Result<T> Failure<T>(string error, ErrorType errorType = ErrorType.Validation) =>
+        Result<T>.Failure(error, errorType);
+
     public static implicit operator bool(Result result) => result.IsSuccess;
 }
 
@@ -38,15 +43,4 @@ public class Result<T> : Result
         new(default!, false, error, errorType);
 
     public static implicit operator Result<T>(T value) => Success(value);
-}
-
-public enum ErrorType
-{
-    None,
-    Validation,
-    NotFound,
-    Conflict,
-    Unauthorized,
-    Forbidden,
-    Internal
 }
