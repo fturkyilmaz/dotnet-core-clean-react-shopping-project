@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'node_modules/react-i18next';
@@ -9,6 +9,7 @@ import api from '@/services/api';
 import Toast from 'react-native-toast-message';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
+import AccessibleTouchable from '@/components/AccessibleTouchable';
 
 type AuthStackParamList = {
     Login: undefined;
@@ -115,12 +116,12 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     <View className="px-6 pt-4">
-                        <TouchableOpacity
+                        <AccessibleTouchable
                             onPress={() => navigation.goBack()}
                             className="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-full items-center justify-center mb-6"
                         >
                             <Ionicons name="arrow-back" size={24} color={theme === 'dark' ? '#e2e8f0' : '#334155'} />
-                        </TouchableOpacity>
+                        </AccessibleTouchable>
 
                         <View className="mb-8">
                             <Text className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
@@ -226,7 +227,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                                 )}
                             </View>
 
-                            <TouchableOpacity
+                            <AccessibleTouchable
                                 className="bg-blue-600 dark:bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-blue-200 dark:shadow-none active:bg-blue-700 dark:active:bg-blue-700 mt-4"
                                 onPress={handleSubmit(onSubmit)}
                                 disabled={loading}
@@ -236,14 +237,14 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                                 ) : (
                                     <Text className="text-white font-bold text-lg">{t('auth.signUp')}</Text>
                                 )}
-                            </TouchableOpacity>
+                            </AccessibleTouchable>
                         </View>
 
                         <View className="flex-row justify-center mt-8 mb-8">
                             <Text className="text-slate-500 dark:text-slate-400">{t('auth.alreadyHaveAccountQuestion')} </Text>
-                            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                            <AccessibleTouchable onPress={() => navigation.navigate('Login')}>
                                 <Text className="text-blue-600 dark:text-blue-400 font-bold">{t('auth.logIn')}</Text>
-                            </TouchableOpacity>
+                            </AccessibleTouchable>
                         </View>
                     </View>
                 </ScrollView>

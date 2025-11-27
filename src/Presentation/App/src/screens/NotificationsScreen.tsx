@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'node_modules/react-i18next';
 import { useSignalRConnection } from '@hooks/useSignalRConnection';
 import { useCartSignal } from '@hooks/useCartSignal';
 import { useOrderSignal } from '@hooks/useOrderSignal';
 import { useNotificationSignal } from '@hooks/useNotificationSignal';
-
+import AccessibleTouchable from '@/components/AccessibleTouchable';
 export default function NotificationsScreen() {
     const { t } = useTranslation();
     const {
@@ -58,20 +58,20 @@ export default function NotificationsScreen() {
             )}
 
             <View style={styles.buttonsContainer}>
-                <TouchableOpacity
+                <AccessibleTouchable
                     style={[styles.button, !isConnected && styles.buttonDisabled]}
                     onPress={testNotification}
                     disabled={!isConnected}
                 >
                     <Text style={styles.buttonText}>Test SignalR Notification</Text>
-                </TouchableOpacity>
+                </AccessibleTouchable>
 
-                <TouchableOpacity
+                <AccessibleTouchable
                     style={styles.button}
                     onPress={testLocalNotification}
                 >
                     <Text style={styles.buttonText}>Test Local Notification</Text>
-                </TouchableOpacity>
+                </AccessibleTouchable>
             </View>
 
             <View style={styles.infoContainer}>

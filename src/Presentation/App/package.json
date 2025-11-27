@@ -7,6 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "lint": "eslint . --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
     "test:e2e": "maestro test .maestro/flows",
     "test:e2e:ios": "maestro test .maestro/flows --platform ios",
     "test:e2e:android": "maestro test .maestro/flows --platform android",
@@ -55,7 +56,12 @@
     "babel-preset-expo": "^54.0.7",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.17",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "eslint": "^9.14.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-native": "^5.0.0"
   },
   "private": true
 }
