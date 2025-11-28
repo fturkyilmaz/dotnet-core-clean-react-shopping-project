@@ -32,7 +32,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+        <SafeAreaView className="flex-1 bg-background dark:bg-background-dark">
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 className="flex-1"
@@ -58,7 +58,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                             <View>
                                 <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">{t('auth.email')}</Text>
                                 <TextInput
-                                    className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
+                                    className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-primary focus:bg-white dark:focus:bg-slate-800"
                                     placeholder={t('auth.email')}
                                     placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                     value={email}
@@ -71,7 +71,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                             <View>
                                 <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1 mt-4">{t('auth.password')}</Text>
                                 <TextInput
-                                    className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
+                                    className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-primary focus:bg-white dark:focus:bg-slate-800"
                                     placeholder={t('auth.password')}
                                     placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                     value={password}
@@ -85,12 +85,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                                 className="items-end my-4"
                                 onPress={() => navigation.navigate('ForgotPassword')}
                             >
-                                <Text className="text-blue-600 dark:text-blue-400 font-semibold">{t('auth.forgotPassword')}</Text>
+                                <Text className="text-primary dark:text-blue-400 font-semibold">{t('auth.forgotPassword')}</Text>
                             </AccessibleTouchable>
 
                             <AccessibleTouchable
                                 accessibilityLabel={t('auth.loginButton')}
-                                className="bg-blue-600 dark:bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-blue-200 dark:shadow-none active:bg-blue-700 dark:active:bg-blue-700"
+                                className="bg-primary dark:bg-primary rounded-xl py-4 items-center shadow-lg shadow-blue-200 dark:shadow-none active:bg-primary-700 dark:active:bg-primary-700"
                                 onPress={handleLogin}
                                 disabled={loading}
                             >
@@ -108,7 +108,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                                 accessibilityLabel={t('auth.signUp')}
                                 onPress={() => navigation.navigate('Signup')}
                             >
-                                <Text className="text-blue-600 dark:text-blue-400 font-bold">{t('auth.signUp')}</Text>
+                                <Text className="text-primary dark:text-blue-400 font-bold">{t('auth.signUp')}</Text>
                             </AccessibleTouchable>
                         </View>
                     </View>

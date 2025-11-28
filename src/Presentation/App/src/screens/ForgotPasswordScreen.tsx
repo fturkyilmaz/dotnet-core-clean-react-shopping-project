@@ -33,7 +33,7 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+        <SafeAreaView className="flex-1 bg-background dark:bg-background-dark">
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 className="flex-1"
@@ -61,7 +61,7 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
                                 <View>
                                     <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">{t('auth.email')}</Text>
                                     <TextInput
-                                        className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
+                                        className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-primary focus:bg-white dark:focus:bg-slate-800"
                                         placeholder={t('auth.email')}
                                         placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                         value={email}
@@ -72,7 +72,7 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
                                 </View>
 
                                 <AccessibleTouchable
-                                    className="bg-blue-600 dark:bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-blue-200 dark:shadow-none active:bg-blue-700 dark:active:bg-blue-700"
+                                    className="bg-primary dark:bg-primary rounded-xl py-4 items-center shadow-lg shadow-blue-200 dark:shadow-none active:bg-primary-700 dark:active:bg-primary-700"
                                     onPress={handleResetPassword}
                                     disabled={loading}
                                 >

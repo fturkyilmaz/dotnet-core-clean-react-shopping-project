@@ -109,7 +109,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+        <SafeAreaView className="flex-1 bg-background dark:bg-background-dark">
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 className="flex-1"
@@ -146,7 +146,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                                     name="name"
                                     render={({ field: { onChange, onBlur, value } }) => (
                                         <TextInput
-                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
+                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-primary focus:bg-white dark:focus:bg-slate-800"
                                             placeholder="John Doe"
                                             placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                             value={value}
@@ -167,7 +167,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                                     name="email"
                                     render={({ field: { onChange, onBlur, value } }) => (
                                         <TextInput
-                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
+                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-primary focus:bg-white dark:focus:bg-slate-800"
                                             placeholder={t('auth.email')}
                                             placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                             value={value}
@@ -190,7 +190,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                                     name="password"
                                     render={({ field: { onChange, onBlur, value } }) => (
                                         <TextInput
-                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
+                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-primary focus:bg-white dark:focus:bg-slate-800"
                                             placeholder={t('auth.password')}
                                             placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                             value={value}
@@ -212,7 +212,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                                     name="confirmPassword"
                                     render={({ field: { onChange, onBlur, value } }) => (
                                         <TextInput
-                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800"
+                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-primary focus:bg-white dark:focus:bg-slate-800"
                                             placeholder={t('auth.confirmPassword')}
                                             placeholderTextColor={theme === 'dark' ? '#64748b' : '#94a3b8'}
                                             value={value}
@@ -228,7 +228,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                             </View>
 
                             <AccessibleTouchable
-                                className="bg-blue-600 dark:bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-blue-200 dark:shadow-none active:bg-blue-700 dark:active:bg-blue-700 mt-4"
+                                className="bg-primary dark:bg-primary rounded-xl py-4 items-center shadow-lg shadow-blue-200 dark:shadow-none active:bg-primary-700 dark:active:bg-primary-700 mt-4"
                                 onPress={handleSubmit(onSubmit)}
                                 disabled={loading}
                             >
@@ -243,7 +243,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                         <View className="flex-row justify-center mt-8 mb-8">
                             <Text className="text-slate-500 dark:text-slate-400">{t('auth.alreadyHaveAccountQuestion')} </Text>
                             <AccessibleTouchable onPress={() => navigation.navigate('Login')}>
-                                <Text className="text-blue-600 dark:text-blue-400 font-bold">{t('auth.logIn')}</Text>
+                                <Text className="text-primary dark:text-blue-400 font-bold">{t('auth.logIn')}</Text>
                             </AccessibleTouchable>
                         </View>
                     </View>

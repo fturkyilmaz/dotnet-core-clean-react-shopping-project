@@ -25,10 +25,10 @@ export default function HomeScreen({ navigation }: any) {
 
     console.log("X", featuredProducts);
     return (
-        <ScrollView className="flex-1 bg-slate-50 dark:bg-slate-900">
+        <ScrollView className="flex-1 bg-slate-50 dark:bg-background-dark">
             {/* Hero Section */}
             <View className="p-6 pt-2">
-                <View className="bg-blue-600 dark:bg-blue-700 rounded-3xl p-6 shadow-lg shadow-blue-200 dark:shadow-none overflow-hidden relative">
+                <View className="bg-primary dark:bg-primary-700 rounded-3xl p-6 shadow-lg shadow-blue-200 dark:shadow-none overflow-hidden relative">
                     <View className="z-10">
                         <Text className="text-blue-100 font-semibold mb-2 uppercase tracking-wider">{t('home.newCollection')}</Text>
                         <Text className="text-3xl font-bold text-white mb-2 w-2/3">
@@ -43,7 +43,7 @@ export default function HomeScreen({ navigation }: any) {
                             className="bg-white px-6 py-3 rounded-xl self-start"
                             onPress={() => navigation.navigate('Products')}
                         >
-                            <Text className="text-blue-600 font-bold">{t('home.shopNow')}</Text>
+                            <Text className="text-primary font-bold">{t('home.shopNow')}</Text>
                         </AccessibleTouchable>
                     </View>
 
@@ -61,7 +61,7 @@ export default function HomeScreen({ navigation }: any) {
                         accessibilityLabel={t('home.seeAll')}
                         onPress={() => navigation.navigate('Categories')}
                     >
-                        <Text className="text-blue-600 dark:text-blue-400 font-semibold">{t('home.seeAll')}</Text>
+                        <Text className="text-primary dark:text-primary-400 font-semibold">{t('home.seeAll')}</Text>
                     </AccessibleTouchable>
                 </View>
 
@@ -113,7 +113,7 @@ export default function HomeScreen({ navigation }: any) {
                                 <Text className="text-slate-900 dark:text-white font-semibold mb-1" numberOfLines={1}>
                                     {item.title}
                                 </Text>
-                                <Text className="text-blue-600 dark:text-blue-400 font-bold">
+                                <Text className="text-primary dark:text-primary-400 font-bold">
                                     ${item.price}
                                 </Text>
                             </AccessibleTouchable>

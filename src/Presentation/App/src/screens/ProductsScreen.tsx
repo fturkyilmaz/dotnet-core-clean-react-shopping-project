@@ -37,7 +37,7 @@ export default function ProductsScreen() {
                     {item.title}
                 </Text>
                 <View className="bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
-                    <Text className="text-blue-700 dark:text-blue-400 font-bold text-sm">
+                    <Text className="text-primary-700 dark:text-primary-400 font-bold text-sm">
                         ${item.price}
                     </Text>
                 </View>
@@ -55,7 +55,7 @@ export default function ProductsScreen() {
 
             <AccessibleTouchable
                 accessibilityLabel={t('products.addToCart')}
-                className="bg-slate-900 dark:bg-blue-600 rounded-xl py-3.5 items-center active:bg-slate-800 dark:active:bg-blue-700"
+                className="bg-primary dark:bg-primary rounded-xl py-3.5 items-center active:bg-primary-700 dark:active:bg-primary-700"
                 onPress={() => handleAddToCart(item)}
             >
                 <Text className="text-white font-semibold">{t('products.addToCart')}</Text>
@@ -65,7 +65,7 @@ export default function ProductsScreen() {
 
     if (isLoading) {
         return (
-            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-900">
+            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-background-dark">
                 <ActivityIndicator size="large" color={theme === 'dark' ? '#60a5fa' : '#0f172a'} />
             </View>
         );
@@ -73,14 +73,14 @@ export default function ProductsScreen() {
 
     if (error) {
         return (
-            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-900">
+            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-background-dark">
                 <Text className="text-red-600 text-lg font-medium">{t('common.error')}</Text>
             </View>
         );
     }
 
     return (
-        <View className="flex-1 bg-slate-50 dark:bg-slate-900">
+        <View className="flex-1 bg-slate-50 dark:bg-background-dark">
             <FlatList
                 data={products}
                 renderItem={renderProduct}

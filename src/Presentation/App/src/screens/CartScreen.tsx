@@ -101,7 +101,7 @@ export default function CartScreen() {
                     <Text className="text-slate-900 dark:text-white font-semibold text-base mb-1" numberOfLines={1}>
                         {item.title}
                     </Text>
-                    <Text className="text-blue-600 dark:text-blue-400 font-bold text-lg">
+                    <Text className="text-primary dark:text-primary-400 font-bold text-lg">
                         ${item.price}
                     </Text>
                 </View>
@@ -139,7 +139,7 @@ export default function CartScreen() {
 
     if (isLoading) {
         return (
-            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-900">
+            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-background-dark">
                 <ActivityIndicator size="large" color={theme === 'dark' ? '#60a5fa' : '#0f172a'} />
             </View>
         );
@@ -150,7 +150,7 @@ export default function CartScreen() {
     const itemsWithQuantity = displayItems.filter(item => item.quantity > 0);
 
     return (
-        <View className="flex-1 bg-slate-50 dark:bg-slate-900">
+        <View className="flex-1 bg-slate-50 dark:bg-background-dark">
             <FlatList
                 data={itemsWithQuantity}
                 renderItem={renderCartItem}
@@ -189,7 +189,7 @@ export default function CartScreen() {
                     </View>
                     <AccessibleTouchable
                         accessibilityLabel={t('cart.checkout')}
-                        className="bg-slate-900 dark:bg-blue-600 rounded-xl py-4 items-center shadow-lg shadow-slate-200 dark:shadow-none active:bg-slate-800 dark:active:bg-blue-700"
+                        className="bg-primary dark:bg-primary rounded-xl py-4 items-center shadow-lg shadow-slate-200 dark:shadow-none active:bg-primary-700 dark:active:bg-primary-700"
                     >
                         <Text className="text-white font-bold text-lg">{t('cart.checkout')}</Text>
                     </AccessibleTouchable>
