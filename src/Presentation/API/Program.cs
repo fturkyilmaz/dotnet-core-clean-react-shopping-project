@@ -36,7 +36,7 @@ builder
     {
         metrics.AddAspNetCoreInstrumentation().AddPrometheusExporter();
 
-        metrics.AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Server.Kestrel");
+        metrics.AddMeter(AppConstants.Metrics.AspNetCoreHosting, AppConstants.Metrics.Kestrel);
     })
     .WithTracing(tracing =>
     {
@@ -44,7 +44,7 @@ builder
 
         tracing.AddOtlpExporter(options =>
         {
-            options.Endpoint = new Uri("http://localhost:4317");
+            options.Endpoint = new Uri(AppConstants.Observability.DefaultOtlpEndpoint);
         });
     });
 
@@ -68,14 +68,18 @@ builder.Services.AddOutputCache(options =>
 
     // Products list policy: cache for 2 minutes
     options.AddPolicy(
-        "ProductsList",
-        builder => builder.Expire(TimeSpan.FromMinutes(2)).Tag("products")
+        AppConstants.CachePolicies.ProductsList,
+        builder => builder.Expire(TimeSpan.FromMinutes(2)).Tag(AppConstants.CacheTags.Products)
     );
 
     // Product detail policy: cache for 5 minutes with ETag
     options.AddPolicy(
-        "ProductDetail",
-        builder => builder.Expire(TimeSpan.FromMinutes(5)).Tag("products").SetVaryByQuery("id")
+        AppConstants.CachePolicies.ProductDetail,
+        builder =>
+            builder
+                .Expire(TimeSpan.FromMinutes(5))
+                .Tag(AppConstants.CacheTags.Products)
+                .SetVaryByQuery("id")
     );
 });
 
@@ -115,7 +119,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
-        "AllowReactApp",
+        AppConstants.CorsPolicies.AllowReactApp,
         policy =>
         {
             var allowedOrigins =
@@ -143,9 +147,8 @@ builder.Services.AddHangfire(configuration =>
         .UseRecommendedSerializerSettings()
         .UsePostgreSqlStorage(options =>
         {
-            var hangfireOptions = builder.Configuration
-                .GetSection(HangfireOptions.SectionName)
-                .Get<HangfireOptions>()
+            var hangfireOptions =
+                builder.Configuration.GetSection(HangfireOptions.SectionName).Get<HangfireOptions>()
                 ?? throw new InvalidOperationException("Hangfire options not configured");
             options.UseNpgsqlConnection(hangfireOptions.ConnectionString);
         })
@@ -153,9 +156,8 @@ builder.Services.AddHangfire(configuration =>
 
 builder.Services.AddHangfireServer(options =>
 {
-    var hangfireOptions = builder.Configuration
-        .GetSection(HangfireOptions.SectionName)
-        .Get<HangfireOptions>()
+    var hangfireOptions =
+        builder.Configuration.GetSection(HangfireOptions.SectionName).Get<HangfireOptions>()
         ?? throw new InvalidOperationException("Hangfire options not configured");
     options.WorkerCount = hangfireOptions.WorkerCount;
 });
@@ -174,24 +176,20 @@ builder
     )
     .AddRabbitMQ(async sp =>
     {
-        var serviceBusOptions = builder.Configuration
-            .GetSection(ServiceBusOptions.SectionName)
-            .Get<ServiceBusOptions>()
+        var serviceBusOptions =
+            builder.Configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()
             ?? throw new InvalidOperationException("ServiceBus options not configured");
 
         if (string.IsNullOrEmpty(serviceBusOptions.Url))
             throw new InvalidOperationException("ServiceBus URL is not configured");
 
-        var factory = new ConnectionFactory()
-        {
-            Uri = new Uri(serviceBusOptions.Url),
-        };
+        var factory = new ConnectionFactory() { Uri = new Uri(serviceBusOptions.Url) };
         return await factory.CreateConnectionAsync();
     })
     .AddUrlGroup(
-        new Uri("http://localhost:9200"),
-        name: "elasticsearch",
-        tags: new[] { "elasticsearch" }
+        new Uri(AppConstants.Observability.DefaultElasticsearchUrl),
+        name: AppConstants.HealthCheckNames.Elasticsearch,
+        tags: new[] { AppConstants.HealthCheckNames.Elasticsearch }
     );
 
 builder.Services.AddHealthChecksUI().AddInMemoryStorage();
@@ -227,13 +225,13 @@ if (app.Environment.IsDevelopment())
     app.UseHangfireDashboard(
         builder.Configuration.GetValue<string>(
             ConfigurationConstants.Hangfire.DashboardPath,
-            "/hangfire"
+            AppConstants.Endpoints.HangfireDashboard
         )
     );
 
     // Schedule Recurring Job
     RecurringJob.AddOrUpdate<ShoppingProject.Infrastructure.Jobs.DatabaseBackupJob>(
-        "database-backup",
+        AppConstants.JobIds.DatabaseBackup,
         job => job.RunAsync(),
         Cron.Daily
     );
@@ -247,32 +245,44 @@ app.Use(
     {
         // HSTS - HTTP Strict Transport Security
         context.Response.Headers.Append(
-            "Strict-Transport-Security",
-            "max-age=31536000; includeSubDomains"
+            AppConstants.SecurityHeaders.StrictTransportSecurity,
+            AppConstants.SecurityHeaders.StrictTransportSecurityValue
         );
 
         // Prevent MIME sniffing
-        context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+        context.Response.Headers.Append(
+            AppConstants.SecurityHeaders.XContentTypeOptions,
+            AppConstants.SecurityHeaders.XContentTypeOptionsValue
+        );
 
         // Prevent clickjacking
-        context.Response.Headers.Append("X-Frame-Options", "DENY");
+        context.Response.Headers.Append(
+            AppConstants.SecurityHeaders.XFrameOptions,
+            AppConstants.SecurityHeaders.XFrameOptionsValue
+        );
 
         // XSS Protection
-        context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+        context.Response.Headers.Append(
+            AppConstants.SecurityHeaders.XXssProtection,
+            AppConstants.SecurityHeaders.XXssProtectionValue
+        );
 
         // Content Security Policy
         context.Response.Headers.Append(
-            "Content-Security-Policy",
-            "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'"
+            AppConstants.SecurityHeaders.ContentSecurityPolicy,
+            AppConstants.SecurityHeaders.ContentSecurityPolicyValue
         );
 
         // Referrer Policy
-        context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+        context.Response.Headers.Append(
+            AppConstants.SecurityHeaders.ReferrerPolicy,
+            AppConstants.SecurityHeaders.ReferrerPolicyValue
+        );
 
         // Permissions Policy
         context.Response.Headers.Append(
-            "Permissions-Policy",
-            "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+            AppConstants.SecurityHeaders.PermissionsPolicy,
+            AppConstants.SecurityHeaders.PermissionsPolicyValue
         );
 
         await next();
@@ -288,27 +298,29 @@ app.UseOutputCache();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
-app.UseCors("AllowReactApp");
+app.UseCors(AppConstants.CorsPolicies.AllowReactApp);
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHealthChecks(
-    "/health",
+    AppConstants.Endpoints.HealthCheck,
     new HealthCheckOptions
     {
         Predicate = _ => true,
         ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
     }
 );
-app.MapHealthChecksUI(options => options.UIPath = "/health-ui");
+app.MapHealthChecksUI(options => options.UIPath = AppConstants.Endpoints.HealthCheckUI);
 
 app.UseWebSockets();
 app.UseMiddleware<ShoppingProject.WebApi.Middleware.WebSocketEchoMiddleware>();
 
 // Map SignalR Hubs
-app.MapHub<ShoppingProject.Infrastructure.Hubs.NotificationHub>("/hubs/notifications");
-app.MapHub<ShoppingProject.Infrastructure.Hubs.CartHub>("/hubs/cart");
-app.MapHub<ShoppingProject.Infrastructure.Hubs.OrderHub>("/hubs/orders");
+app.MapHub<ShoppingProject.Infrastructure.Hubs.NotificationHub>(
+    AppConstants.Endpoints.NotificationHub
+);
+app.MapHub<ShoppingProject.Infrastructure.Hubs.CartHub>(AppConstants.Endpoints.CartHub);
+app.MapHub<ShoppingProject.Infrastructure.Hubs.OrderHub>(AppConstants.Endpoints.OrderHub);
 
 app.MapControllers();
 app.Run();
