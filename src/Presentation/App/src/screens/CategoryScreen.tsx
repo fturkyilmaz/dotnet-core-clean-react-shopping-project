@@ -1,11 +1,10 @@
-import { View, Text, FlatList, ActivityIndicator, Image } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useQuery } from '@tanstack/react-query';
 import { externalApi } from '@/services/api';
 import { useTheme } from '@/context/ThemeContext';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function CategoryScreen({ navigation }: any) {
     const { theme } = useTheme();
@@ -42,14 +41,14 @@ export default function CategoryScreen({ navigation }: any) {
 
     if (isLoading) {
         return (
-            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-900">
+            <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-background-dark">
                 <ActivityIndicator size="large" color={theme === 'dark' ? '#60a5fa' : '#2563eb'} />
             </View>
         );
     }
 
     return (
-        <View className="flex-1 bg-slate-50 dark:bg-slate-900">
+        <View className="flex-1 bg-slate-50 dark:bg-background-dark">
             <FlatList
                 data={categories}
                 renderItem={renderCategory}

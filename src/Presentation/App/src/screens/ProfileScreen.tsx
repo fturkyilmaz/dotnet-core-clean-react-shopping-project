@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import AccessibleTouchable from '@/components/AccessibleTouchable';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/store/slices/authSlice';
@@ -13,10 +13,12 @@ const ProfileScreen = () => {
     const { t, i18n } = useTranslation();
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: RootState) => state.auth);
-    const { theme } = useTheme();
+    const { theme, toggleTheme } = useTheme();
 
     const changeLanguage = async (lang: string) => {
         try {
+            console.log('Changing language to:', lang);
+
             await AsyncStorage.setItem('user-language', lang);
             await i18n.changeLanguage(lang);
         } catch (error) {
@@ -88,6 +90,30 @@ const ProfileScreen = () => {
                                     <Text className={`text-sm font-semibold ${i18n.language === 'tr' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>TR</Text>
                                 </AccessibleTouchable>
                             </View>
+                        </View>
+
+                        {/* Dark Mode Toggle */}
+                        <View className="flex-row items-center justify-between py-3 mt-2 border-t border-slate-50 dark:border-slate-700">
+                            <View className="flex-row items-center gap-3">
+                                <View className="w-10 h-10 bg-slate-50 dark:bg-slate-700 rounded-full items-center justify-center">
+                                    <Ionicons name={theme === 'dark' ? 'moon' : 'sunny'} size={20} color={theme === 'dark' ? '#fbbf24' : '#f59e0b'} />
+                                </View>
+                                <Text className="text-slate-700 dark:text-slate-200 font-semibold text-base">{t('profile.darkMode')}</Text>
+                            </View>
+
+                            <AccessibleTouchable
+                                accessibilityLabel={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                                className={`w-14 h-8 rounded-full justify-center ${theme === 'dark' ? 'bg-primary' : 'bg-slate-300'}`}
+                                onPress={toggleTheme}
+                            >
+                                <View
+                                    className="w-6 h-6 rounded-full bg-white shadow-md"
+                                    style={{
+                                        marginLeft: theme === 'dark' ? 28 : 4,
+                                        transition: 'margin-left 0.2s'
+                                    }}
+                                />
+                            </AccessibleTouchable>
                         </View>
                     </View>
 

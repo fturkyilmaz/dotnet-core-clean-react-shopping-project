@@ -74,6 +74,8 @@
         "title": "Profile",
         "settings": "Settings",
         "language": "Language",
+        "languageEnglish": "English",
+        "languageTurkish": "Turkish",
         "theme": "Theme",
         "darkMode": "Dark Mode",
         "lightMode": "Light Mode",

@@ -13,7 +13,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { colorScheme, setColorScheme } = useColorScheme();
-    const [theme, setTheme] = useState<Theme>('light');
+    const [theme, setTheme] = useState<Theme>(colorScheme || 'light');
 
     useEffect(() => {
         const loadTheme = async () => {
@@ -24,10 +24,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             } else {
                 // Default to light if no preference saved
                 setColorScheme('light');
+                setTheme('light');
             }
         };
         loadTheme();
-    }, []);
+    }, [setColorScheme]);
+
+    // Sync theme state with colorScheme
+    useEffect(() => {
+        if (colorScheme) {
+            setTheme(colorScheme as Theme);
+        }
+    }, [colorScheme]);
 
     const toggleTheme = async () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';

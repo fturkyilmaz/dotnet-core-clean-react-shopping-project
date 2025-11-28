@@ -3,7 +3,7 @@ import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import { login } from '@/store/slices/authSlice';
 import { AppDispatch, RootState } from '@/store';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -68,7 +68,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                                 />
                             </View>
 
-                            <View>
+                            <View className="mb-6">
                                 <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1 mt-4">{t('auth.password')}</Text>
                                 <TextInput
                                     className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-primary focus:bg-white dark:focus:bg-slate-800"
@@ -80,13 +80,6 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                                 />
                             </View>
 
-                            <AccessibleTouchable
-                                accessibilityLabel={t('auth.forgotPassword')}
-                                className="items-end my-4"
-                                onPress={() => navigation.navigate('ForgotPassword')}
-                            >
-                                <Text className="text-primary dark:text-blue-400 font-semibold">{t('auth.forgotPassword')}</Text>
-                            </AccessibleTouchable>
 
                             <AccessibleTouchable
                                 accessibilityLabel={t('auth.loginButton')}
@@ -102,15 +95,24 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                             </AccessibleTouchable>
                         </View>
 
-                        <View className="flex-row justify-center mt-8">
-                            <Text className="text-slate-500 dark:text-slate-400">{t('auth.dontHaveAccount')} </Text>
-                            <AccessibleTouchable
-                                accessibilityLabel={t('auth.signUp')}
-                                onPress={() => navigation.navigate('Signup')}
-                            >
-                                <Text className="text-primary dark:text-blue-400 font-bold">{t('auth.signUp')}</Text>
-                            </AccessibleTouchable>
+                        <View className="flex-row justify-center mt-3">
+                            <View className="flex-row items-center">
+                                <Text className="text-slate-500 dark:text-slate-400">{t('auth.dontHaveAccount')} </Text>
+                                <AccessibleTouchable
+                                    accessibilityLabel={t('auth.signUp')}
+                                    onPress={() => navigation.navigate('Signup')}
+                                >
+                                    <Text className="text-primary dark:text-blue-400 font-bold">{t('auth.signUp')}</Text>
+                                </AccessibleTouchable>
+                            </View>
                         </View>
+                        <AccessibleTouchable
+                            accessibilityLabel={t('auth.forgotPassword')}
+                            className="items-end"
+                            onPress={() => navigation.navigate('ForgotPassword')}
+                        >
+                            <Text className="text-primary dark:text-blue-400 font-semibold">  {t('auth.forgotPassword')}</Text>
+                        </AccessibleTouchable>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

@@ -2,9 +2,9 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import authReducer from './slices/authSlice';
-import productsReducer from './slices/productsSlice';
-import cartReducer from './slices/cartSlice';
+import authReducer from '@/store/slices/authSlice';
+import productsReducer from '@/store/slices/productsSlice';
+import cartReducer from '@/store/slices/cartSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,

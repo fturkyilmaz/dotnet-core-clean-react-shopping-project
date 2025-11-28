@@ -97,13 +97,13 @@ export default function HomeScreen({ navigation }: any) {
                         <ActivityIndicator size="large" color={theme === 'dark' ? '#60a5fa' : '#2563eb'} />
                     </View>
                 ) : (
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingBottom: 32 }}>
                         {featuredProducts?.map((item) => (
                             <AccessibleTouchable
                                 accessibilityLabel={item.title}
                                 key={item.id}
                                 className="bg-white dark:bg-slate-800 w-48 p-4 rounded-2xl mr-4 shadow-sm border border-slate-100 dark:border-slate-700"
-                                onPress={() => { }}
+                                onPress={() => { navigation.navigate('ProductDetails', { productId: item.id }) }}
                             >
                                 <Image
                                     source={{ uri: item.image }}

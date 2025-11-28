@@ -1,7 +1,7 @@
 import { View, Text, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
@@ -57,7 +57,7 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
                         </View>
 
                         {!sent ? (
-                            <View className="space-y-6">
+                            <View className="gap-y-4">
                                 <View>
                                     <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">{t('auth.email')}</Text>
                                     <TextInput

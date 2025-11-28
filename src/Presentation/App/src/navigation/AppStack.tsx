@@ -1,17 +1,21 @@
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import HomeScreen from '@/screens/HomeScreen';
 import ProductsScreen from '@/screens/ProductsScreen';
 import CartScreen from '@/screens/CartScreen';
 import ProfileScreen from '@/screens/ProfileScreen';
 import CategoryScreen from '@/screens/CategoryScreen';
+import ProductDetailScreen from '@/screens/ProductDetailScreen';
+import OrderSuccessScreen from '@/screens/OrderSuccessScreen';
 import CustomHeader from '@/components/CustomHeader';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
-export default function AppStack() {
+function TabNavigator() {
     const { theme } = useTheme();
     const { t } = useTranslation();
     const isDark = theme === 'dark';
@@ -90,5 +94,25 @@ export default function AppStack() {
                 }}
             />
         </Tab.Navigator>
+    );
+}
+
+export default function AppStack() {
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerShown: false,
+            }}
+        >
+            <Stack.Screen name="MainTabs" component={TabNavigator} />
+            <Stack.Screen
+                name="ProductDetails"
+                component={ProductDetailScreen}
+                options={{
+                    headerShown: false,
+                    presentation: 'card',
+                }}
+            />
+        </Stack.Navigator>
     );
 }

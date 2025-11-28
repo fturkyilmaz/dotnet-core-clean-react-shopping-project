@@ -74,6 +74,8 @@
         "title": "Profil",
         "settings": "Ayarlar",
         "language": "Dil",
+        "languageEnglish": "İngilizce",
+        "languageTurkish": "Türkçe",
         "theme": "Tema",
         "darkMode": "Karanlık Mod",
         "lightMode": "Aydınlık Mod",

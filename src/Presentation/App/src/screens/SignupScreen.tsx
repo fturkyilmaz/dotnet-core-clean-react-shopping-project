@@ -1,7 +1,7 @@
 import { View, Text, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
@@ -138,7 +138,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                             </View>
                         ) : null}
 
-                        <View className="space-y-5">
+                        <View className="gap-y-5">
                             <View>
                                 <Text className="text-slate-700 dark:text-slate-300 font-semibold mb-2 ml-1">{t('auth.fullName')}</Text>
                                 <Controller
@@ -241,10 +241,12 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
                         </View>
 
                         <View className="flex-row justify-center mt-8 mb-8">
-                            <Text className="text-slate-500 dark:text-slate-400">{t('auth.alreadyHaveAccountQuestion')} </Text>
-                            <AccessibleTouchable onPress={() => navigation.navigate('Login')}>
-                                <Text className="text-primary dark:text-blue-400 font-bold">{t('auth.logIn')}</Text>
-                            </AccessibleTouchable>
+                            <View className="flex-row items-center">
+                                <Text className="text-slate-500 dark:text-slate-400">{t('auth.alreadyHaveAccountQuestion')} </Text>
+                                <AccessibleTouchable onPress={() => navigation.navigate('Login')}>
+                                    <Text className="text-primary dark:text-blue-400 font-bold">{t('auth.logIn')}</Text>
+                                </AccessibleTouchable>
+                            </View>
                         </View>
                     </View>
                 </ScrollView>
