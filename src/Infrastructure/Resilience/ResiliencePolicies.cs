@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.CircuitBreaker;
+using Polly.Fallback;
 using Polly.Retry;
 using Polly.Timeout;
 
@@ -73,16 +75,7 @@ public static class ResiliencePolicies
         Func<CancellationToken, Task<TResult>> fallbackAction
     )
     {
-        return Policy<TResult>
-            .Handle<Exception>()
-            .FallbackAsync(
-                fallbackAction: (ct) => fallbackAction(ct),
-                onFallbackAsync: (outcome, context) =>
-                {
-                    Console.WriteLine($"Fallback executed due to: {outcome.Exception?.Message}");
-                    return Task.CompletedTask;
-                }
-            );
+        return Policy<TResult>.Handle<Exception>().FallbackAsync((ct) => fallbackAction(ct));
     }
 
     /// <summary>

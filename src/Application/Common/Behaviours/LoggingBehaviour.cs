@@ -1,6 +1,6 @@
-﻿using ShoppingProject.Application.Common.Interfaces;
-using MediatR.Pipeline;
+﻿using MediatR.Pipeline;
 using Microsoft.Extensions.Logging;
+using ShoppingProject.Application.Common.Interfaces;
 
 namespace ShoppingProject.Application.Common.Behaviours;
 
@@ -29,7 +29,12 @@ public class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest>
             userName = await _identityService.GetUserNameAsync(userId);
         }
 
-        _logger.LogInformation("ShoppingProject Request: {Name} {@UserId} {@UserName} {@Request}",
-            requestName, userId, userName, request);
+        _logger.LogInformation(
+            "ShoppingProject Request: {Name} {@UserId} {@UserName} {@Request}",
+            requestName,
+            userId,
+            userName,
+            request
+        );
     }
 }

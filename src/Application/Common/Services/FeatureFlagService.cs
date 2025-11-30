@@ -1,20 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Domain.Entities;
 
 namespace ShoppingProject.Application.Common.Services;
-
-public interface IFeatureFlagService
-{
-    Task<bool> IsEnabledAsync(
-        string featureName,
-        string? userId = null,
-        CancellationToken cancellationToken = default
-    );
-    Task<T> GetVariantAsync<T>(
-        string featureName,
-        T defaultValue,
-        CancellationToken cancellationToken = default
-    );
-}
 
 public class FeatureFlagService : IFeatureFlagService
 {

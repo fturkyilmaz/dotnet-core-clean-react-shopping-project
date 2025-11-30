@@ -1,4 +1,6 @@
 using MediatR;
+using Microsoft.Extensions.Logging;
+using ShoppingProject.Application.Common.Interfaces;
 
 namespace ShoppingProject.Application.Common.Behaviours;
 

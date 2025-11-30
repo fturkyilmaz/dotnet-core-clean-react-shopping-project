@@ -1,8 +1,10 @@
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Application.Contracts.ServiceBus;
 
 namespace ShoppingProject.Infrastructure.BackgroundJobs;
 

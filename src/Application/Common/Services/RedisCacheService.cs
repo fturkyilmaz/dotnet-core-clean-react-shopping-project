@@ -1,25 +1,8 @@
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
+using ShoppingProject.Application.Common.Interfaces;
 
-namespace ShoppingProject.Application.Common.Interfaces;
-
-public interface ICacheService
-{
-    Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default);
-    Task SetAsync<T>(
-        string key,
-        T value,
-        TimeSpan? expiry = null,
-        CancellationToken cancellationToken = default
-    );
-    Task RemoveAsync(string key, CancellationToken cancellationToken = default);
-    Task<T> GetOrCreateAsync<T>(
-        string key,
-        Func<Task<T>> factory,
-        TimeSpan? expiry = null,
-        CancellationToken cancellationToken = default
-    );
-}
+namespace ShoppingProject.Application.Common.Services;
 
 public class RedisCacheService : ICacheService
 {
@@ -83,6 +66,30 @@ public class RedisCacheService : ICacheService
 
         var value = await factory();
         await SetAsync(key, value, expiry, cancellationToken);
+
+        return value;
+    }
+
+    public async Task<T> GetOrSetAsync<T>(
+        string key,
+        Func<Task<T>> factory,
+        TimeSpan? expiration = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var cachedValue = await GetAsync<T>(key, cancellationToken);
+
+        if (cachedValue is not null)
+        {
+            return cachedValue;
+        }
+
+        var value = await factory();
+
+        if (value is not null)
+        {
+            await SetAsync(key, value, expiration, cancellationToken);
+        }
 
         return value;
     }
