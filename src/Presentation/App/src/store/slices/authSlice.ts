@@ -24,7 +24,6 @@ export const login = createAsyncThunk(
   async (credentials: LoginRequest, { rejectWithValue }) => {
     try {
       const response = await api.post<ApiResponse<AuthResponse>>('/identity/login', credentials);
-      console.log('Full response:', response.data);
       
       if (!response.data.isSuccess) {
         return rejectWithValue(response.data.message || 'Login failed');
@@ -49,7 +48,21 @@ export const login = createAsyncThunk(
 
 export const logout = createAsyncThunk('auth/logout', async () => {
   await AsyncStorage.removeItem('token');
+  await AsyncStorage.removeItem('refreshToken');
+  // to do clear all redux state
 });
+
+export const fetchUserProfile = createAsyncThunk(
+  'auth/fetchUserProfile',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get<ApiResponse<User>>('/identity/me');
+      return response.data?.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch profile');
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: 'auth',
@@ -68,7 +81,7 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload.token;
+        state.token = action.payload.accessToken;
         state.isAuthenticated = true;
       })
       .addCase(login.rejected, (state, action) => {
@@ -79,6 +92,17 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
+      })
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(fetchUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

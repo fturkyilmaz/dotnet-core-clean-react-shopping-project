@@ -20,6 +20,8 @@ export const fetchCart = createAsyncThunk(
   async (username: string) => {
     // API çağrısı: GET /carts
     const response = await api.get<Cart>(`/carts`);
+
+    console.log("response.data", response.data);
     return response.data;
   }
 );

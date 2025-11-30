@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '@/store/slices/authSlice';
+import { logout, fetchUserProfile } from '@/store/slices/authSlice';
 import { AppDispatch, RootState } from '@/store';
 import { useTheme } from '@/context/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,7 +13,13 @@ const ProfileScreen = () => {
     const { t, i18n } = useTranslation();
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: RootState) => state.auth);
+
+    console.log('user', user);
     const { theme, toggleTheme } = useTheme();
+
+    useEffect(() => {
+        dispatch(fetchUserProfile());
+    }, [dispatch]);
 
     const changeLanguage = async (lang: string) => {
         try {
@@ -30,6 +36,13 @@ const ProfileScreen = () => {
         dispatch(logout());
     };
 
+    const getDisplayName = () => {
+        if (user?.firstName && user?.lastName) {
+            return `${user.firstName} ${user.lastName}`;
+        }
+        return user?.username || 'User';
+    };
+
     return (
         <View className="flex-1 bg-slate-50 dark:bg-slate-900">
             <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
@@ -41,7 +54,7 @@ const ProfileScreen = () => {
                         </View>
                         <View>
                             <Text className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {user?.username || 'User'}
+                                {getDisplayName()}
                             </Text>
                             <Text className="text-slate-500 dark:text-slate-400">
                                 {user?.email || 'user@example.com'}
