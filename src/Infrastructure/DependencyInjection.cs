@@ -5,12 +5,16 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Application.Common.Services;
 using ShoppingProject.Domain.Constants;
+using ShoppingProject.Infrastructure.BackgroundJobs;
 using ShoppingProject.Infrastructure.Configuration;
 using ShoppingProject.Infrastructure.Constants;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Data.Interceptors;
 using ShoppingProject.Infrastructure.Identity;
+using ShoppingProject.Infrastructure.Repositories;
+using ShoppingProject.Infrastructure.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -75,32 +79,14 @@ public static class DependencyInjection
         builder.Services.AddTransient<IIdentityService, IdentityService>();
 
         // Register repositories
-        builder.Services.AddScoped(
-            typeof(IRepository<>),
-            typeof(ShoppingProject.Infrastructure.Repositories.Repository<>)
-        );
-        builder.Services.AddScoped<
-            IFeatureFlagRepository,
-            ShoppingProject.Infrastructure.Repositories.FeatureFlagRepository
-        >();
-        builder.Services.AddScoped<
-            ICartRepository,
-            ShoppingProject.Infrastructure.Repositories.CartRepository
-        >();
-        builder.Services.AddScoped<
-            IProductRepository,
-            ShoppingProject.Infrastructure.Repositories.ProductRepository
-        >();
+        builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        builder.Services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
+        builder.Services.AddScoped<ICartRepository, CartRepository>();
+        builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
-        builder.Services.AddSingleton<
-            ICacheService,
-            ShoppingProject.Infrastructure.Services.RedisCacheService
-        >();
-        builder.Services.AddSingleton<
-            ShoppingProject.Application.Common.Services.IFeatureFlagService,
-            ShoppingProject.Application.Common.Services.FeatureFlagService
-        >();
-        builder.Services.AddHostedService<ShoppingProject.Infrastructure.BackgroundJobs.OutboxProcessorService>();
+        builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+        builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+        builder.Services.AddHostedService<OutboxProcessorService>();
 
         builder.Services.AddStackExchangeRedisCache(options =>
         {
