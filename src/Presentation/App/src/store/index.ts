@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import authReducer from '@/store/slices/authSlice';
 import productsReducer from '@/store/slices/productsSlice';
 import cartReducer from '@/store/slices/cartSlice';
+import offlineMiddleware from '@/store/middleware/offlineMiddleware';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -27,7 +28,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat(offlineMiddleware),
 });
 
 export const persistor = persistStore(store);

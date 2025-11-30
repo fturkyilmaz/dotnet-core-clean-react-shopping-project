@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { useEffect } from 'react';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { OfflineMessage, SyncBadge } from '@/components/OfflineIndicator';
 
 export default function CartScreen() {
     const { t } = useTranslation();
@@ -22,6 +24,7 @@ export default function CartScreen() {
     const dispatch = useDispatch<AppDispatch>();
     const cart = useSelector((state: RootState) => state.cart.cart);
     const loading = useSelector((state: RootState) => state.cart.loading);
+    const { isOnline, isSyncing, pendingCount, manualSync } = useNetworkStatus();
 
     useEffect(() => {
         dispatch(fetchCart(''));
@@ -142,6 +145,30 @@ export default function CartScreen() {
 
     return (
         <View className="flex-1 bg-slate-50 dark:bg-background-dark">
+            {!isOnline && (
+                <OfflineMessage
+                    title={t('offline.title') || 'You\'re Offline'}
+                    message={t('offline.message') || 'Your changes are saved locally and will sync when online.'}
+                />
+            )}
+            {pendingCount > 0 && (
+                <View className="px-4 py-2 bg-blue-50 dark:bg-blue-900/10 flex-row items-center justify-between">
+                    <Text className="text-blue-700 dark:text-blue-300 text-sm font-medium">
+                        {pendingCount} pending change{pendingCount > 1 ? 's' : ''}
+                    </Text>
+                    {isOnline && (
+                        <AccessibleTouchable
+                            onPress={manualSync}
+                            disabled={isSyncing}
+                            className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded"
+                        >
+                            <Text className="text-blue-700 dark:text-blue-300 text-xs font-semibold">
+                                {isSyncing ? 'Syncing...' : 'Sync Now'}
+                            </Text>
+                        </AccessibleTouchable>
+                    )}
+                </View>
+            )}
             <FlatList
                 data={itemsWithQuantity}
                 renderItem={renderCartItem}

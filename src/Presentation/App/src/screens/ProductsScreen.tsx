@@ -6,15 +6,25 @@ import { Product, NavigationProp } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { useNavigation } from '@react-navigation/native';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { OfflineMessage } from '@/components/OfflineIndicator';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store';
+import { addToCart } from '@/store/slices/cartSlice';
 
 export default function ProductsScreen() {
     const navigation = useNavigation<NavigationProp>();
     const { t } = useTranslation();
     const { data: products, isLoading, error } = useProducts();
     const { theme } = useTheme();
+    const { isOnline } = useNetworkStatus();
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleAddToCart = (product: Product) => {
-        // TODO: Implement actual add to cart logic here
+        dispatch(addToCart({
+            ...product,
+            quantity: 1,
+        }));
         Toast.show({
             type: 'success',
             text1: t('products.addedToCart'),
@@ -88,6 +98,12 @@ export default function ProductsScreen() {
 
     return (
         <View className="flex-1 bg-slate-50 dark:bg-background-dark">
+            {!isOnline && (
+                <OfflineMessage
+                    title={t('offline.title') || 'You\'re Offline'}
+                    message={t('offline.message') || 'You can browse cached products but can\'t add new items offline.'}
+                />
+            )}
             <FlatList
                 data={products}
                 renderItem={renderProduct}
