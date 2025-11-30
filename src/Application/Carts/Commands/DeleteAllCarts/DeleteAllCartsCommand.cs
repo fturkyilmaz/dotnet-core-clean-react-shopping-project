@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using ShoppingProject.Application.Common.Interfaces;
 
 namespace ShoppingProject.Application.Carts.Commands.DeleteAllCarts
@@ -8,19 +7,16 @@ namespace ShoppingProject.Application.Carts.Commands.DeleteAllCarts
 
     public class DeleteAllCartsCommandHandler : IRequestHandler<DeleteAllCartsCommand>
     {
-        private readonly IApplicationDbContext _context;
+        private readonly ICartRepository _cartRepository;
 
-        public DeleteAllCartsCommandHandler(IApplicationDbContext context)
+        public DeleteAllCartsCommandHandler(ICartRepository cartRepository)
         {
-            _context = context;
+            _cartRepository = cartRepository;
         }
 
         public async Task Handle(DeleteAllCartsCommand request, CancellationToken cancellationToken)
         {
-            if (_context.Carts != null)
-                await _context.Carts.ExecuteDeleteAsync(cancellationToken);
-
-            await _context.SaveChangesAsync(cancellationToken);
+            await _cartRepository.DeleteAllAsync(cancellationToken);
         }
     }
 }

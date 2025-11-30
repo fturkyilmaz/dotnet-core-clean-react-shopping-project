@@ -73,9 +73,28 @@ public static class DependencyInjection
 
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
+
+        // Register repositories
+        builder.Services.AddScoped(
+            typeof(IRepository<>),
+            typeof(ShoppingProject.Infrastructure.Repositories.Repository<>)
+        );
+        builder.Services.AddScoped<
+            IFeatureFlagRepository,
+            ShoppingProject.Infrastructure.Repositories.FeatureFlagRepository
+        >();
+        builder.Services.AddScoped<
+            ICartRepository,
+            ShoppingProject.Infrastructure.Repositories.CartRepository
+        >();
+        builder.Services.AddScoped<
+            IProductRepository,
+            ShoppingProject.Infrastructure.Repositories.ProductRepository
+        >();
+
         builder.Services.AddSingleton<
             ICacheService,
-            ShoppingProject.Application.Common.Services.RedisCacheService
+            ShoppingProject.Infrastructure.Services.RedisCacheService
         >();
         builder.Services.AddSingleton<
             ShoppingProject.Application.Common.Services.IFeatureFlagService,

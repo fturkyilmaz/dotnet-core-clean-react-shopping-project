@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using ShoppingProject.Application.Common.Interfaces;
@@ -8,7 +7,7 @@ namespace ShoppingProject.Application.Common.Services;
 
 public class FeatureFlagService : IFeatureFlagService
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IFeatureFlagRepository _repository;
     private readonly IMemoryCache _cache;
     private readonly IUser _currentUser;
     private readonly ILogger<FeatureFlagService> _logger;
@@ -16,13 +15,13 @@ public class FeatureFlagService : IFeatureFlagService
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
     public FeatureFlagService(
-        IApplicationDbContext context,
+        IFeatureFlagRepository repository,
         IMemoryCache cache,
         IUser currentUser,
         ILogger<FeatureFlagService> logger
     )
     {
-        _context = context;
+        _repository = repository;
         _cache = cache;
         _currentUser = currentUser;
         _logger = logger;
@@ -43,10 +42,7 @@ public class FeatureFlagService : IFeatureFlagService
                 async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = CacheDuration;
-                    return await _context.FeatureFlags.FirstOrDefaultAsync(
-                        f => f.Name == featureName,
-                        cancellationToken
-                    );
+                    return await _repository.GetByNameAsync(featureName, cancellationToken);
                 }
             );
 
@@ -86,10 +82,7 @@ public class FeatureFlagService : IFeatureFlagService
                 async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = CacheDuration;
-                    return await _context.FeatureFlags.FirstOrDefaultAsync(
-                        f => f.Name == featureName,
-                        cancellationToken
-                    );
+                    return await _repository.GetByNameAsync(featureName, cancellationToken);
                 }
             );
 

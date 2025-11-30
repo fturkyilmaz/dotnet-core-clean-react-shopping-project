@@ -2,7 +2,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using ShoppingProject.Application.Common.Interfaces;
 
-namespace ShoppingProject.Application.Common.Services;
+namespace ShoppingProject.Infrastructure.Services;
 
 public class RedisCacheService : ICacheService
 {

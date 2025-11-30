@@ -13,7 +13,7 @@ namespace ShoppingProject.UnitTests.Application.Queries;
 
 public class GetProductByIdQueryTests
 {
-    private readonly Mock<IApplicationDbContext> _mockContext;
+    private readonly Mock<IProductRepository> _mockProductRepository;
     private readonly Mock<IMapper> _mockMapper;
     private readonly Mock<ICacheService> _mockCacheService;
     private readonly GetProductByIdQueryHandler _handler;
@@ -21,11 +21,11 @@ public class GetProductByIdQueryTests
 
     public GetProductByIdQueryTests()
     {
-        _mockContext = new Mock<IApplicationDbContext>();
+        _mockProductRepository = new Mock<IProductRepository>();
         _mockMapper = new Mock<IMapper>();
         _mockCacheService = new Mock<ICacheService>();
         _handler = new GetProductByIdQueryHandler(
-            _mockContext.Object,
+            _mockProductRepository.Object,
             _mockMapper.Object,
             _mockCacheService.Object
         );

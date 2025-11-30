@@ -1,5 +1,4 @@
 using Ardalis.GuardClauses;
-using Microsoft.EntityFrameworkCore;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.DTOs;
 
@@ -9,17 +8,17 @@ public record GetProductByIdQuery(int Id) : IRequest<ProductDto>;
 
 public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, ProductDto>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IProductRepository _productRepository;
     private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
 
     public GetProductByIdQueryHandler(
-        IApplicationDbContext context,
+        IProductRepository productRepository,
         IMapper mapper,
         ICacheService cacheService
     )
     {
-        _context = context;
+        _productRepository = productRepository;
         _mapper = mapper;
         _cacheService = cacheService;
     }
@@ -35,9 +34,10 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             key,
             async () =>
             {
-                var entity = await _context
-                    .Products
-                    .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+                var entity = await _productRepository.GetByIdAsync(
+                    Guid.Parse(request.Id.ToString()),
+                    cancellationToken
+                );
 
                 if (entity == null)
                     return null;
