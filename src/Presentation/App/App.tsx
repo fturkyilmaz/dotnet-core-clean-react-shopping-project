@@ -13,6 +13,8 @@ import { View } from 'react-native';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import sqliteDb from '@/services/sqlite';
+import UnifiedAnalyticsManager from '@/services/unifiedAnalytics';
+import { initializeFirebaseAnalytics } from '@/services/firebaseAnalytics';
 
 const queryClient = new QueryClient();
 
@@ -35,6 +37,34 @@ function AppContent() {
             // Cleanup on app unmount
             sqliteDb.close();
         };
+    }, []);
+
+    useEffect(() => {
+        // Initialize analytics services
+        const initAnalytics = async () => {
+            try {
+                // Initialize Firebase Analytics
+                await initializeFirebaseAnalytics();
+                
+                // Initialize Unified Analytics Manager
+                await UnifiedAnalyticsManager.initialize({
+                    enableFirebase: true,
+                    enableLocal: true,
+                    enableCrashlytics: true,
+                });
+                
+                console.log('✅ App: Analytics initialized');
+                
+                // Track app launch
+                UnifiedAnalyticsManager.trackEvent('app_launched', {
+                    timestamp: new Date().toISOString(),
+                });
+            } catch (error) {
+                console.error('App: Failed to initialize analytics:', error);
+            }
+        };
+        
+        initAnalytics();
     }, []);
 
     return (

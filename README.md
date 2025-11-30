@@ -94,6 +94,35 @@ Run the Web API:
 dotnet run --project src/API/ShoppingProject.WebApi.csproj
 ```
 
+### Running the Mobile App
+
+Navigate to the mobile app directory and start:
+
+```bash
+cd src/Presentation/App
+yarn install
+yarn start
+```
+
+## 📱 Mobile Features
+
+### Offline-First Architecture
+- **SQLite Database**: Local persistence for products and cart items
+- **SyncManager**: Automatic sync when device comes back online
+- **Offline Queue**: Operations queued and synced in order
+
+### Analytics & Monitoring
+- **Google Analytics**: Comprehensive event tracking
+- **Firebase Crashlytics**: Automatic crash detection and reporting
+- **Performance Metrics**: Real-time query times and API latency
+- **Cache Analytics**: Track cache hit rates and effectiveness
+
+See detailed docs:
+- [FIREBASE_ANALYTICS_SETUP.md](./FIREBASE_ANALYTICS_SETUP.md) - Firebase setup and configuration
+- [ANALYTICS_INTEGRATION_GUIDE.md](./ANALYTICS_INTEGRATION_GUIDE.md) - Developer integration guide
+- [OFFLINE_ARCHITECTURE.md](./OFFLINE_ARCHITECTURE.md) - Offline-first architecture details
+- [ADVANCED_CACHING_ANALYTICS.md](./ADVANCED_CACHING_ANALYTICS.md) - Caching and performance optimization
+
 ## 📊 Observability & Monitoring
 
 ### Health Checks UI

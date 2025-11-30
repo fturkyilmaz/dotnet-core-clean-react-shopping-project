@@ -1,13 +1,16 @@
 import api from '@/services/api';
 import localStorageService, { OfflineOperation } from '@/services/localStorage';
+import UnifiedAnalyticsManager from '@/services/unifiedAnalytics';
 
 /**
  * SyncManager handles offline operations and syncs them with the server
  * when the device comes back online
+ * Integrated with Unified Analytics for tracking sync events and performance
  */
 export class SyncManager {
   private isSyncing = false;
   private syncListeners: ((status: SyncStatus) => void)[] = [];
+  private analytics = UnifiedAnalyticsManager;
 
   private static instance: SyncManager;
 
@@ -47,6 +50,8 @@ export class SyncManager {
     }
 
     this.isSyncing = true;
+    const syncStartTime = performance.now();
+    this.analytics.trackSyncEvent('started', { timestamp: new Date().toISOString() });
     this.notifyListeners({ isOnline: true, isSyncing: true, pendingCount: 0 });
 
     try {
@@ -54,6 +59,13 @@ export class SyncManager {
 
       if (operations.length === 0) {
         console.log('No pending operations to sync');
+        const syncDuration = performance.now() - syncStartTime;
+        this.analytics.trackSyncEvent('completed', {
+          duration: syncDuration,
+          operationsCount: 0,
+          successCount: 0,
+          failureCount: 0,
+        });
         this.notifyListeners({ isOnline: true, isSyncing: false, pendingCount: 0 });
         this.isSyncing = false;
         return { success: true, message: 'No pending operations' };
@@ -66,26 +78,57 @@ export class SyncManager {
 
       for (const operation of operations) {
         try {
+          const operationStartTime = performance.now();
           const result = await this.syncOperation(operation);
+          const operationDuration = performance.now() - operationStartTime;
+          
           if (result) {
             successCount++;
             await localStorageService.markOperationAsSynced(operation.id);
+            this.analytics.trackOfflineOperation(
+              operation.operation_type,
+              operation.entity_type,
+              operationDuration
+            );
           } else {
             failureCount++;
             await localStorageService.incrementRetryCount(operation.id);
+            this.analytics.trackEvent('sync_operation_failed', {
+              operation_type: operation.operation_type,
+              entity_type: operation.entity_type,
+              duration_ms: operationDuration,
+            });
           }
         } catch (error) {
           console.error(`Failed to sync operation ${operation.id}:`, error);
           failureCount++;
           await localStorageService.incrementRetryCount(operation.id);
+          this.analytics.trackException(
+            error instanceof Error ? error : new Error(String(error)),
+            {
+              operation: `sync_operation_${operation.operation_type}`,
+              metadata: {
+                operation_id: operation.id,
+                entity_type: operation.entity_type,
+              },
+            }
+          );
         }
       }
 
       // Clear synced operations
       await localStorageService.clearSyncedOperations();
 
+      const syncDuration = performance.now() - syncStartTime;
       const message = `Synced: ${successCount} succeeded, ${failureCount} failed`;
       console.log(message);
+
+      this.analytics.trackSyncEvent('completed', {
+        duration: syncDuration,
+        operationsCount: operations.length,
+        successCount,
+        failureCount,
+      });
 
       this.notifyListeners({ isOnline: true, isSyncing: false, pendingCount: failureCount });
       this.isSyncing = false;
@@ -97,7 +140,12 @@ export class SyncManager {
         failureCount,
       };
     } catch (error) {
+      const syncDuration = performance.now() - syncStartTime;
       console.error('Sync failed:', error);
+      this.analytics.trackSyncEvent('failed', {
+        duration: syncDuration,
+        error: error instanceof Error ? error.message : String(error),
+      });
       this.notifyListeners({ isOnline: false, isSyncing: false, pendingCount: 0 });
       this.isSyncing = false;
       return {

@@ -1,12 +1,17 @@
 import { SQLiteDatabase } from './sqlite';
 import { CartItem, Product } from '@/types';
+import CacheManager from './cacheManager';
+import UnifiedAnalyticsManager from './unifiedAnalytics';
 
 /**
  * Local Storage Service for offline data persistence
  * Abstracts SQLite operations for products and cart items
+ * Integrated with CacheManager and Unified Analytics
  */
 export class LocalStorageService {
   private db: ReturnType<typeof SQLiteDatabase.getInstance>;
+  private cacheManager = CacheManager;
+  private analytics = UnifiedAnalyticsManager;
 
   constructor() {
     this.db = SQLiteDatabase.getInstance();

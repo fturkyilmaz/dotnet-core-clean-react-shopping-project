@@ -70,7 +70,22 @@ export class SQLiteDatabase {
         );
       `);
 
-      console.log('SQLite database initialized successfully');
+      // Create indexes for performance optimization
+      await this.db.execAsync(`
+        CREATE INDEX IF NOT EXISTS idx_products_id ON products(id);
+        CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+        CREATE INDEX IF NOT EXISTS idx_products_synced_at ON products(synced_at);
+        
+        CREATE INDEX IF NOT EXISTS idx_cart_items_id ON cart_items(id);
+        CREATE INDEX IF NOT EXISTS idx_cart_items_product_id ON cart_items(product_id);
+        CREATE INDEX IF NOT EXISTS idx_cart_items_updated_at ON cart_items(updated_at);
+        
+        CREATE INDEX IF NOT EXISTS idx_offline_queue_status ON offline_queue(status);
+        CREATE INDEX IF NOT EXISTS idx_offline_queue_entity_type ON offline_queue(entity_type);
+        CREATE INDEX IF NOT EXISTS idx_offline_queue_created_at ON offline_queue(created_at);
+      `);
+
+      console.log('SQLite database initialized successfully with indexes');
     } catch (error) {
       console.error('Failed to initialize database:', error);
       throw error;
