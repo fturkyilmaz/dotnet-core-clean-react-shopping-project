@@ -8,6 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { externalApi } from "@/services/api";
 import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store";
 import { addToCart } from "@/store/slices/cartSlice";
 import Toast from "react-native-toast-message";
 import { CartItem, Product } from "@/types";
@@ -17,7 +18,7 @@ export default function ProductDetailScreen({ route, navigation }: any) {
   const { productId } = route.params;
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", productId],

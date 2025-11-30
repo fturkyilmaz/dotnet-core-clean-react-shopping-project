@@ -123,7 +123,6 @@ const ProfileScreen = () => {
                                     className="w-6 h-6 rounded-full bg-white shadow-md"
                                     style={{
                                         marginLeft: theme === 'dark' ? 28 : 4,
-                                        transition: 'margin-left 0.2s'
                                     }}
                                 />
                             </AccessibleTouchable>

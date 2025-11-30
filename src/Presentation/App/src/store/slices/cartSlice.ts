@@ -113,7 +113,12 @@ export const removeAllCartItems = createAsyncThunk(
 const cartSlice = createSlice({
   name: "cart",
   initialState,
-  reducers: {},
+  reducers: {
+    clearCart: (state) => {
+      state.cart = null;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       // FETCH CART
@@ -202,4 +207,5 @@ const cartSlice = createSlice({
   },
 });
 
+export const { clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

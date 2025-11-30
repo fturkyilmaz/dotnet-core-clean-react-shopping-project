@@ -2,13 +2,13 @@ import { View, Text, FlatList, Image, ActivityIndicator } from 'react-native';
 import AccessibleTouchable from '@/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/hooks/useProducts';
-import { Product } from '@/types';
+import { Product, NavigationProp } from '@/types';
 import { useTheme } from '@/context/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { useNavigation } from '@react-navigation/native';
 
 export default function ProductsScreen() {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp>();
     const { t } = useTranslation();
     const { data: products, isLoading, error } = useProducts();
     const { theme } = useTheme();

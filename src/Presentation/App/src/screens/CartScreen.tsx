@@ -138,10 +138,7 @@ export default function CartScreen() {
     // Ensure displayItems is always an array of CartItem
     const displayItems = Array.isArray(cart?.items) ? cart.items : [];
     const totalPrice = displayItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const itemsWithQuantity = displayItems.filter(item => item.quantity >= 0);
-
-    console.log('itemsWithQuantity', itemsWithQuantity);
-    console.log('displayItems', displayItems);
+    const itemsWithQuantity = displayItems.filter(item => item.quantity > 0);
 
     return (
         <View className="flex-1 bg-slate-50 dark:bg-background-dark">
