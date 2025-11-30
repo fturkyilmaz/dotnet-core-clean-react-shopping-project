@@ -75,8 +75,13 @@ public static class DependencyInjection
         builder.Services.AddTransient<IIdentityService, IdentityService>();
         builder.Services.AddSingleton<
             ICacheService,
-            ShoppingProject.Infrastructure.Services.CacheService
+            ShoppingProject.Application.Common.Services.RedisCacheService
         >();
+        builder.Services.AddSingleton<
+            ShoppingProject.Application.Common.Services.IFeatureFlagService,
+            ShoppingProject.Application.Common.Services.FeatureFlagService
+        >();
+        builder.Services.AddHostedService<ShoppingProject.Infrastructure.BackgroundJobs.OutboxProcessorService>();
 
         builder.Services.AddStackExchangeRedisCache(options =>
         {
