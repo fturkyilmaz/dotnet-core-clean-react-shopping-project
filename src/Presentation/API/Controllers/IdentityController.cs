@@ -1,15 +1,17 @@
+using System.Security.Claims;
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
+using ShoppingProject.Application.DTOs.Identity;
 
 namespace ShoppingProject.WebApi.Controllers;
 
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiController]
-[AllowAnonymous]
 public class IdentityController : ControllerBase
 {
     private readonly IIdentityService _identityService;
@@ -96,22 +98,59 @@ public class IdentityController : ControllerBase
 
         return Ok(ServiceResult<string>.Success($"Role '{roleName}' created successfully"));
     }
-}
 
-public class LoginRequest
-{
-    public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-}
+    [HttpGet("me")]
+    [AllowAnonymous]
+    public async Task<ActionResult<UserInfoResponse>> GetCurrentUserInfo()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
 
-public class RegisterRequest
-{
-    public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-}
+        // Fetch user from identity service
+        var user = await _identityService.GetUserByIdAsync(userId);
+        if (user.Result.Succeeded == false || user.Response == null)
+        {
+            return NotFound();
+        }
 
-public class RefreshTokenRequest
-{
-    public string AccessToken { get; set; } = string.Empty;
-    public string RefreshToken { get; set; } = string.Empty;
+        var response = new UserInfoResponse
+        {
+            Id = user.Response.Id,
+            Email = user.Response.Email ?? string.Empty,
+            FirstName = user.Response.FirstName,
+            LastName = user.Response.LastName,
+            UserName = user.Response.UserName,
+            Gender = user.Response.Gender,
+        };
+
+        return Ok(ServiceResult<UserInfoResponse>.Success(response));
+    }
+
+    [HttpPut("me")]
+    [Authorize]
+    public async Task<ActionResult<ServiceResult<string>>> UpdateUser(UpdateUserRequest request)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var result = await _identityService.UpdateUserAsync(
+            userId,
+            request.FirstName ?? string.Empty,
+            request.LastName ?? string.Empty,
+            request.Gender ?? string.Empty
+        );
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
+        }
+
+        return Ok(ServiceResult<string>.Success("User updated successfully"));
+    }
 }

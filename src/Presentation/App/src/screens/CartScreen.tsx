@@ -1,62 +1,52 @@
+import React from 'react';
 import { View, Text, FlatList, Image, ActivityIndicator, Alert } from 'react-native';
 import AccessibleTouchable from '@/components/AccessibleTouchable';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import api from '@/services/api';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/store';
 import { CartItem } from '@/types';
+import {
+    fetchCart,
+    updateCartItem,
+    removeCartItem,
+    removeAllCartItems
+} from '@/store/slices/cartSlice';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeContext';
 import Toast from 'react-native-toast-message';
-import { useState } from 'react';
+import { useEffect } from 'react';
 
 export default function CartScreen() {
     const { t } = useTranslation();
     const { theme } = useTheme();
-    const queryClient = useQueryClient();
-    const [localCartItems, setLocalCartItems] = useState<CartItem[]>([]);
+    const dispatch = useDispatch<AppDispatch>();
+    const cart = useSelector((state: RootState) => state.cart.cart);
+    const loading = useSelector((state: RootState) => state.cart.loading);
 
-    const { data: cartItems, isLoading } = useQuery({
-        queryKey: ['cart'],
-        queryFn: async () => {
-            const response = await api.get<CartItem[]>('/carts');
-            setLocalCartItems(response.data);
-            return response.data;
-        },
-    });
+    useEffect(() => {
+        dispatch(fetchCart(''));
+    }, [dispatch]);
 
     const handleIncreaseQuantity = (item: CartItem) => {
-        const updatedItems = localCartItems.map(cartItem =>
-            cartItem.id === item.id
-                ? { ...cartItem, quantity: cartItem.quantity + 1 }
-                : cartItem
-        );
-        setLocalCartItems(updatedItems);
-        // TODO: Call API to update quantity
+        dispatch(updateCartItem({ cartId: item.id, productId: item.id, quantity: item.quantity + 1 }));
     };
 
     const handleDecreaseQuantity = (item: CartItem) => {
         if (item.quantity > 1) {
-            const updatedItems = localCartItems.map(cartItem =>
-                cartItem.id === item.id
-                    ? { ...cartItem, quantity: cartItem.quantity - 1 }
-                    : cartItem
-            );
-            setLocalCartItems(updatedItems);
-            // TODO: Call API to update quantity
+            dispatch(updateCartItem({ cartId: item.id, productId: item.id, quantity: item.quantity - 1 }));
         }
     };
 
     const handleRemoveItem = (item: CartItem) => {
-        const updatedItems = localCartItems.filter(cartItem => cartItem.id !== item.id);
-        setLocalCartItems(updatedItems);
-        Toast.show({
-            type: 'success',
-            text1: t('cart.itemRemoved'),
-            text2: item.title,
-            position: 'top',
-            visibilityTime: 2000,
+        dispatch(removeCartItem({ id: item.id })).unwrap().then(() => {
+            Toast.show({
+                type: 'success',
+                text1: t('cart.itemRemoved'),
+                text2: item.title,
+                position: 'top',
+                visibilityTime: 2000,
+            });
         });
-        // TODO: Call API to remove item
     };
 
     const handleClearCart = () => {
@@ -72,14 +62,14 @@ export default function CartScreen() {
                     text: t('cart.clearCart'),
                     style: 'destructive',
                     onPress: () => {
-                        setLocalCartItems([]);
-                        Toast.show({
-                            type: 'success',
-                            text1: t('cart.cartCleared'),
-                            position: 'top',
-                            visibilityTime: 2000,
+                        dispatch(removeAllCartItems()).unwrap().then(() => {
+                            Toast.show({
+                                type: 'success',
+                                text1: t('cart.cartCleared'),
+                                position: 'top',
+                                visibilityTime: 2000,
+                            });
                         });
-                        // TODO: Call API to clear cart
                     },
                 },
             ]
@@ -137,7 +127,7 @@ export default function CartScreen() {
         </View>
     );
 
-    if (isLoading) {
+    if (loading) {
         return (
             <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-background-dark">
                 <ActivityIndicator size="large" color={theme === 'dark' ? '#60a5fa' : '#0f172a'} />
@@ -145,9 +135,11 @@ export default function CartScreen() {
         );
     }
 
-    const displayItems = localCartItems.length > 0 ? localCartItems : cartItems || [];
+    // Ensure displayItems is always an array of CartItem
+    const displayItems = Array.isArray(cart?.items) ? cart.items : [];
     const totalPrice = displayItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const itemsWithQuantity = displayItems.filter(item => item.quantity > 0);
+
 
     return (
         <View className="flex-1 bg-slate-50 dark:bg-background-dark">

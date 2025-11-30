@@ -1,3 +1,4 @@
+using ShoppingProject.Application.Carts.Commands.DeleteAllCarts;
 using ShoppingProject.Application.Carts.Commands.CreateCart;
 using ShoppingProject.Application.Carts.Commands.UpdateCart;
 using ShoppingProject.Application.Carts.Commands.DeleteCart;
@@ -66,6 +67,15 @@ namespace ShoppingProject.WebApi.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _sender.Send(new DeleteCartCommand(id));
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route("delete-all")]
+        [Authorize(Policy = Policies.CanPurge)]
+        public async Task<IActionResult> DeleteAll()
+        {
+            await _sender.Send(new DeleteAllCartsCommand());
             return NoContent();
         }
     }

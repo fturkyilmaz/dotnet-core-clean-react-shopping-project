@@ -1,5 +1,5 @@
 using FluentValidation;
-using ShoppingProject.WebApi.Controllers;
+using ShoppingProject.Application.DTOs.Identity;
 
 namespace ShoppingProject.WebApi.Validators;
 
@@ -40,5 +40,23 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
             .WithMessage("Password must contain at least one number")
             .Matches("[^a-zA-Z0-9]")
             .WithMessage("Password must contain at least one special character");
+    }
+}
+
+public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest>
+{
+    public UpdateUserRequestValidator()
+    {
+        RuleFor(x => x.FirstName)
+            .MaximumLength(50)
+            .WithMessage("First name must not exceed 50 characters");
+
+        RuleFor(x => x.LastName)
+            .MaximumLength(50)
+            .WithMessage("Last name must not exceed 50 characters");
+
+        RuleFor(x => x.Gender)
+            .MaximumLength(20)
+            .WithMessage("Gender must not exceed 20 characters");
     }
 }

@@ -42,6 +42,28 @@ public class IdentityService : IIdentityService
         return user?.UserName;
     }
 
+    public async Task<(Result Result, UserInfoResponse? Response)> GetUserByIdAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+        {
+            return (Result.Failure(new[] { "User not found" }), null);
+        }
+
+        var response = new UserInfoResponse
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email ?? string.Empty,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Gender = user.Gender,
+        };
+
+        return (Result.Success(), response);
+    }
+
     public async Task<(Result Result, string UserId)> CreateUserAsync(
         string userName,
         string password
@@ -306,6 +328,30 @@ public class IdentityService : IIdentityService
         }
 
         var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
+
+        return result.ToApplicationResult();
+    }
+
+    public async Task<Result> UpdateUserAsync(
+        string userId,
+        string firstName,
+        string lastName,
+        string gender
+    )
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+        {
+            return Result.Failure(new[] { "User not found." });
+        }
+
+        user.FirstName = firstName;
+        user.LastName = lastName;
+        user.Gender = gender;
+        user.UpdateAt = DateTime.UtcNow;
+
+        var result = await _userManager.UpdateAsync(user);
 
         return result.ToApplicationResult();
     }

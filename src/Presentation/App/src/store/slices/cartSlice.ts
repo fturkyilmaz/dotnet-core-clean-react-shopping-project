@@ -90,6 +90,23 @@ export const removeCartItem = createAsyncThunk(
     }
   }
 );
+// DELETE /carts/delete-all (Sepetten tüm ürünleri çıkarma)
+export const removeAllCartItems = createAsyncThunk(
+  'cart/removeAllCartItems',
+  async (_, { rejectWithValue }) => {
+    try {
+      await api.delete<Cart>('/carts/delete-all');
+      return true;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to remove all cart items'
+      );
+    }
+  }
+);
+
 
 const cartSlice = createSlice({
   name: "cart",
@@ -162,6 +179,23 @@ const cartSlice = createSlice({
           (action.payload as string) ||
           action.error.message ||
           "Failed to remove from cart";
+      })
+
+      // REMOVE ALL CART ITEMS
+      .addCase(removeAllCartItems.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeAllCartItems.fulfilled, (state) => {
+        state.loading = false;
+        state.cart = { ...state.cart, items: [] } as Cart;
+      })
+      .addCase(removeAllCartItems.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          (action.payload as string) ||
+          action.error.message ||
+          "Failed to remove all cart items";
       });
   },
 });
