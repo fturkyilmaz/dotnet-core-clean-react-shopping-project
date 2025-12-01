@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
+using ShoppingProject.Domain.Constants;
 
 namespace ShoppingProject.Infrastructure.Identity;
 
@@ -232,7 +233,8 @@ public class IdentityService : IIdentityService
         string email,
         string password,
         string? firstName = null,
-        string? lastName = null
+        string? lastName = null,
+        string role = Roles.Client
     )
     {
         var existingUser = await _userManager.FindByEmailAsync(email);
@@ -255,6 +257,11 @@ public class IdentityService : IIdentityService
         if (!result.Succeeded)
         {
             return Result.Failure(result.Errors.Select(e => e.Description).ToArray());
+        }
+
+        if (!string.IsNullOrEmpty(role))
+        {
+            await _userManager.AddToRoleAsync(user, role);
         }
 
         return Result.Success();

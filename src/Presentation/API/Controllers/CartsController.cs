@@ -1,15 +1,15 @@
-using ShoppingProject.Application.Carts.Commands.DeleteAllCarts;
-using ShoppingProject.Application.Carts.Commands.CreateCart;
-using ShoppingProject.Application.Carts.Commands.UpdateCart;
-using ShoppingProject.Application.Carts.Commands.DeleteCart;
-using ShoppingProject.Application.Carts.Queries.GetCarts;
-using ShoppingProject.Application.Carts.Queries.GetCartById;
-using ShoppingProject.Domain.Common;
-using ShoppingProject.Domain.Constants;
+using Asp.Versioning;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Asp.Versioning;
-using MediatR; // Added this using statement for ISender
+using ShoppingProject.Application.Carts.Commands.CreateCart;
+using ShoppingProject.Application.Carts.Commands.DeleteAllCarts;
+using ShoppingProject.Application.Carts.Commands.DeleteCart;
+using ShoppingProject.Application.Carts.Commands.UpdateCart;
+using ShoppingProject.Application.Carts.Queries.GetCartById;
+using ShoppingProject.Application.Carts.Queries.GetCarts;
+using ShoppingProject.Domain.Common;
+using ShoppingProject.Domain.Constants;
 
 namespace ShoppingProject.WebApi.Controllers
 {
@@ -26,7 +26,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ActionResult<List<CartBriefDto>>> GetAll()
         {
             var carts = await _sender.Send(new GetCartsQuery());
@@ -34,7 +34,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ActionResult<CartBriefDto>> GetById(int id)
         {
             var cart = await _sender.Send(new GetCartByIdQuery(id));
@@ -42,7 +42,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = Policies.CanPurge)]
+        [Authorize]
         public async Task<ActionResult<int>> Create(CreateCartCommand command)
         {
             var id = await _sender.Send(command);
@@ -50,7 +50,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Policy = Policies.CanPurge)]
+        [Authorize]
         public async Task<IActionResult> Update(int id, UpdateCartCommand command)
         {
             if (id != command.Id)
@@ -63,7 +63,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Policy = Policies.CanPurge)]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             await _sender.Send(new DeleteCartCommand(id));

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Application.DTOs.Identity;
+using ShoppingProject.Domain.Constants;
 
 namespace ShoppingProject.WebApi.Controllers;
 
@@ -72,7 +73,7 @@ public class IdentityController : ControllerBase
     }
 
     [HttpPost("{userId}/assign-admin-role")]
-    [AllowAnonymous] // TODO: In production, this should require admin authentication
+    [Authorize(Policy = Policies.RequireAdministratorRole)]
     public async Task<ActionResult<ServiceResult<string>>> AssignAdminRole(string userId)
     {
         var result = await _identityService.AddUserToRoleAsync(userId, "Administrator");
@@ -86,7 +87,7 @@ public class IdentityController : ControllerBase
     }
 
     [HttpPost("roles/{roleName}")]
-    [AllowAnonymous] // TODO: In production, this should require admin authentication
+    [Authorize(Policy = Policies.RequireAdministratorRole)]
     public async Task<ActionResult<ServiceResult<string>>> CreateRole(string roleName)
     {
         var result = await _identityService.CreateRoleAsync(roleName);

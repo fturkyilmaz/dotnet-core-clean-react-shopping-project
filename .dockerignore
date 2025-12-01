@@ -1,0 +1,51 @@
+# Git
+**/.git
+**/.gitignore
+**/.gitattributes
+
+# IDE
+**/.vs
+**/.vscode
+**/.idea
+**/*.swp
+**/*.swo
+**/~*
+
+# Build outputs
+**/bin
+**/obj
+**/out
+**/artifacts
+
+# Docker
+**/.dockerignore
+**/Dockerfile*
+**/docker-compose*
+
+# Node
+**/node_modules
+**/npm-debug.log
+**/yarn-error.log
+
+# Environment & Secrets
+**/.env
+**/.env.*
+**/appsettings.Development.json
+**/appsettings.*.json
+**/secrets.json
+**/*.pfx
+**/*.p12
+
+# Test results
+**/TestResults
+**/coverage
+**/*.trx
+
+# Documentation
+**/README.md
+**/LICENSE
+**/*.md
+
+# CI/CD
+**/.github
+**/.azure

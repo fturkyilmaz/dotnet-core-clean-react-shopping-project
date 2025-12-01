@@ -138,11 +138,37 @@ public static class DependencyInjection
 
         builder.Services.AddAuthorization(options =>
         {
+            // Administrator-only policies
             options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator));
             options.AddPolicy(
                 Policies.CanManageProducts,
                 policy => policy.RequireRole(Roles.Administrator)
             );
+            options.AddPolicy(
+                Policies.RequireAdministratorRole,
+                policy => policy.RequireRole(Roles.Administrator)
+            );
+            options.AddPolicy(
+                Policies.CanManageClients,
+                policy => policy.RequireRole(Roles.Administrator)
+            );
+            options.AddPolicy(
+                Policies.CanViewSystemConfig,
+                policy => policy.RequireRole(Roles.Administrator)
+            );
+
+            // Client role policy
+            options.AddPolicy(
+                Policies.RequireClientRole,
+                policy => policy.RequireRole(Roles.Client)
+            );
         });
+
+        // Register authorization handlers
+        builder.Services.AddSingleton<
+            Microsoft.AspNetCore.Authorization.IAuthorizationHandler,
+            ShoppingProject.Infrastructure.Authorization.ResourceOwnerRequirementHandler
+        >();
+        builder.Services.AddHttpContextAccessor();
     }
 }

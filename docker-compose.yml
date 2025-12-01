@@ -1,6 +1,43 @@
 version: '3.8'
 
 services:
+  # .NET API Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shoppingproject-api
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=ShoppingProjectDb;Username=postgres;Password=postgres
+      - ConnectionStrings__RedisConnection=redis:6379
+      - ServiceBus__Url=amqp://guest:guest@rabbitmq:5672
+      - Hangfire__ConnectionString=Host=postgres;Database=ShoppingProjectDb;Username=postgres;Password=postgres
+      - Observability__ElasticsearchUrl=http://elasticsearch:9200
+      - Observability__OtlpEndpoint=http://jaeger:4317
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - shoppingproject-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
