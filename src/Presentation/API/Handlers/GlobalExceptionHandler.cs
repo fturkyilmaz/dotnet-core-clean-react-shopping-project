@@ -19,13 +19,19 @@ public class GlobalExceptionHandler : IExceptionHandler
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
         Exception exception,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        _logger.LogError(exception, "An unhandled exception occurred: {ExceptionMessage}", exception.Message);
+        _logger.LogError(
+            exception,
+            "An unhandled exception occurred: {ExceptionMessage}",
+            exception.Message
+        );
 
         var problemDetails = MapExceptionToProblemDetails(httpContext, exception);
 
-        httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
+        httpContext.Response.StatusCode =
+            problemDetails.Status ?? StatusCodes.Status500InternalServerError;
         httpContext.Response.ContentType = "application/problem+json";
 
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
@@ -35,12 +41,18 @@ public class GlobalExceptionHandler : IExceptionHandler
     /// <summary>
     /// Maps exceptions to ProblemDetails based on exception type and application logic.
     /// </summary>
-    private ProblemDetails MapExceptionToProblemDetails(HttpContext httpContext, Exception exception)
+    private ProblemDetails MapExceptionToProblemDetails(
+        HttpContext httpContext,
+        Exception exception
+    )
     {
         var problemDetails = new ProblemDetails
         {
             Instance = httpContext.Request.Path,
             Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+            Status = StatusCodes.Status500InternalServerError,
+            Title = "Internal Server Error",
+            Detail = "An internal server error occurred. Please try again later.",
         };
 
         switch (exception)
@@ -82,11 +94,12 @@ public class GlobalExceptionHandler : IExceptionHandler
                 break;
 
             default:
-                problemDetails.Status = StatusCodes.Status500InternalServerError;
-                problemDetails.Title = "Internal Server Error";
-                problemDetails.Detail = "An internal server error occurred. Please try again later.";
                 // Don't expose internal error details in production
-                if (!httpContext.RequestServices.GetRequiredService<IHostEnvironment>().IsProduction())
+                if (
+                    !httpContext
+                        .RequestServices.GetRequiredService<IHostEnvironment>()
+                        .IsProduction()
+                )
                 {
                     problemDetails.Detail = exception.Message;
                     problemDetails.Extensions["stackTrace"] = exception.StackTrace;
