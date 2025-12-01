@@ -1,19 +1,19 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+clean-architecture:
+  label: Clean Architecture
+  permalink: /clean-architecture
+  description: Uygulama katmanlarının ayrılması ve bağımsız test edilebilirliğe odaklanan yazılar.
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+dotnet:
+  label: .NET & C#
+  permalink: /dotnet
+  description: .NET Core, C# dili, Async/Await ve performans optimizasyonları ile ilgili teknik makaleler.
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+azure-cloud:
+  label: Azure Cloud Services
+  permalink: /azure
+  description: Azure Cosmos DB, Key Vault, Functions ve Container Apps gibi bulut hizmetleri kullanımı ve uygulamaları.
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+nosql-modeling:
+  label: NoSQL Veri Modelleme
+  permalink: /nosql
+  description: Cosmos DB gibi NoSQL veritabanlarında partition key seçimi ve veri denormalizasyon stratejileri.

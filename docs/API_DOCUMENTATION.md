@@ -118,3 +118,35 @@ The API uses the **RFC 7807 Problem Details** standard for error responses.
 ## OpenAPI / Swagger
 The full OpenAPI specification is available at `/swagger/v1/swagger.json` when running the application locally.
 The Swagger UI is accessible at `/swagger`.
+
+## Real-Time Communication (SignalR)
+The application uses SignalR for real-time updates.
+-   **Notification Hub**: `/hubs/notifications` - For system-wide or user-specific notifications.
+-   **Cart Hub**: `/hubs/cart` - For real-time cart updates.
+-   **Order Hub**: `/hubs/orders` - For order status updates.
+
+## Operational Endpoints
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/health` | JSON Health Check (Database, Redis, RabbitMQ status) |
+| `GET` | `/health-ui` | Graphical Health Check UI |
+| `GET` | `/hangfire` | Background Job Dashboard (Dev only) |
+
+## Security & Infrastructure
+### Security Headers
+The following security headers are enforced on all responses:
+-   `Strict-Transport-Security` (HSTS)
+-   `X-Content-Type-Options: nosniff`
+-   `X-Frame-Options: DENY`
+-   `X-XSS-Protection: 1; mode=block`
+-   `Content-Security-Policy` (CSP)
+
+### Rate Limiting
+-   **Strategy**: IP-based rate limiting.
+-   **Storage**: In-memory (distributed cache ready).
+-   **Configuration**: Limits are defined in `appsettings.json`.
+
+### Observability
+-   **Logging**: Structured logging via **Serilog** (Console + File/Elasticsearch).
+-   **Metrics**: Prometheus metrics exposed at `/metrics` (via OpenTelemetry).
+-   **Tracing**: OpenTelemetry tracing enabled for HTTP requests and dependencies.
