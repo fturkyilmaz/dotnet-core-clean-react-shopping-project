@@ -169,6 +169,7 @@ public static class DependencyInjection
             Microsoft.AspNetCore.Authorization.IAuthorizationHandler,
             ShoppingProject.Infrastructure.Authorization.ResourceOwnerRequirementHandler
         >();
+        builder.Services.AddScoped<IUser, CurrentUser>();
         builder.Services.AddHttpContextAccessor();
     }
 }

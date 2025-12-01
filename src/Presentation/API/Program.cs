@@ -21,7 +21,6 @@ using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Identity;
 using ShoppingProject.WebApi;
 using ShoppingProject.WebApi.Extensions;
-using ShoppingProject.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -112,8 +111,6 @@ builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 builder.AddInfrastructureServices();
 
 builder.Services.AddApplicationServices();
-builder.Services.AddScoped<IUser, CurrentUser>();
-builder.Services.AddHttpContextAccessor();
 
 // Add CORS for React frontend
 builder.Services.AddCors(options =>

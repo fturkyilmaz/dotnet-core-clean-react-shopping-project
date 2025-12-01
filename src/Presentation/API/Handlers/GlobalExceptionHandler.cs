@@ -1,19 +1,26 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using ShoppingProject.Application.Common.Constants;
 using ShoppingProject.Application.Common.Exceptions;
+using ShoppingProject.Domain.Enums;
 
 namespace ShoppingProject.WebApi.Handlers;
 
 /// <summary>
 /// Global exception handler that converts unhandled exceptions to standardized RFC 7807 ProblemDetails responses.
 /// </summary>
-public class GlobalExceptionHandler : IExceptionHandler
+public sealed class GlobalExceptionHandler : IExceptionHandler
 {
     private readonly ILogger<GlobalExceptionHandler> _logger;
+    private readonly IHostEnvironment _environment;
 
-    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+    public GlobalExceptionHandler(
+        ILogger<GlobalExceptionHandler> logger,
+        IHostEnvironment environment
+    )
     {
         _logger = logger;
+        _environment = environment;
     }
 
     public async ValueTask<bool> TryHandleAsync(
@@ -22,11 +29,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         CancellationToken cancellationToken
     )
     {
-        _logger.LogError(
-            exception,
-            "An unhandled exception occurred: {ExceptionMessage}",
-            exception.Message
-        );
+        LogException(exception);
 
         var problemDetails = MapExceptionToProblemDetails(httpContext, exception);
 
@@ -38,75 +41,129 @@ public class GlobalExceptionHandler : IExceptionHandler
         return true;
     }
 
-    /// <summary>
-    /// Maps exceptions to ProblemDetails based on exception type and application logic.
-    /// </summary>
+    private void LogException(Exception exception)
+    {
+        switch (exception)
+        {
+            case NotFoundException:
+                _logger.LogWarning(exception, "Resource not found: {Message}", exception.Message);
+                break;
+            case BadRequestException:
+            case ValidationException:
+                _logger.LogWarning(exception, "Bad request: {Message}", exception.Message);
+                break;
+            case ForbiddenAccessException:
+            case UnauthorizedAccessException:
+                _logger.LogWarning(exception, "Access issue: {Message}", exception.Message);
+                break;
+            default:
+                _logger.LogError(exception, "Unhandled exception: {Message}", exception.Message);
+                break;
+        }
+    }
+
     private ProblemDetails MapExceptionToProblemDetails(
         HttpContext httpContext,
         Exception exception
     )
     {
-        var problemDetails = new ProblemDetails
+        return exception switch
+        {
+            NotFoundException notFound => CreateProblem(
+                httpContext,
+                StatusCodes.Status404NotFound,
+                "Resource Not Found",
+                notFound.Message,
+                RfcTypes.NotFound,
+                ErrorType.NotFound
+            ),
+            ForbiddenAccessException forbidden => CreateProblem(
+                httpContext,
+                StatusCodes.Status403Forbidden,
+                "Access Forbidden",
+                forbidden.Message,
+                RfcTypes.Forbidden,
+                ErrorType.Forbidden
+            ),
+            BadRequestException badRequest => CreateProblem(
+                httpContext,
+                StatusCodes.Status400BadRequest,
+                "Bad Request",
+                badRequest.Message,
+                RfcTypes.BadRequest,
+                ErrorType.Conflict
+            ),
+            ValidationException validation => CreateProblem(
+                httpContext,
+                StatusCodes.Status422UnprocessableEntity,
+                "Validation Failed",
+                validation.Message,
+                RfcTypes.Validation,
+                ErrorType.Validation,
+                ("errors", validation.Errors)
+            ),
+            UnauthorizedAccessException unauthorized => CreateProblem(
+                httpContext,
+                StatusCodes.Status401Unauthorized,
+                "Unauthorized",
+                unauthorized.Message,
+                RfcTypes.Unauthorized,
+                ErrorType.Unauthorized
+            ),
+            _ => CreateDefaultProblem(httpContext, exception),
+        };
+    }
+
+    private ProblemDetails CreateProblem(
+        HttpContext httpContext,
+        int status,
+        string title,
+        string detail,
+        string type,
+        ErrorType errorType,
+        (string key, object value)? extension = null
+    )
+    {
+        var problem = new ProblemDetails
         {
             Instance = httpContext.Request.Path,
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "Internal Server Error",
-            Detail = "An internal server error occurred. Please try again later.",
+            Status = status,
+            Title = title,
+            Detail = detail,
+            Type = type,
         };
 
-        switch (exception)
+        // Domain-specific error type
+        problem.Extensions["errorType"] = errorType.ToString();
+
+        if (extension.HasValue)
         {
-            case NotFoundException notFoundException:
-                problemDetails.Status = StatusCodes.Status404NotFound;
-                problemDetails.Title = "Resource Not Found";
-                problemDetails.Detail = notFoundException.Message;
-                problemDetails.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4";
-                break;
-
-            case ForbiddenAccessException forbiddenException:
-                problemDetails.Status = StatusCodes.Status403Forbidden;
-                problemDetails.Title = "Access Forbidden";
-                problemDetails.Detail = forbiddenException.Message;
-                problemDetails.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3";
-                break;
-
-            case BadRequestException badRequestException:
-                problemDetails.Status = StatusCodes.Status400BadRequest;
-                problemDetails.Title = "Bad Request";
-                problemDetails.Detail = badRequestException.Message;
-                problemDetails.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1";
-                break;
-
-            case ValidationException validationException:
-                problemDetails.Status = StatusCodes.Status422UnprocessableEntity;
-                problemDetails.Title = "Validation Failed";
-                problemDetails.Detail = validationException.Message;
-                problemDetails.Type = "https://tools.ietf.org/html/rfc4918#section-11.2";
-                problemDetails.Extensions["errors"] = validationException.Errors;
-                break;
-
-            case UnauthorizedAccessException unauthorizedException:
-                problemDetails.Status = StatusCodes.Status401Unauthorized;
-                problemDetails.Title = "Unauthorized";
-                problemDetails.Detail = unauthorizedException.Message;
-                problemDetails.Type = "https://tools.ietf.org/html/rfc7235#section-3.1";
-                break;
-
-            default:
-                // Don't expose internal error details in production
-                if (
-                    !httpContext
-                        .RequestServices.GetRequiredService<IHostEnvironment>()
-                        .IsProduction()
-                )
-                {
-                    problemDetails.Detail = exception.Message;
-                    problemDetails.Extensions["stackTrace"] = exception.StackTrace;
-                }
-                break;
+            problem.Extensions[extension.Value.key] = extension.Value.value;
         }
 
-        return problemDetails;
+        return problem;
+    }
+
+    private ProblemDetails CreateDefaultProblem(HttpContext httpContext, Exception exception)
+    {
+        var problem = new ProblemDetails
+        {
+            Instance = httpContext.Request.Path,
+            Status = StatusCodes.Status500InternalServerError,
+            Title = "Internal Server Error",
+            Detail = _environment.IsProduction()
+                ? "An internal server error occurred. Please try again later."
+                : exception.Message,
+            Type = RfcTypes.InternalServerError,
+        };
+
+        problem.Extensions["errorType"] = ErrorType.Internal.ToString();
+
+        if (!_environment.IsProduction())
+        {
+            problem.Extensions["stackTrace"] = exception.StackTrace;
+        }
+
+        return problem;
     }
 }

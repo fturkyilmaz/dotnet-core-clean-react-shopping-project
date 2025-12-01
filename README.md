@@ -22,7 +22,7 @@ This is a full-stack e-commerce application built with .NET Core 9/10, React.js,
 
 ## 🏗️ Architecture Overview
 
-The solution is organized into four concentric layers:
+The solution is organized into four concentric layers. For a detailed deep-dive into the system design, data models, and technology choices, please refer to [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 1.  **Domain**: Enterprise logic, Entities, Value Objects, Domain Events, Repository Interfaces. (No dependencies)
 2.  **Application**: Business logic, Use Cases (CQRS Commands/Queries), DTOs, Validators. (Depends on Domain)
@@ -75,6 +75,26 @@ Start all required services (PostgreSQL, Redis, RabbitMQ, Elasticsearch, Kibana)
 docker compose up -d
 ```
 
+### Azure Resources Setup
+To deploy this application to Azure, you will need the following resources:
+1.  **Azure App Service** (Linux Plan) for hosting the Web API.
+2.  **Azure Database for PostgreSQL** (Flexible Server recommended).
+3.  **Azure Cache for Redis** (Basic tier is sufficient for dev).
+4.  **Azure Service Bus** (Standard tier) or keep using RabbitMQ on a VM/Container.
+5.  **Application Insights** for monitoring.
+
+### Environment Variables
+Ensure the following variables are set in `appsettings.json` or your environment:
+
+| Variable | Description | Example |
+| :--- | :--- | :--- |
+| `ConnectionStrings__DefaultConnection` | PostgreSQL Connection | `Host=localhost;Database=ShopDb;...` |
+| `ConnectionStrings__RedisConnection` | Redis Connection | `localhost:6379` |
+| `JwtOptions__Secret` | JWT Signing Key | `super-secret-key-min-32-chars` |
+| `JwtOptions__Issuer` | Token Issuer | `ShoppingApi` |
+| `JwtOptions__Audience` | Token Audience | `ShoppingClient` |
+| `ServiceBusOptions__Url` | Message Broker URL | `amqp://guest:guest@localhost:5672` |
+
 ### Database Migration
 
 Apply pending migrations to the PostgreSQL database:
@@ -91,6 +111,21 @@ Run the Web API:
 ```bash
 dotnet run --project src/API/ShoppingProject.WebApi.csproj
 ```
+
+### Deployment Instructions
+1.  **Build Docker Image**:
+    ```bash
+    docker build -t shopping-api -f Dockerfile .
+    ```
+2.  **Push to Registry** (e.g., Azure Container Registry):
+    ```bash
+    docker tag shopping-api myregistry.azurecr.io/shopping-api
+    docker push myregistry.azurecr.io/shopping-api
+    ```
+3.  **Deploy to App Service**:
+    -   Create an App Service for Containers.
+    -   Point it to your Docker Image.
+    -   Set the Environment Variables in the App Service Configuration.
 
 ### Running the Mobile App
 
@@ -115,11 +150,14 @@ yarn start
 - **Performance Metrics**: Real-time query times and API latency
 - **Cache Analytics**: Track cache hit rates and effectiveness
 
-See detailed docs:
-- [FIREBASE_ANALYTICS_SETUP.md](./FIREBASE_ANALYTICS_SETUP.md) - Firebase setup and configuration
-- [ANALYTICS_INTEGRATION_GUIDE.md](./ANALYTICS_INTEGRATION_GUIDE.md) - Developer integration guide
-- [OFFLINE_ARCHITECTURE.md](./OFFLINE_ARCHITECTURE.md) - Offline-first architecture details
-- [ADVANCED_CACHING_ANALYTICS.md](./ADVANCED_CACHING_ANALYTICS.md) - Caching and performance optimization
+See detailed docs in the [`docs/`](./docs/docs/guides/) folder:
+- [Development Setup](./docs/docs/guides/development-setup.md) - Complete local development guide
+- [Production Deployment](./docs/docs/guides/production-deployment.md) - Azure and Kubernetes deployment
+- [Testing Guide](./docs/docs/guides/testing.md) - Unit, integration, and E2E testing
+- [Clean Architecture Refactoring](./docs/docs/guides/clean-architecture-refactoring.md) - Recent architecture improvements
+- [Firebase Analytics Setup](./docs/docs/guides/firebase-analytics-setup.md) - Firebase setup and configuration
+- [Analytics Integration](./docs/docs/guides/analytics-integration.md) - Developer integration guide
+- [Docker Deployment](./docs/docs/guides/docker-deployment.md) - Docker and container guide
 
 ## 📊 Observability & Monitoring
 
@@ -226,3 +264,8 @@ View the [CI/CD workflows](.github/workflows/) for more details.
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) by Robert C. Martin
 - [Domain-Driven Design](https://www.amazon.com/Domain-Driven-Design-Tackling-Complexity-Software/dp/0321125215) by Eric Evans
 - [jasontaylordev/CleanArchitecture](https://github.com/jasontaylordev/CleanArchitecture) for inspiration.
+
+## ⚠️ Known Limitations & Trade-offs
+-   **Eventual Consistency**: Due to the asynchronous nature of the Event Bus, updates (like inventory) may not be immediately reflected in all read models.
+-   **Complexity**: The microservice-ready architecture (CQRS, Bus, etc.) introduces overhead compared to a simple Monolith.
+-   **PostgreSQL Partitioning**: Currently simulated via logical separation; physical partitioning is not yet enabled (see `ARCHITECTURE.md`).

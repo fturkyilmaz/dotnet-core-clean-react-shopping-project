@@ -24,4 +24,14 @@ public class JwtOptions
     /// The secret key used to sign and verify JWT tokens
     /// </summary>
     public string? Secret { get; set; }
+
+    /// <summary>
+    /// Token expiry time in minutes
+    /// </summary>
+    public int ExpiryMinutes { get; set; } = 60;
+
+    /// <summary>
+    /// Refresh token expiry time in days
+    /// </summary>
+    public int RefreshTokenExpiryDays { get; set; } = 7;
 }

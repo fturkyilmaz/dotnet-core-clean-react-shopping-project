@@ -1,7 +1,7 @@
 using FluentValidation;
 using ShoppingProject.Application.DTOs.Identity;
 
-namespace ShoppingProject.WebApi.Validators;
+namespace ShoppingProject.Application.Validators;
 
 public class LoginRequestValidator : AbstractValidator<LoginRequest>
 {

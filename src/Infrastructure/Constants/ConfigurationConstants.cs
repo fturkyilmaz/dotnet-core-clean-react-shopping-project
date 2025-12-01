@@ -37,4 +37,10 @@ public static class ConfigurationConstants
     {
         public const string IpRateLimiting = "IpRateLimiting";
     }
+
+    public static class ApiKey
+    {
+        public const string HeaderName = "X-Api-Key";
+        public const string SectionName = "Authentication:ApiKey";
+    }
 }
