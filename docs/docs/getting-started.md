@@ -6,7 +6,7 @@ sidebar_position: 2
 
 ## Prerequisites
 
-- .NET 9 SDK
+- .NET 9-10 SDK
 - Docker Desktop
 - PostgreSQL
 - Redis

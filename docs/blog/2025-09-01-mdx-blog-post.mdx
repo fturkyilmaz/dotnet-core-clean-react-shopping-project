@@ -1,0 +1,75 @@
+slug: mdx-blog-post title: MDX Blog Post: React ve Native ile İnteraktif İçerik authors: [slorber, furkanturkyilmaz] tags: [docusaurus, react, react-native]
+
+Blog gönderileri, Docusaurus Markdown özelliklerini (örneğin MDX) destekler. MDX, Markdown içerisine doğrudan React bileşenleri gömmemize olanak tanır, bu da statik blog yazılarını dinamik ve interaktif hale getirir.
+
+:::tip
+
+React'in gücünü kullanarak blog yazılarına interaktif widget'lar, canlı kod örnekleri veya veri görselleştirmeleri ekleyin.
+
+:::
+
+<!-- truncate -->
+
+MDX İle İnteraktiflik Kazanma
+
+MDX'in temel avantajı, açıklayıcı metinler (Markdown) ile çalışan kod bloklarını (React/JSX) sorunsuz bir şekilde birleştirmesidir. Aşağıdaki örnek, basit bir tıklama eylemini gösterir, ancak bu yetenek; canlı çalışan hesaplayıcılara, haritalara veya veri tablolarına kadar genişletilebilir.
+
+1. Temel İnteraktif React Bileşeni
+
+Aşağıdaki kod bloğu, standart bir React functional component'inin MDX içerisinde nasıl kullanılabileceğini gösterir:
+
+import React, { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <div style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '8px' }}>
+      <p>Mevcut Sayı: {count}</p>
+      <button 
+        onClick={() => setCount(count + 1)}
+        style={{ 
+          backgroundColor: '#007BFF', 
+          color: 'white', 
+          padding: '8px 15px', 
+          borderRadius: '4px', 
+          border: 'none', 
+          cursor: 'pointer' 
+        }}
+      >
+        Sayacı Artır
+      </button>
+    </div>
+  );
+}
+
+// Bu bileşen, aşağıdaki gibi doğrudan MDX içine yazılabilir:
+// <Counter />
+
+
+React Native Konularını Bloga Taşıma
+
+Docusaurus veya MDX, doğrudan React Native uygulamasını çalıştırmasa da, React Native kod örneklerini veya ekran çıktılarını göstermek için MDX içindeki web tabanlı React bileşenlerini kullanabiliriz.
+
+Örneğin, bir React Native bileşeninin render ettiği UI'yı taklit eden bir web bileşeni oluşturulabilir veya react-native-web gibi kütüphanelerle bazı kodların tarayıcıda çalıştırılması sağlanabilir.
+
+2. React Native Örnek Kodunun Gösterimi (Simüle Edilmiş)
+
+React Native'de bir 'Güvenli Alan' (SafeAreaView) bileşeninin nasıl görüneceğini göstermek için bir simülasyon yapısı:
+
+<div 
+  style={{ 
+    backgroundColor: '#333', 
+    color: 'white', 
+    padding: '20px', 
+    borderRadius: '12px', 
+    maxWidth: '300px', 
+    margin: '20px auto',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.5)'
+  }}
+>
+  <h4 style={{marginTop: 0}}>React Native View</h4>
+  <p>Bu alan, React Native kodunun web'de simüle edilmiş çıktısıdır.</p>
+</div>
+
+
+MDX ile, blog içeriğiniz artık yalnızca metin ve resimlerden ibaret olmak zorunda değil; doğrudan okuyucunun etkileşimde bulunabileceği canlı demoları barındırabilir.
