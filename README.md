@@ -1,10 +1,5 @@
 # ShoppingProject - Clean Architecture .NET & React.js Solution
 
-[![.NET CI/CD](https://github.com/YOUR_USERNAME/ShoppingProject/actions/workflows/dotnet-ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/ShoppingProject/actions/workflows/dotnet-ci.yml)
-[![Docker Build](https://github.com/YOUR_USERNAME/ShoppingProject/actions/workflows/docker-build.yml/badge.svg)](https://github.com/YOUR_USERNAME/ShoppingProject/actions/workflows/docker-build.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ShoppingProject&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ShoppingProject)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ShoppingProject&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ShoppingProject)
-
 A modern, scalable e-commerce backend built with .NET 9/10, following Clean Architecture principles, CQRS, and Domain-Driven Design (DDD).
 
 ## 🚀 Technology Stack
