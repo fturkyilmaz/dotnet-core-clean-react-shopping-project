@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Domain.Constants;
+using ShoppingProject.Infrastructure.Configuration;
 
 namespace ShoppingProject.Infrastructure.Identity;
 
@@ -20,6 +21,7 @@ public class IdentityService : IIdentityService
     private readonly IAuthorizationService _authorizationService;
     private readonly IConfiguration _configuration;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly JwtOptions _jwtOptions;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
@@ -34,6 +36,9 @@ public class IdentityService : IIdentityService
         _authorizationService = authorizationService;
         _configuration = configuration;
         _roleManager = roleManager;
+
+        _jwtOptions = new JwtOptions();
+        configuration.GetSection(JwtOptions.SectionName).Bind(_jwtOptions);
     }
 
     public async Task<string?> GetUserNameAsync(string userId)
@@ -130,7 +135,7 @@ public class IdentityService : IIdentityService
         var refreshToken = GenerateRefreshToken();
 
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // TODO: Move to config
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryDays);
 
         await _userManager.UpdateAsync(user);
 
@@ -195,9 +200,7 @@ public class IdentityService : IIdentityService
 
     private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["Secret"];
-        var key = Encoding.ASCII.GetBytes(secretKey!);
+        var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret!);
 
         var tokenValidationParameters = new TokenValidationParameters
         {
@@ -269,9 +272,7 @@ public class IdentityService : IIdentityService
 
     private async Task<string> GenerateJwtToken(ApplicationUser user)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["Secret"];
-        var key = Encoding.ASCII.GetBytes(secretKey!);
+        var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret!);
 
         var claims = new List<Claim>
         {
@@ -290,13 +291,13 @@ public class IdentityService : IIdentityService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpiryMinutes"]!)),
+            Expires = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiryMinutes),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature
             ),
-            Issuer = jwtSettings["Issuer"],
-            Audience = jwtSettings["Audience"],
+            Issuer = _jwtOptions.Issuer,
+            Audience = _jwtOptions.Audience,
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
