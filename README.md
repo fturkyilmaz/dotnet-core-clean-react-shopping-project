@@ -1,10 +1,13 @@
-# ShoppingProject - Clean Architecture .NET & React.js Solution
+# ShoppingProject - Clean Architecture .NET & React.js & React Native Solution
 
-A modern, scalable e-commerce backend built with .NET 9/10, following Clean Architecture principles, CQRS, and Domain-Driven Design (DDD).
+## 📚 Project Overview
+
+This is a full-stack e-commerce application built with .NET Core 9/10, React.js, and React Native. The project follows Clean Architecture principles, CQRS, and Domain-Driven Design (DDD).
 
 ## 🚀 Technology Stack
 
 - **Core Framework**: .NET 9/10 (C#)
+- **Frontend**: React.js, React Native, Tailwind, Redux Toolkit, Firebase, Context API, React Query, Nativewind
 - **Architecture**: Clean Architecture, CQRS (MediatR)
 - **Database**: PostgreSQL (Entity Framework Core)
 - **Caching**: Redis (Distributed Cache)
