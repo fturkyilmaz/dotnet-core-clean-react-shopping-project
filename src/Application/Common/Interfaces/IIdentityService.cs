@@ -1,31 +1,40 @@
 ﻿using ShoppingProject.Application.Common.Models;
 
-namespace ShoppingProject.Application.Common.Interfaces;
-
-public interface IIdentityService
+namespace ShoppingProject.Application.Common.Interfaces
 {
-    Task<string?> GetUserNameAsync(string userId);
+    public interface IIdentityService
+    {
+        Task<string?> GetUserNameAsync(string userId);
 
-    Task<(Result Result, UserInfoResponse? Response)> GetUserByIdAsync(string userId);
+        Task<(Result Result, UserInfoResponse? Response)> GetUserByIdAsync(string userId);
 
-    Task<bool> IsInRoleAsync(string userId, string role);
+        Task<bool> IsInRoleAsync(string userId, string role);
 
-    Task<bool> AuthorizeAsync(string userId, string policyName);
+        Task<bool> AuthorizeAsync(string userId, string policyName);
 
-    Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password);
+        Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password);
 
-    Task<Result> DeleteUserAsync(string userId);
+        Task<Result> DeleteUserAsync(string userId);
 
-    Task<(Result Result, AuthResponse? Response)> LoginAsync(string email, string password);
+        Task<(Result Result, AuthResponse? Response)> LoginAsync(string email, string password);
 
-    Task<(Result Result, AuthResponse? Response)> RefreshTokenAsync(
-        string token,
-        string refreshToken
-    );
+        Task<(Result Result, AuthResponse? Response)> RefreshTokenAsync(
+            string token,
+            string refreshToken
+        );
 
-    Task<Result> AddUserToRoleAsync(string userId, string role);
+        Task<Result> AddUserToRoleAsync(string userId, string role);
 
-    Task<Result> CreateRoleAsync(string roleName);
+        Task<Result> CreateRoleAsync(string roleName);
 
-    Task<Result> UpdateUserAsync(string userId, string firstName, string lastName, string gender);
+        Task<Result> UpdateUserAsync(
+            string userId,
+            string firstName,
+            string lastName,
+            string gender
+        );
+
+        Task<Result> RequestPasswordResetAsync(string email);
+        Task<Result> ResetPasswordAsync(string email, string token, string newPassword);
+    }
 }

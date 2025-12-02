@@ -176,4 +176,39 @@ public class IdentityController : ControllerBase
 
         return Ok(ServiceResult<string>.Success("User updated successfully"));
     }
+
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ServiceResult<string>>> ForgotPassword(
+        ForgotPasswordRequest request
+    )
+    {
+        var result = await _identityService.RequestPasswordResetAsync(request.Email);
+        if (!result.Succeeded)
+            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
+
+        return Ok(ServiceResult<string>.Success("Reset maili gönderildi."));
+    }
+
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ServiceResult<string>>> ResetPassword(
+        ResetPasswordRequest request
+    )
+    {
+        var result = await _identityService.ResetPasswordAsync(
+            request.Email,
+            request.Token,
+            request.NewPassword
+        );
+
+        if (!result.Succeeded)
+            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
+
+        return Ok(ServiceResult<string>.Success("Şifre güncellendi."));
+    }
 }

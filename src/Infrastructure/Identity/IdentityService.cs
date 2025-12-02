@@ -17,6 +17,7 @@ namespace ShoppingProject.Infrastructure.Identity;
 
 public class IdentityService : IIdentityService
 {
+    private readonly IEmailService _emailService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
     private readonly IAuthorizationService _authorizationService;
@@ -31,7 +32,8 @@ public class IdentityService : IIdentityService
         IAuthorizationService authorizationService,
         IConfiguration configuration,
         RoleManager<IdentityRole> roleManager,
-        ILogger<IdentityService> logger
+        ILogger<IdentityService> logger,
+        IEmailService emailService
     )
     {
         _userManager = userManager;
@@ -40,7 +42,7 @@ public class IdentityService : IIdentityService
         _configuration = configuration;
         _roleManager = roleManager;
         _logger = logger;
-
+        _emailService = emailService;
         _jwtOptions = new JwtOptions();
         configuration.GetSection(JwtOptions.SectionName).Bind(_jwtOptions);
     }
@@ -362,5 +364,43 @@ public class IdentityService : IIdentityService
         var result = await _userManager.UpdateAsync(user);
 
         return result.ToApplicationResult();
+    }
+
+    public async Task<Result> RequestPasswordResetAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            return Result.Failure(new[] { "User not found." });
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        // Mail gönder
+        await _emailService.SendPasswordResetEmailAsync(email, token);
+
+        _logger.LogInformation("Password reset token generated for user {UserId}", user.Id);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ResetPasswordAsync(string email, string token, string newPassword)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            return Result.Failure(new[] { "User not found." });
+        }
+
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+        if (!result.Succeeded)
+        {
+            return Result.Failure(result.Errors.Select(e => e.Description).ToArray());
+        }
+
+        _logger.LogInformation("Password reset successfully for user {UserId}", user.Id);
+
+        return Result.Success();
     }
 }

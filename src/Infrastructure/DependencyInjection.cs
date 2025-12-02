@@ -169,6 +169,7 @@ public static class DependencyInjection
         // Register authorization handlers
         builder.Services.AddScoped<IAuthorizationHandler, ResourceOwnerRequirementHandler>();
         builder.Services.AddScoped<IUser, CurrentUser>();
+        builder.Services.AddScoped<IEmailService, EmailService>();
         builder.Services.AddHttpContextAccessor();
     }
 }

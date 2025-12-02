@@ -8,6 +8,7 @@ using ShoppingProject.Application.Carts.Commands.DeleteCart;
 using ShoppingProject.Application.Carts.Commands.UpdateCart;
 using ShoppingProject.Application.Carts.Queries.GetCartById;
 using ShoppingProject.Application.Carts.Queries.GetCarts;
+using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Constants;
 
