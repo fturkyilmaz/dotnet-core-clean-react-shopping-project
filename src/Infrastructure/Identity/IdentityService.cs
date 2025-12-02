@@ -48,18 +48,14 @@ public class IdentityService : IIdentityService
     public async Task<string?> GetUserNameAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
-
         return user?.UserName;
     }
 
     public async Task<(Result Result, UserInfoResponse? Response)> GetUserByIdAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
-
         if (user == null)
-        {
-            return (Result.Failure(new[] { "User not found" }), null);
-        }
+            return (Result.Failure(new[] { "User not found." }), null);
 
         var response = new UserInfoResponse
         {
@@ -80,46 +76,36 @@ public class IdentityService : IIdentityService
     )
     {
         var user = new ApplicationUser { UserName = userName, Email = userName };
-
         var result = await _userManager.CreateAsync(user, password);
-
         return (result.ToApplicationResult(), user.Id);
     }
 
     public async Task<bool> IsInRoleAsync(string userId, string role)
     {
         var user = await _userManager.FindByIdAsync(userId);
-
         return user != null && await _userManager.IsInRoleAsync(user, role);
     }
 
     public async Task<bool> AuthorizeAsync(string userId, string policyName)
     {
         var user = await _userManager.FindByIdAsync(userId);
-
         if (user == null)
-        {
             return false;
-        }
 
         var principal = await _userClaimsPrincipalFactory.CreateAsync(user);
-
         var result = await _authorizationService.AuthorizeAsync(principal, policyName);
-
         return result.Succeeded;
     }
 
     public async Task<Result> DeleteUserAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
-
         return user != null ? await DeleteUserAsync(user) : Result.Success();
     }
 
     public async Task<Result> DeleteUserAsync(ApplicationUser user)
     {
         var result = await _userManager.DeleteAsync(user);
-
         return result.ToApplicationResult();
     }
 
@@ -139,7 +125,6 @@ public class IdentityService : IIdentityService
         var token = await GenerateJwtToken(user);
         var refreshToken = GenerateRefreshToken();
 
-        // Hash refresh token before storing
         user.RefreshToken = HashRefreshToken(refreshToken);
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryDays);
 
@@ -167,7 +152,7 @@ public class IdentityService : IIdentityService
         if (principal == null)
         {
             _logger.LogWarning("Invalid access token provided for refresh");
-            return (Result.Failure(new[] { "Invalid access token or refresh token" }), null);
+            return (Result.Failure(new[] { "Invalid access token or refresh token." }), null);
         }
 
         var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -176,10 +161,9 @@ public class IdentityService : IIdentityService
         if (user == null)
         {
             _logger.LogWarning("Refresh token attempt for non-existent user: {UserId}", userId);
-            return (Result.Failure(new[] { "Invalid access token or refresh token" }), null);
+            return (Result.Failure(new[] { "Invalid access token or refresh token." }), null);
         }
 
-        // Verify hashed refresh token
         var hashedRefreshToken = HashRefreshToken(refreshToken);
         if (
             user.RefreshToken != hashedRefreshToken
@@ -187,13 +171,12 @@ public class IdentityService : IIdentityService
         )
         {
             _logger.LogWarning("Invalid or expired refresh token for user: {UserId}", userId);
-            return (Result.Failure(new[] { "Invalid access token or refresh token" }), null);
+            return (Result.Failure(new[] { "Invalid access token or refresh token." }), null);
         }
 
         var newAccessToken = await GenerateJwtToken(user);
         var newRefreshToken = GenerateRefreshToken();
 
-        // Refresh token rotation: invalidate old token and issue new one
         user.RefreshToken = HashRefreshToken(newRefreshToken);
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryDays);
         await _userManager.UpdateAsync(user);
@@ -219,6 +202,14 @@ public class IdentityService : IIdentityService
         return Convert.ToBase64String(randomNumber);
     }
 
+    private string HashRefreshToken(string refreshToken)
+    {
+        using var sha256 = SHA256.Create();
+        var bytes = Encoding.UTF8.GetBytes(refreshToken);
+        var hash = sha256.ComputeHash(bytes);
+        return Convert.ToBase64String(hash);
+    }
+
     private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
     {
         var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret!);
@@ -229,8 +220,7 @@ public class IdentityService : IIdentityService
             ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
-            // Only for refresh flow - normal API calls should validate lifetime
-            ValidateLifetime = false,
+            ValidateLifetime = false, // only for refresh flow
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -263,11 +253,8 @@ public class IdentityService : IIdentityService
     )
     {
         var existingUser = await _userManager.FindByEmailAsync(email);
-
         if (existingUser != null)
-        {
             return Result.Failure(new[] { "User with this email already exists." });
-        }
 
         var user = new ApplicationUser
         {
@@ -278,16 +265,11 @@ public class IdentityService : IIdentityService
         };
 
         var result = await _userManager.CreateAsync(user, password);
-
         if (!result.Succeeded)
-        {
             return Result.Failure(result.Errors.Select(e => e.Description).ToArray());
-        }
 
         if (!string.IsNullOrEmpty(role))
-        {
             await _userManager.AddToRoleAsync(user, role);
-        }
 
         return Result.Success();
     }
@@ -299,23 +281,13 @@ public class IdentityService : IIdentityService
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.Email, user.Email!),
-            new Claim("CorrelationId", Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")), // ✅ standard jti
         };
 
-        // Add TenantId if available
-        if (!string.IsNullOrEmpty(user.TenantId))
-        {
-            claims.Add(new Claim("TenantId", user.TenantId));
-        }
-
-        // Add role claims
         var roles = await _userManager.GetRolesAsync(user);
-        foreach (var role in roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role));
-        }
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -331,7 +303,6 @@ public class IdentityService : IIdentityService
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
-
         return tokenHandler.WriteToken(token);
     }
 
@@ -391,15 +362,5 @@ public class IdentityService : IIdentityService
         var result = await _userManager.UpdateAsync(user);
 
         return result.ToApplicationResult();
-    }
-
-    /// <summary>
-    /// Hashes a refresh token using SHA256 for secure storage.
-    /// </summary>
-    private string HashRefreshToken(string refreshToken)
-    {
-        using var sha256 = SHA256.Create();
-        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
-        return Convert.ToBase64String(bytes);
     }
 }

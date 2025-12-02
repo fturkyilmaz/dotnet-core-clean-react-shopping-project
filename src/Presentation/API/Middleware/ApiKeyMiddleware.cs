@@ -37,8 +37,9 @@ public class ApiKeyMiddleware
                 context,
                 StatusCodes.Status401Unauthorized,
                 "API Key Missing",
-                "Api Key was not provided",
-                ErrorType.Unauthorized
+                "API Key was not provided",
+                ErrorType.Unauthorized,
+                "API_KEY_MISSING"
             );
             return;
         }
@@ -46,7 +47,10 @@ public class ApiKeyMiddleware
         var appSettings = context.RequestServices.GetRequiredService<IConfiguration>();
         var apiKey = appSettings.GetValue<string>(ConfigurationConstants.ApiKey.SectionName);
 
-        if (string.IsNullOrEmpty(apiKey) || !apiKey.Equals(extractedApiKey))
+        if (
+            string.IsNullOrEmpty(apiKey)
+            || !apiKey.Equals(extractedApiKey, StringComparison.Ordinal)
+        )
         {
             _logger.LogWarning(
                 "Unauthorized API access attempt with invalid API key. IP: {IpAddress}, Path: {Path}",
@@ -59,7 +63,8 @@ public class ApiKeyMiddleware
                 StatusCodes.Status401Unauthorized,
                 "Unauthorized",
                 "Invalid API Key",
-                ErrorType.Unauthorized
+                ErrorType.Unauthorized,
+                "INVALID_API_KEY"
             );
             return;
         }
@@ -72,7 +77,8 @@ public class ApiKeyMiddleware
         int status,
         string title,
         string detail,
-        ErrorType errorType
+        ErrorType errorType,
+        string errorCode
     )
     {
         var problem = new ProblemDetails
@@ -85,6 +91,7 @@ public class ApiKeyMiddleware
         };
 
         problem.Extensions["errorType"] = errorType.ToString();
+        problem.Extensions["errorCode"] = errorCode;
 
         // Add correlation ID for request tracking
         if (
