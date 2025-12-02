@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Services;
 using ShoppingProject.Domain.Constants;
+using ShoppingProject.Infrastructure.Authorization;
 using ShoppingProject.Infrastructure.BackgroundJobs;
 using ShoppingProject.Infrastructure.Configuration;
 using ShoppingProject.Infrastructure.Constants;
@@ -165,10 +167,7 @@ public static class DependencyInjection
         });
 
         // Register authorization handlers
-        builder.Services.AddSingleton<
-            Microsoft.AspNetCore.Authorization.IAuthorizationHandler,
-            ShoppingProject.Infrastructure.Authorization.ResourceOwnerRequirementHandler
-        >();
+        builder.Services.AddScoped<IAuthorizationHandler, ResourceOwnerRequirementHandler>();
         builder.Services.AddScoped<IUser, CurrentUser>();
         builder.Services.AddHttpContextAccessor();
     }

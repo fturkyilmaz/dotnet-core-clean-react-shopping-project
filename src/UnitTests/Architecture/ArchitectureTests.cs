@@ -11,6 +11,8 @@ public class ArchitectureTests
         typeof(ShoppingProject.Application.Common.Interfaces.IApplicationDbContext).Assembly;
     private static readonly Assembly InfrastructureAssembly =
         typeof(ShoppingProject.Infrastructure.Data.ApplicationDbContext).Assembly;
+    private static readonly Assembly PresentationAssembly =
+        typeof(ShoppingProject.WebApi.Middleware.ApiKeyMiddleware).Assembly;
 
     [Fact]
     public void Domain_Should_Not_HaveDependencyOnOtherProjects()
@@ -164,5 +166,52 @@ public class ArchitectureTests
             result.IsSuccessful,
             "All repositories should reside in Infrastructure.Repositories namespace"
         );
+    }
+
+    [Fact]
+    public void Controllers_Should_HaveCorrectNaming()
+    {
+        var result = Types
+            .InAssembly(PresentationAssembly)
+            .That()
+            .ResideInNamespace("ShoppingProject.WebApi.Controllers")
+            .Should()
+            .HaveNameEndingWith("Controller")
+            .GetResult();
+
+        Assert.True(result.IsSuccessful, "All controllers should end with 'Controller'");
+    }
+
+    [Fact]
+    public void Controllers_Should_NotDependOnInfrastructureOrApplication()
+    {
+        var result = Types
+            .InAssembly(PresentationAssembly)
+            .That()
+            .ResideInNamespace("ShoppingProject.WebApi.Controllers")
+            .ShouldNot()
+            .HaveDependencyOn("ShoppingProject.Infrastructure")
+            .AndShouldNot()
+            .HaveDependencyOn("ShoppingProject.Application")
+            .GetResult();
+
+        Assert.True(
+            result.IsSuccessful,
+            "Controllers should not depend directly on Infrastructure or Application layers"
+        );
+    }
+
+    [Fact]
+    public void Services_Should_HaveCorrectNaming()
+    {
+        var result = Types
+            .InAssembly(InfrastructureAssembly)
+            .That()
+            .ResideInNamespace("ShoppingProject.Infrastructure.Services")
+            .Should()
+            .HaveNameEndingWith("Service")
+            .GetResult();
+
+        Assert.True(result.IsSuccessful, "All services should end with 'Service'");
     }
 }
