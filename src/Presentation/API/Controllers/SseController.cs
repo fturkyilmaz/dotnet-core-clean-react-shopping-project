@@ -9,6 +9,10 @@ namespace ShoppingProject.WebApi.Controllers;
 public class SseController : ControllerBase
 {
     [HttpGet("events")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task GetEvents(CancellationToken cancellationToken)
     {
         Response.Headers.Append("Content-Type", "text/event-stream");

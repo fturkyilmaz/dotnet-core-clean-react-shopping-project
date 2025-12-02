@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Products.Commands.CreateProduct;
 using ShoppingProject.Application.Products.Commands.DeleteProduct;
@@ -28,7 +29,7 @@ namespace ShoppingProject.WebApi.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        [Microsoft.AspNetCore.OutputCaching.OutputCache(PolicyName = "ProductsList")]
+        [OutputCache(PolicyName = "ProductsList")]
         [ProducesResponseType(typeof(List<ProductDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<ProductDto>>> GetAll()
         {
@@ -38,7 +39,7 @@ namespace ShoppingProject.WebApi.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        [Microsoft.AspNetCore.OutputCaching.OutputCache(PolicyName = "ProductDetail")]
+        [OutputCache(PolicyName = "ProductDetail")]
         [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductDto>> GetById(int id)

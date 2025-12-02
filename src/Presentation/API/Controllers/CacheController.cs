@@ -22,6 +22,10 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpGet("{key}")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Get(string key)
         {
             var value = await _redisCacheService.GetValueAsync(key);
@@ -31,6 +35,10 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpPost("set")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Set([FromBody] RedisCacheRequest redisCacheRequestModel)
         {
             await _redisCacheService.SetValueAsync(
@@ -41,6 +49,10 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpDelete("{key}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Delete(string key)
         {
             await _redisCacheService.Clear(key);
