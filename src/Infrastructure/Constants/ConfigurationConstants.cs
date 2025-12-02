@@ -63,4 +63,15 @@ public static class ConfigurationConstants
         public const string HeaderName = "X-Correlation-Id";
         public const string ItemsKey = "CorrelationId";
     }
+
+    public static class Email
+    {
+        public const string SmtpHost = "Email:SmtpHost";
+        public const string SmtpPort = "Email:SmtpPort";
+        public const string SmtpUser = "Email:SmtpUser";
+        public const string SmtpPass = "Email:SmtpPass";
+        public const string From = "Email:From";
+        public const string EnableSsl = "Email:EnableSsl";
+        public const string ClientUrl = "Email:ClientUrl";
+    }
 }

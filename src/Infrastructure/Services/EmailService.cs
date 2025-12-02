@@ -1,24 +1,24 @@
 using System.Net;
 using System.Net.Mail;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Infrastructure.Configuration;
 
 namespace ShoppingProject.Infrastructure.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly IConfiguration _configuration;
+        private readonly EmailOptions _options;
 
-        public EmailService(IConfiguration configuration)
+        public EmailService(IOptions<EmailOptions> options)
         {
-            _configuration = configuration;
+            _options = options.Value;
         }
 
         public async Task SendPasswordResetEmailAsync(string email, string resetToken)
         {
             var subject = "Şifre Sıfırlama Talebi";
-            var resetLink =
-                $"{_configuration["App:ClientUrl"]}/reset-password?token={resetToken}&email={email}";
+            var resetLink = $"{_options.ClientUrl}/reset-password?token={resetToken}&email={email}";
             var body = $"Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:\n\n{resetLink}";
 
             await SendEmailAsync(email, subject, body);
@@ -35,35 +35,46 @@ namespace ShoppingProject.Infrastructure.Services
 
         private async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            var smtpHost =
-                _configuration["Email:SmtpHost"]
-                ?? throw new ArgumentNullException("Email:SmtpHost config missing");
-            var smtpPortStr =
-                _configuration["Email:SmtpPort"]
-                ?? throw new ArgumentNullException("Email:SmtpPort config missing");
-            var smtpUser =
-                _configuration["Email:SmtpUser"]
-                ?? throw new ArgumentNullException("Email:SmtpUser config missing");
-            var smtpPass =
-                _configuration["Email:SmtpPass"]
-                ?? throw new ArgumentNullException("Email:SmtpPass config missing");
-            var fromEmail =
-                _configuration["Email:From"]
-                ?? throw new ArgumentNullException("Email:From config missing");
-
-            if (!int.TryParse(smtpPortStr, out var smtpPort))
+            try
             {
-                throw new InvalidOperationException("Email:SmtpPort must be a valid integer");
+                using var client = new SmtpClient(_options.SmtpHost, _options.SmtpPort)
+                {
+                    Credentials = string.IsNullOrWhiteSpace(_options.SmtpUser)
+                        ? null
+                        : new NetworkCredential(_options.SmtpUser, _options.SmtpPass),
+                    EnableSsl = _options.EnableSsl,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Timeout = 10000, // 10 saniye timeout
+                };
+
+                using var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(_options.From),
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = false,
+                };
+
+                mailMessage.To.Add(toEmail);
+
+                await client.SendMailAsync(mailMessage);
             }
-
-            using var client = new SmtpClient(smtpHost, smtpPort)
+            catch (SmtpException ex)
             {
-                Credentials = new NetworkCredential(smtpUser, smtpPass),
-                EnableSsl = true,
-            };
-
-            var mailMessage = new MailMessage(fromEmail, toEmail, subject, body);
-            await client.SendMailAsync(mailMessage);
+                // SMTP bağlantı hataları için loglama
+                throw new InvalidOperationException(
+                    $"SMTP error while sending mail: {ex.Message}",
+                    ex
+                );
+            }
+            catch (Exception ex)
+            {
+                // Genel hatalar için loglama
+                throw new InvalidOperationException(
+                    $"Unexpected error while sending mail: {ex.Message}",
+                    ex
+                );
+            }
         }
     }
 }

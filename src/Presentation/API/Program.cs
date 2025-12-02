@@ -19,6 +19,7 @@ using ShoppingProject.Infrastructure.Configuration;
 using ShoppingProject.Infrastructure.Constants;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Identity;
+using ShoppingProject.Infrastructure.Services;
 using ShoppingProject.WebApi;
 using ShoppingProject.WebApi.Extensions;
 
@@ -191,7 +192,9 @@ builder
 
 builder.Services.AddHealthChecksUI().AddInMemoryStorage();
 
-// ... (existing code)
+builder.Services.AddOptions<EmailOptions>().Bind(builder.Configuration.GetSection("Email"));
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
@@ -344,4 +347,5 @@ app.MapHub<ShoppingProject.Infrastructure.Hubs.CartHub>(AppConstants.Endpoints.C
 app.MapHub<ShoppingProject.Infrastructure.Hubs.OrderHub>(AppConstants.Endpoints.OrderHub);
 
 app.MapControllers();
+
 app.Run();
