@@ -188,11 +188,11 @@ public class ArchitectureTests
         var result = Types
             .InAssembly(PresentationAssembly)
             .That()
-            .ResideInNamespace("ShoppingProject.WebApi.Controllers")
-            .ShouldNot()
-            .HaveDependencyOn("ShoppingProject.Infrastructure")
-            .AndShouldNot()
-            .HaveDependencyOn("ShoppingProject.Application")
+            .ResideInNamespace("ShoppingProject.Application")
+            .Should()
+            .NotHaveDependencyOn("ShoppingProject.Infrastructure")
+            .And()
+            .NotHaveDependencyOn("ShoppingProject.WebApi")
             .GetResult();
 
         Assert.True(

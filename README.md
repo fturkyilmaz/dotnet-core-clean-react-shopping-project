@@ -206,6 +206,9 @@ Explore and test API endpoints:
 | POST   | `/register` | User registration | No |
 | POST   | `/{userId}/assign-admin-role` | Assign admin role to user | No (Dev only) |
 | POST   | `/roles/{roleName}` | Create new role | No (Dev only) |
+| GET    | `/roles` | Get all roles | No |
+| POST   | `/reset-password` | Reset user password | No |
+| POST    | `/forgot-password` | Forgot password | No |
 
 ### Cache (`/api/v1/Cache`)
 | Method | Endpoint | Description | Auth Required |
