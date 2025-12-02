@@ -50,9 +50,24 @@ This issue documents the comprehensive improvements made to the .NET Core Clean 
 - [ ] **MediatR License**  
   - Resolve Lucky Penny license warning → purchase license or migrate to open-source MediatR  
 
-### Testing & CI/CD
-- [ ] Add Testcontainers-based integration tests  
-- [ ] Enhance GitHub Actions pipeline (cache, SonarQube, Docker scan)  
+### 🧪 Testing & CI/CD
+
+#### 🔴 High Priority
+- [ ] **Integration Tests**
+  - Add Testcontainers-based integration tests for PostgreSQL, Redis, RabbitMQ  
+  - Ensure tests run in isolated containers → reproducible builds  
+
+#### 🟠 Medium Priority
+- [ ] **GitHub Actions Pipeline**
+  - Add caching for NuGet packages → faster builds  
+  - Integrate SonarQube analysis → code quality & maintainability checks  
+  - Add Docker image scanning → security compliance  
+
+#### 🟢 Low Priority
+- [ ] **Pipeline Enhancements**
+  - Parallelize test jobs → reduce CI time  
+  - Add matrix builds for multiple .NET versions  
+  - Publish test coverage reports to GitHub Pages or dashboard  
 
 ### Deployment & Documentation
 - [ ] Helm deploy with environment-specific values  

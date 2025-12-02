@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using ShoppingProject.Domain.Constants;
 using ShoppingProject.Infrastructure.Authorization;
 using ShoppingProject.Infrastructure.BackgroundJobs;
 using ShoppingProject.Infrastructure.Configuration;
+using ShoppingProject.Infrastructure.Configuration.Validators;
 using ShoppingProject.Infrastructure.Constants;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Data.Interceptors;
@@ -170,6 +172,10 @@ public static class DependencyInjection
         builder.Services.AddScoped<IAuthorizationHandler, ResourceOwnerRequirementHandler>();
         builder.Services.AddScoped<IUser, CurrentUser>();
         builder.Services.AddScoped<IEmailService, EmailService>();
+        builder.Services.AddSingleton<IValidator<RabbitMqOptions>, RabbitMqOptionsValidator>();
+        builder.Services.AddSingleton<IValidator<RedisOptions>, RedisOptionsValidator>();
+        builder.Services.AddSingleton<IValidator<PostgresOptions>, PostgresOptionsValidator>();
+
         builder.Services.AddHttpContextAccessor();
     }
 }

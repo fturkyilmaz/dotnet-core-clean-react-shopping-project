@@ -100,6 +100,24 @@ builder.Services.AddOutputCache(options =>
     );
 });
 
+builder
+    .Services.AddOptions<RabbitMqOptions>()
+    .Bind(builder.Configuration.GetSection(RabbitMqOptions.SectionName))
+    .ValidateFluently()
+    .ValidateOnStart();
+
+builder
+    .Services.AddOptions<RedisOptions>()
+    .Bind(builder.Configuration.GetSection(RedisOptions.SectionName))
+    .ValidateFluently()
+    .ValidateOnStart();
+
+builder
+    .Services.AddOptions<PostgresOptions>()
+    .Bind(builder.Configuration.GetSection(PostgresOptions.SectionName))
+    .ValidateFluently()
+    .ValidateOnStart();
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
