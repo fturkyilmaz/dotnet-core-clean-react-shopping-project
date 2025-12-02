@@ -12,5 +12,5 @@ export * from './auth';
 
 // Re-export commonly used types for convenience
 export type { Product, ProductCategory, ProductRating } from './product';
-export type { CartItem, CartState, CartSummary } from './cart';
+export type { CartItem, CreateCartDto, UpdateCartDto } from './cart';
 export type { User, AuthState, LoginRequest, RegisterRequest } from './auth';

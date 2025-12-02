@@ -1,12 +1,12 @@
-import { BasketItem as BasketItemType, Product } from "../types";
+import { CartItem } from "../types";
 
 interface BasketItemProps {
-  item: BasketItemType;
-  addToBasket: (product: Product) => void;
-  removeFromBasket: (id: number) => void;
+  item: CartItem;
+  onUpdateQuantity: (id: number, quantity: number) => void;
+  onRemove: (id: number) => void;
 }
 
-const BasketItem = ({ item, addToBasket, removeFromBasket }: BasketItemProps) => {
+const BasketItem = ({ item, onUpdateQuantity, onRemove }: BasketItemProps) => {
   return (
     <div className="row align-items-center g-3">
       <div className="col-md-2 text-center">
@@ -23,23 +23,26 @@ const BasketItem = ({ item, addToBasket, removeFromBasket }: BasketItemProps) =>
         <h5 className="mb-1 text-muted fw-semibold text-truncate" title={item?.title}>
           {item?.title}
         </h5>
-        <p className="text-muted small mb-0 text-truncate">
-          {item?.category}
-        </p>
       </div>
 
       <div className="col-md-3">
         <div className="d-flex align-items-center justify-content-center justify-content-md-start gap-3 bg-light rounded-pill p-1" style={{ width: "fit-content" }}>
           <button
-            onClick={() => removeFromBasket(item?.id)}
+            onClick={() => {
+              if (item.quantity > 1) {
+                onUpdateQuantity(item.id, item.quantity - 1);
+              } else {
+                onRemove(item.id);
+              }
+            }}
             className="btn btn-sm btn-white rounded-circle shadow-sm text-danger fw-bold"
             style={{ width: "32px", height: "32px" }}
           >
             -
           </button>
-          <span className="fw-bold px-2">{item?.amount}</span>
+          <span className="fw-bold px-2">{item?.quantity}</span>
           <button
-            onClick={() => addToBasket(item)}
+            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
             className="btn btn-sm btn-white rounded-circle shadow-sm text-success fw-bold"
             style={{ width: "32px", height: "32px" }}
           >
@@ -50,7 +53,7 @@ const BasketItem = ({ item, addToBasket, removeFromBasket }: BasketItemProps) =>
 
       <div className="col-md-2 text-end">
         <span className="fs-5 fw-bold text-primary">
-          {(item.price * item.amount).toFixed(2)} ₺
+          {(item.price * item.quantity).toFixed(2)} ₺
         </span>
         <div className="small text-muted">
           {item.price} ₺ / adet

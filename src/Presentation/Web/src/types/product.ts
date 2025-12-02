@@ -41,7 +41,7 @@ export interface Product extends BaseEntity {
 /**
  * Product creation DTO (without ID)
  */
-export type CreateProductDto = Omit<Product, 'id'>;
+export type CreateProductDto = Omit<Product, 'id' | 'rating'>;
 
 /**
  * Product update DTO (partial with required ID)

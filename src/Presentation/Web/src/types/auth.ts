@@ -63,7 +63,7 @@ export interface TokenPayload {
 // ============================================================================
 
 /**
- * User entity
+ * User entity (base for UserInfoResponse)
  */
 export interface User {
   id: string;
@@ -72,6 +72,13 @@ export interface User {
   lastName?: string;
   roles: string[];
   isEmailVerified: boolean;
+}
+
+/**
+ * User information response, compatible with User and adding username
+ */
+export interface UserInfoResponse extends User {
+  username: string;
 }
 
 /**

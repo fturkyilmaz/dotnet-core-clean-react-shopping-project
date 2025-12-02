@@ -57,7 +57,7 @@ apiClient.interceptors.request.use(
 // Response Interceptor
 // --------------------
 apiClient.interceptors.response.use(
-  (response:unknown) => response,
+  (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 

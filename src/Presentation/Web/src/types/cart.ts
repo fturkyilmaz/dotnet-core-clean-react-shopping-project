@@ -9,7 +9,7 @@ import type { BaseEntity } from './common';
 // ============================================================================
 
 /**
- * Item in the shopping cart
+ * Item in the shopping cart (matches backend CartBriefDto)
  */
 export interface CartItem extends BaseEntity {
   title: string;
@@ -19,45 +19,29 @@ export interface CartItem extends BaseEntity {
 }
 
 /**
- * Cart item creation DTO
+ * Cart item creation DTO (matches CreateCartCommand)
  */
-export interface AddToCartDto {
+export interface CreateCartDto {
+  title: string;
+  price: number;
+  image: string;
+  quantity: number;
+}
+
+/**
+ * Cart item update DTO (matches UpdateCartCommand)
+ */
+export interface UpdateCartDto {
   id: number;
   title: string;
   price: number;
   image: string;
-}
-
-/**
- * Update cart item quantity
- */
-export interface UpdateCartItemDto {
-  id: number;
   quantity: number;
 }
 
 // ============================================================================
 // Cart State Types
 // ============================================================================
-
-/**
- * Shopping cart state
- */
-export interface CartState {
-  items: CartItem[];
-  total: number;
-}
-
-/**
- * Cart summary information
- */
-export interface CartSummary {
-  itemCount: number;
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  total: number;
-}
 
 /**
  * Cart totals calculation
@@ -68,15 +52,3 @@ export interface CartTotals {
   itemCount: number;
 }
 
-// ============================================================================
-// Cart Actions
-// ============================================================================
-
-/**
- * Cart action types for better type safety
- */
-export type CartAction =
-  | { type: 'ADD_ITEM'; payload: CartItem }
-  | { type: 'REMOVE_ITEM'; payload: number }
-  | { type: 'UPDATE_QUANTITY'; payload: UpdateCartItemDto }
-  | { type: 'CLEAR_CART' };

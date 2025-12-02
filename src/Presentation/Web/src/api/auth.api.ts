@@ -31,7 +31,7 @@ export const authApi = {
     return response.data.data;
   },
 
-  getCurrentUser: async (): Promise<AuthResponse['user']> => {
+  getCurrentUser: async (): Promise<UserInfoResponse> => {
     const response = await apiClient.get<ServiceResult<UserInfoResponse>>('/identity/me');
     return response.data.data;
   },

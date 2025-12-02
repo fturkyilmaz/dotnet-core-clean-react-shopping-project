@@ -1,15 +1,32 @@
 import type { FC } from "react";
-import { useBasket } from "../hooks";
+import { useCart } from "../hooks";
 import BasketItem from "../components/BasketItem";
 import { Link } from "react-router-dom";
+import Loader from "../components/Loader";
 
 const CartsPage: FC = () => {
-  const { basket, addToBasket, removeFromBasket, purchaseBasket, totalItems, totalPrice } = useBasket();
+  const {
+    cartItems,
+    isLoading,
+    updateCartItem,
+    removeFromCart,
+    clearCart,
+    totalItems,
+    totalPrice
+  } = useCart();
 
   const shippingCost = totalPrice > 0 ? 29.99 : 0;
   const grandTotal = totalPrice + shippingCost;
 
-  if (basket.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="container my-5">
+        <Loader />
+      </div>
+    );
+  }
+
+  if (cartItems.length === 0) {
     return (
       <div className="container my-5">
         <div className="row justify-content-center">
@@ -99,6 +116,19 @@ const CartsPage: FC = () => {
     );
   }
 
+  const handleUpdateQuantity = (id: number, quantity: number) => {
+    const item = cartItems.find(i => i.id === id);
+    if (item) {
+      updateCartItem({
+        id,
+        title: item.title,
+        price: item.price,
+        image: item.image,
+        quantity
+      });
+    }
+  };
+
   return (
     <div className="container my-5">
       <h2 className="mb-4 fw-bold">Alışveriş Sepetim</h2>
@@ -108,12 +138,12 @@ const CartsPage: FC = () => {
           <div className="card border-0 shadow-sm">
             <div className="card-body p-4">
               <div className="d-flex flex-column gap-4">
-                {basket.map((item) => (
+                {cartItems.map((item) => (
                   <div key={item.id}>
                     <BasketItem
                       item={item}
-                      addToBasket={addToBasket}
-                      removeFromBasket={removeFromBasket}
+                      onUpdateQuantity={handleUpdateQuantity}
+                      onRemove={removeFromCart}
                     />
                     <hr className="my-4 text-muted opacity-25" />
                   </div>
@@ -141,9 +171,7 @@ const CartsPage: FC = () => {
 
               <div className="d-flex justify-content-between mb-3">
                 <span className="text-muted">Kargo</span>
-                <span className={shippingCost === 0 ? "text-success fw-semibold" : "fw-semibold"}>
-                  {shippingCost === 0 ? "Ücretsiz" : `${shippingCost.toFixed(2)} ₺`}
-                </span>
+                <span className="fw-semibold">{shippingCost === 0 ? "Ücretsiz" : `${shippingCost.toFixed(2)} ₺`}</span>
               </div>
 
               <hr className="my-4" />
@@ -155,7 +183,7 @@ const CartsPage: FC = () => {
 
               <button
                 className="btn btn-primary w-100 py-3 fs-5 fw-semibold rounded-3 shadow-sm"
-                onClick={purchaseBasket}
+                onClick={() => clearCart()}
               >
                 Siparişi Tamamla
               </button>

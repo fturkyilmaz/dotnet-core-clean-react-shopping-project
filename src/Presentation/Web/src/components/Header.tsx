@@ -6,6 +6,8 @@ import { toggleTheme } from '@store/slices/uiSlice';
 import { logout } from '@store/slices/authSlice';
 import { GlobeAltIcon, MoonIcon, SunIcon, ShoppingCartIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 
+import { CartItem } from '@/types/cart';
+
 const Header: FC = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
@@ -14,7 +16,7 @@ const Header: FC = () => {
   const cartItems = useAppSelector((state) => state.cart.items);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
-  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const totalItems = cartItems.reduce((total: number, item: CartItem) => total + item.quantity, 0);
   const isAdmin = user?.roles?.some(role =>
     role.toLowerCase() === 'admin' || role.toLowerCase() === 'administrator'
   );

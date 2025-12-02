@@ -1,0 +1,54 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - link "🛒 Furkan Store" [ref=e5]:
+        - /url: /
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link "Home" [ref=e10]:
+              - /url: /
+          - listitem [ref=e11]:
+            - link "Categories" [ref=e12]:
+              - /url: /category
+          - listitem [ref=e13]:
+            - link "Cart" [ref=e14]:
+              - /url: /carts
+              - img [ref=e15]
+              - text: Cart
+        - generic [ref=e17]:
+          - button "en" [ref=e19] [cursor=pointer]:
+            - img [ref=e20]
+            - generic [ref=e22]: en
+          - button "Toggle theme" [ref=e23] [cursor=pointer]:
+            - img [ref=e24]
+          - generic [ref=e26]:
+            - link "Sign In" [ref=e27] [cursor=pointer]:
+              - /url: /login
+            - link "Sign Up" [ref=e28] [cursor=pointer]:
+              - /url: /register
+  - generic [ref=e33]:
+    - generic [ref=e34]:
+      - heading "Sign In" [level=2] [ref=e35]
+      - paragraph [ref=e36]:
+        - text: Don't have an account?
+        - link "Sign Up" [ref=e37]:
+          - /url: /register
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]: Email
+        - textbox "Email" [ref=e41]:
+          - /placeholder: name@example.com
+      - generic [ref=e42]:
+        - generic [ref=e43]: Password
+        - textbox "Password" [ref=e44]:
+          - /placeholder: ••••••••
+      - button "Sign In" [ref=e46] [cursor=pointer]
+    - generic [ref=e47]:
+      - separator [ref=e48]
+      - generic [ref=e49]: or
+    - button "Continue with Google" [ref=e51] [cursor=pointer]: Continue with Google
+```
