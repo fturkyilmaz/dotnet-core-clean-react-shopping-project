@@ -55,11 +55,14 @@ public class OutboxProcessorService : BackgroundService
         var context = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
         var messageBus = scope.ServiceProvider.GetRequiredService<IServiceBus>();
 
-        var unprocessedMessages = await context
-            .OutboxMessages.Where(m => !m.IsProcessed && m.CanRetry)
-            .OrderBy(m => m.OccurredOnUtc)
+        // DB’den raw kolonları çekiyoruz, computed property yok
+        var allMessages = await context
+            .OutboxMessages.OrderBy(m => m.OccurredOnUtc)
             .Take(BatchSize)
             .ToListAsync(cancellationToken);
+
+        // Client-side filter: IsProcessed ve CanRetry burada kullanılabilir
+        var unprocessedMessages = allMessages.Where(m => !m.IsProcessed && m.CanRetry).ToList();
 
         if (!unprocessedMessages.Any())
             return;

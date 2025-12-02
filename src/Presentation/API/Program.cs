@@ -203,18 +203,13 @@ builder
             ConfigurationConstants.ConnectionStrings.RedisConnection
         )!
     )
-    .AddRabbitMQ(async sp =>
-    {
-        var serviceBusOptions =
-            builder.Configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()
-            ?? throw new InvalidOperationException("ServiceBus options not configured");
-
-        if (string.IsNullOrEmpty(serviceBusOptions.Url))
-            throw new InvalidOperationException("ServiceBus URL is not configured");
-
-        var factory = new ConnectionFactory() { Uri = new Uri(serviceBusOptions.Url) };
-        return await factory.CreateConnectionAsync();
-    })
+    .AddRabbitMQ(
+        builder.Configuration.GetConnectionString(
+            ConfigurationConstants.ConnectionStrings.RabbitMqConnection
+        )!,
+        name: "rabbitmq",
+        tags: new[] { "ready" }
+    )
     .AddUrlGroup(
         new Uri(AppConstants.Observability.DefaultElasticsearchUrl),
         name: AppConstants.HealthCheckNames.Elasticsearch,

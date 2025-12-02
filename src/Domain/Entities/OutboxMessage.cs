@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using ShoppingProject.Domain.Common;
 
 namespace ShoppingProject.Domain.Entities;
@@ -16,8 +17,13 @@ public class OutboxMessage : BaseEntity
     public int RetryCount { get; set; }
     public DateTime? NextRetryUtc { get; set; }
 
+    [NotMapped]
     public bool IsProcessed => ProcessedOnUtc.HasValue;
+
+    [NotMapped]
     public bool HasFailed => !string.IsNullOrEmpty(Error);
+
+    [NotMapped]
     public bool CanRetry =>
         RetryCount < 5 && (!NextRetryUtc.HasValue || NextRetryUtc.Value <= DateTime.UtcNow);
 
@@ -32,7 +38,6 @@ public class OutboxMessage : BaseEntity
         Error = error;
         RetryCount++;
 
-        // Exponential backoff: 1min, 2min, 4min, 8min, 16min
         var delayMinutes = Math.Pow(2, RetryCount);
         NextRetryUtc = DateTime.UtcNow.AddMinutes(delayMinutes);
     }

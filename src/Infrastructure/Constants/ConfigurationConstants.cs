@@ -7,6 +7,7 @@ public static class ConfigurationConstants
         public const string DefaultConnection = "DefaultConnection";
         public const string DefaultConnectionReadOnly = "DefaultConnection_ReadOnly";
         public const string RedisConnection = "RedisConnection";
+        public const string RabbitMqConnection = "RabbitMqConnection";
     }
 
     public static class JwtSettings
