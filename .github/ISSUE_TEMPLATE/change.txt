@@ -30,13 +30,6 @@ Eksik: ValidateLifetime = false doğru ama sadece refresh flow için kullanılma
 
 Fix: Normal API çağrılarında ValidateLifetime = true.
 
-diff
-- ValidateLifetime = false, // Important: we want to validate expired tokens
-+ ValidateLifetime = false, // Only for refresh flow
-4. Refresh Token Expiry
-Eksik: Refresh token expiry güncellenmiyor.
-
-Fix: Refresh sırasında expiry yeniden set edilmeli.
 
 diff
 - user.RefreshToken = newRefreshToken;

@@ -48,12 +48,29 @@ builder
         });
     });
 
-// Add Rate Limiting
+// Add Rate Limiting with Redis distributed storage
 builder.Services.AddMemoryCache();
 builder.Services.Configure<AspNetCoreRateLimit.IpRateLimitOptions>(
     builder.Configuration.GetSection(ConfigurationConstants.RateLimiting.IpRateLimiting)
 );
-builder.Services.AddInMemoryRateLimiting();
+
+// Use Redis for distributed rate limiting in production, in-memory for development
+if (builder.Environment.IsProduction())
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = builder.Configuration.GetConnectionString(
+            ConfigurationConstants.ConnectionStrings.RedisConnection
+        );
+        options.InstanceName = "RateLimiting:";
+    });
+    builder.Services.AddDistributedRateLimiting();
+}
+else
+{
+    builder.Services.AddInMemoryRateLimiting();
+}
+
 builder.Services.AddSingleton<
     AspNetCoreRateLimit.IRateLimitConfiguration,
     AspNetCoreRateLimit.RateLimitConfiguration
@@ -125,7 +142,21 @@ builder.Services.AddCors(options =>
                     .Configuration.GetSection(ConfigurationConstants.Cors.AllowedOrigins)
                     .Get<string[]>()
                 ?? Array.Empty<string>();
-            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+
+            policy
+                .WithOrigins(allowedOrigins)
+                .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .WithHeaders(
+                    "Content-Type",
+                    "Authorization",
+                    "X-Requested-With",
+                    "X-Correlation-Id",
+                    "Accept",
+                    "Accept-Language"
+                )
+                .WithExposedHeaders("X-Correlation-Id", "Content-Disposition")
+                .AllowCredentials()
+                .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
         }
     );
 });
