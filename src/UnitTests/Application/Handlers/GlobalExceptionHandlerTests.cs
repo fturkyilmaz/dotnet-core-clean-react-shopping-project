@@ -1,5 +1,10 @@
+using System.IO;
+using System.Text.Json;
 using FluentAssertions;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ShoppingProject.Application.Common.Exceptions;
@@ -16,30 +21,25 @@ public class GlobalExceptionHandlerTests
     {
         _loggerMock = new Mock<ILogger<GlobalExceptionHandler>>();
         var envMock = new Mock<IHostEnvironment>();
-        envMock.Setup(e => e.IsProduction()).Returns(false);
-
+        envMock.SetupGet(e => e.EnvironmentName).Returns("Development");
         _handler = new GlobalExceptionHandler(_loggerMock.Object, envMock.Object);
-        _httpContext = new DefaultHttpContext();
+        _httpContext = new DefaultHttpContext { Response = { Body = new MemoryStream() } };
     }
 
     [Fact]
     public async Task TryHandleAsync_NotFoundException_Returns404ProblemDetails()
     {
-        // Arrange
         var exception = new NotFoundException("Product not found");
 
-        // Act
         await _handler.TryHandleAsync(_httpContext, exception, CancellationToken.None);
 
-        // Assert
         _httpContext.Response.StatusCode.Should().Be(StatusCodes.Status404NotFound);
 
-        // Deserialize response body
         _httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
-        var problem =
-            await System.Text.Json.JsonSerializer.DeserializeAsync<ExtendedProblemDetails>(
-                _httpContext.Response.Body
-            );
+        var problem = await JsonSerializer.DeserializeAsync<ExtendedProblemDetails>(
+            _httpContext.Response.Body,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
 
         problem.Should().NotBeNull();
         problem!.Status.Should().Be(StatusCodes.Status404NotFound);
@@ -51,22 +51,21 @@ public class GlobalExceptionHandlerTests
     [Fact]
     public async Task TryHandleAsync_ValidationException_Returns422ProblemDetailsWithErrors()
     {
-        // Arrange
-        var exception = new ValidationException(
-            new Dictionary<string, string[]> { { "Name", new[] { "Name is required" } } }
-        );
+        var failures = new List<ValidationFailure>
+        {
+            new ValidationFailure("Name", "Name is required"),
+        };
+        var exception = new ValidationException(failures);
 
-        // Act
         await _handler.TryHandleAsync(_httpContext, exception, CancellationToken.None);
 
-        // Assert
         _httpContext.Response.StatusCode.Should().Be(StatusCodes.Status422UnprocessableEntity);
 
         _httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
-        var problem =
-            await System.Text.Json.JsonSerializer.DeserializeAsync<ExtendedProblemDetails>(
-                _httpContext.Response.Body
-            );
+        var problem = await JsonSerializer.DeserializeAsync<ExtendedProblemDetails>(
+            _httpContext.Response.Body,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
 
         problem.Should().NotBeNull();
         problem!.ErrorCode.Should().Be("VALIDATION_ERROR");

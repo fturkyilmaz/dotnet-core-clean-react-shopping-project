@@ -1,12 +1,12 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useProduct } from '@hooks';
-import { toast } from 'react-toastify';
+import { useProducts, useDeleteProduct } from '@hooks';
 import Loader from '@components/Loader';
 
 const AdminDashboard: FC = () => {
     const navigate = useNavigate();
-    const { products } = useProduct();
+    const { data: products, isLoading } = useProducts();
+    const { mutate: deleteProduct } = useDeleteProduct();
     const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders'>('overview');
 
     // Mock statistics
@@ -17,10 +17,9 @@ const AdminDashboard: FC = () => {
         activeUsers: 1234,
     };
 
-    const handleDeleteProduct = (_id: number): void => {
+    const handleDeleteProduct = (id: number): void => {
         if (window.confirm('Are you sure you want to delete this product?')) {
-            // TODO: Implement delete API call
-            toast.success('Product deleted successfully');
+            deleteProduct(id);
         }
     };
 
@@ -28,7 +27,7 @@ const AdminDashboard: FC = () => {
         navigate('/admin/products/add');
     };
 
-    if (!products) {
+    if (isLoading) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
                 <Loader />
@@ -245,7 +244,7 @@ const AdminDashboard: FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {products.slice(0, 10).map((product) => (
+                                    {products?.slice(0, 10).map((product) => (
                                         <tr key={product.id}>
                                             <td>
                                                 <img

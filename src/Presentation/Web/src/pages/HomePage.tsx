@@ -1,26 +1,33 @@
 import type { FC } from "react";
 import Loader from "@components/Loader";
 import Card from "@components/Card";
-import { useProduct } from "@hooks";
+import { useSearchParams } from "react-router-dom";
+import { useProducts } from "@hooks";
 
 const HomePage: FC = () => {
-  const { products, category } = useProduct();
+  const { data: products, isLoading } = useProducts();
+  const [searchParams] = useSearchParams();
+  const category = searchParams.get("category") || "all";
+
+  const filteredProducts = category === "all"
+    ? products
+    : products?.filter(p => p.category.toLowerCase() === category.toLowerCase());
 
   const displayCategory = category === "all" ? "Tüm Ürünler" : category;
-  const productCount = products?.length ?? 0;
+  const productCount = filteredProducts?.length ?? 0;
 
   return (
     <div className="container my-5">
       {/* Header Section */}
       <div className="text-center mb-5">
-        <h1 className="display-4 fw-bold mb-3">{displayCategory}</h1>
+        <h1 className="display-4 fw-bold mb-3 text-capitalize">{displayCategory}</h1>
         <p className="text-muted fs-5">
-          {products ? `${productCount} ürün bulundu` : "Ürünler yükleniyor..."}
+          {isLoading ? "Ürünler yükleniyor..." : `${productCount} ürün bulundu`}
         </p>
       </div>
 
       {/* Products Grid */}
-      {!products ? (
+      {isLoading ? (
         <div className="d-flex justify-content-center my-5">
           <Loader />
         </div>
@@ -33,7 +40,7 @@ const HomePage: FC = () => {
         </div>
       ) : (
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-          {products.map((product) => (
+          {filteredProducts?.map((product) => (
             <div className="col" key={product.id}>
               <Card product={product} />
             </div>

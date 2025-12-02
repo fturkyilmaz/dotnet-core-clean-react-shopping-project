@@ -1,18 +1,17 @@
 import { FC, FormEvent, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { authApi } from '@api/authApi';
+import { useAuth } from '@hooks/useAuth';
 
 const RegisterPage: FC = () => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
+    const { register, isRegistering } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
         // Validate passwords match
@@ -27,19 +26,7 @@ const RegisterPage: FC = () => {
             return;
         }
 
-        setIsLoading(true);
-
-        try {
-            await authApi.register({ email, password });
-
-            toast.success(t('registerSuccess'));
-            setTimeout(() => navigate('/login'), 2000);
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.message || t('registerFailed');
-            toast.error(errorMessage);
-        } finally {
-            setIsLoading(false);
-        }
+        register({ email, password, confirmPassword });
     };
 
     return (
@@ -113,9 +100,9 @@ const RegisterPage: FC = () => {
                                     <button
                                         type="submit"
                                         className="btn btn-primary btn-lg"
-                                        disabled={isLoading}
+                                        disabled={isRegistering}
                                     >
-                                        {isLoading ? (
+                                        {isRegistering ? (
                                             <>
                                                 <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                                 {t('loading')}...

@@ -75,7 +75,8 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 "Resource Not Found",
                 notFound.Message,
                 ConfigurationConstants.RfcTypes.NotFound,
-                ErrorType.NotFound
+                ErrorType.NotFound,
+                "NOT_FOUND"
             ),
             ForbiddenAccessException forbidden => CreateProblem(
                 httpContext,
@@ -83,7 +84,8 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 "Access Forbidden",
                 forbidden.Message,
                 ConfigurationConstants.RfcTypes.Forbidden,
-                ErrorType.Forbidden
+                ErrorType.Forbidden,
+                "FORBIDDEN"
             ),
             BadRequestException badRequest => CreateProblem(
                 httpContext,
@@ -91,7 +93,8 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 "Bad Request",
                 badRequest.Message,
                 ConfigurationConstants.RfcTypes.BadRequest,
-                ErrorType.Conflict
+                ErrorType.Conflict,
+                "BAD_REQUEST"
             ),
             ValidationException validation => CreateProblem(
                 httpContext,
@@ -100,6 +103,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 validation.Message,
                 ConfigurationConstants.RfcTypes.Validation,
                 ErrorType.Validation,
+                "VALIDATION_ERROR",
                 ("errors", validation.Errors)
             ),
             UnauthorizedAccessException unauthorized => CreateProblem(
@@ -108,19 +112,21 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 "Unauthorized",
                 unauthorized.Message,
                 ConfigurationConstants.RfcTypes.Unauthorized,
-                ErrorType.Unauthorized
+                ErrorType.Unauthorized,
+                "UNAUTHORIZED"
             ),
             _ => CreateDefaultProblem(httpContext, exception),
         };
     }
 
-    private ProblemDetails CreateProblem(
+    public ProblemDetails CreateProblem(
         HttpContext httpContext,
         int status,
         string title,
         string detail,
         string type,
         ErrorType errorType,
+        string errorCode,
         (string key, object value)? extension = null
     )
     {
@@ -133,8 +139,8 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
             Type = type,
         };
 
-        // Domain-specific error type
         problem.Extensions["errorType"] = errorType.ToString();
+        problem.Extensions["errorCode"] = errorCode;
 
         // Add correlation ID for request tracking
         if (
@@ -169,8 +175,8 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         };
 
         problem.Extensions["errorType"] = ErrorType.Internal.ToString();
+        problem.Extensions["errorCode"] = "INTERNAL_SERVER_ERROR";
 
-        // Add correlation ID for request tracking
         if (
             httpContext.Items.TryGetValue(
                 ConfigurationConstants.CorrelationId.ItemsKey,

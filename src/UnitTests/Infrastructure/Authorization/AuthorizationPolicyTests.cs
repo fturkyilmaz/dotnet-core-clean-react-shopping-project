@@ -141,21 +141,4 @@ public class AuthorizationPolicyTests
                 && rolesReq.AllowedRoles.Contains(Roles.Client)
         );
     }
-
-    [Fact]
-    public void CanManageOwnClientsPolicy_RequiresDietitianRoleAndResourceOwnership()
-    {
-        // Act
-        var policy = _authorizationOptions.GetPolicy(Policies.CanManageOwnClients);
-
-        // Assert
-        Assert.NotNull(policy);
-        Assert.Contains(
-            policy.Requirements,
-            r =>
-                r is RolesAuthorizationRequirement rolesReq
-                && rolesReq.AllowedRoles.Contains(Roles.Dietitian)
-        );
-        Assert.Contains(policy.Requirements, r => r is ResourceOwnerRequirement);
-    }
 }

@@ -1,6 +1,7 @@
 import { FC, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useCreateProduct } from '@hooks';
 
 interface ProductFormData {
     title: string;
@@ -12,7 +13,7 @@ interface ProductFormData {
 
 const AddProductPage: FC = () => {
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
+    const { mutate: createProduct, isPending: isLoading } = useCreateProduct();
     const [formData, setFormData] = useState<ProductFormData>({
         title: '',
         description: '',
@@ -40,7 +41,7 @@ const AddProductPage: FC = () => {
         }));
     };
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
         // Validation
@@ -65,22 +66,11 @@ const AddProductPage: FC = () => {
             return;
         }
 
-        setIsLoading(true);
-
-        try {
-            // TODO: Implement actual API call
-            // await productsApi.createProduct(formData);
-
-            // Mock API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            toast.success('Product added successfully!');
-            navigate('/admin');
-        } catch (error) {
-            toast.error('Failed to add product');
-        } finally {
-            setIsLoading(false);
-        }
+        createProduct(formData, {
+            onSuccess: () => {
+                navigate('/admin');
+            }
+        });
     };
 
     const handleCancel = () => {

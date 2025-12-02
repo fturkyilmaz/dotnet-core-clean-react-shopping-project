@@ -14,16 +14,15 @@ const ProductDetailPage: FC = () => {
     const dispatch = useAppDispatch();
     const { addToBasket } = useBasket();
 
-    // Fetch product from API using existing hook
-    const { products } = useProduct();
-    const product = products?.find((p) => p.id === Number(id));
+    // Fetch product from API using React Query hook
+    const { data: product, isLoading, isError } = useProduct(Number(id));
 
     // Add to recently viewed
     useEffect(() => {
-        if (id) {
+        if (id && product) {
             dispatch(addToRecentlyViewed(Number(id)));
         }
-    }, [id, dispatch]);
+    }, [id, product, dispatch]);
 
     const handleAddToCart = (): void => {
         if (product) {
@@ -37,7 +36,7 @@ const ProductDetailPage: FC = () => {
         navigate('/carts');
     };
 
-    if (!products) {
+    if (isLoading) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
                 <Loader />
@@ -45,7 +44,7 @@ const ProductDetailPage: FC = () => {
         );
     }
 
-    if (!product) {
+    if (isError || !product) {
         return (
             <div className="container text-center py-5">
                 <div className="alert alert-warning" role="alert">

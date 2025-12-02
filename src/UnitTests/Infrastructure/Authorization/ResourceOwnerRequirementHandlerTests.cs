@@ -73,7 +73,7 @@ public class ResourceOwnerRequirementHandlerTests
                 new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, "user-id"),
-                    new Claim(ClaimTypes.Role, Roles.Dietitian),
+                    new Claim(ClaimTypes.Role, Roles.Client),
                 }
             )
         );
@@ -98,7 +98,7 @@ public class ResourceOwnerRequirementHandlerTests
                 new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, "user-id"),
-                    new Claim(ClaimTypes.Role, Roles.Dietitian),
+                    new Claim(ClaimTypes.Role, Roles.Client),
                 }
             )
         );
@@ -112,35 +112,6 @@ public class ResourceOwnerRequirementHandlerTests
         await _handler.HandleAsync(context);
 
         // Assert
-        Assert.False(context.HasSucceeded);
-    }
-
-    [Fact]
-    public async Task HandleRequirementAsync_DietitianRole_WithResourceId_CallsOwnershipCheck()
-    {
-        // Arrange
-        var requirement = new ResourceOwnerRequirement("Client");
-        var user = new ClaimsPrincipal(
-            new ClaimsIdentity(
-                new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, "dietitian-user-id"),
-                    new Claim(ClaimTypes.Role, Roles.Dietitian),
-                }
-            )
-        );
-        var context = new AuthorizationHandlerContext(new[] { requirement }, user, null);
-
-        var httpContext = new DefaultHttpContext();
-        httpContext.Request.RouteValues["id"] = "123";
-        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
-
-        // Act
-        await _handler.HandleAsync(context);
-
-        // Assert
-        // Since CheckClientOwnership returns false by default (placeholder implementation),
-        // the requirement should not succeed
         Assert.False(context.HasSucceeded);
     }
 

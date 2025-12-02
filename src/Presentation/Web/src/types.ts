@@ -25,9 +25,9 @@ export interface BasketItem extends Product {
 
 export interface ServiceResult<T> {
   data: T;
-  success: boolean;
+  succeeded: boolean;
   message: string;
-  statusCode: number;
+  errors: string[];
 }
 
 export interface Paginate<T> {
@@ -38,4 +38,13 @@ export interface Paginate<T> {
   pages: number;
   hasPrevious: boolean;
   hasNext: boolean;
+}
+
+ export interface UserInfoResponse {
+  id: string;
+  userName: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  gender: string;
 }

@@ -1,7 +1,6 @@
-import axios from "axios";
 import type { FC } from "react";
-import { useState, useEffect, useCallback } from "react";
-import { useProduct } from "../hooks";
+import { useCallback, useMemo } from "react";
+import { useProducts } from "@hooks";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 
@@ -29,28 +28,31 @@ const categoryColors: CategoryColors = {
   "women's clothing": "danger"
 };
 
+import { useSearchParams } from "react-router-dom";
+
 const CategoryPage: FC = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState<string[]>([]);
-  const { setCategory, category } = useProduct();
+  const { data: products, isLoading } = useProducts();
+  const [searchParams] = useSearchParams();
+  const category = searchParams.get("category") || "all";
+
+  const categories = useMemo(() => {
+    if (!products) return [];
+    const uniqueCategories = Array.from(new Set(products.map(p => p.category)));
+    return uniqueCategories.sort();
+  }, [products]);
 
   const handleSetCategory = useCallback((cat: string): void => {
-    setCategory(cat);
-    navigate("/");
-  }, [setCategory, navigate]);
+    navigate(`/?category=${encodeURIComponent(cat)}`);
+  }, [navigate]);
 
-  useEffect(() => {
-    const fetchCategories = async (): Promise<void> => {
-      try {
-        const response = await axios.get<string[]>("https://fakestoreapi.com/products/categories");
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+  if (isLoading) {
+    return (
+      <div className="container my-5">
+        <Loader />
+      </div>
+    );
+  }
 
   if (categories.length === 0) {
     return (

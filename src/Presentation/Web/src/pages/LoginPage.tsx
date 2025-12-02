@@ -1,54 +1,17 @@
 import { FC, FormEvent, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
-import { useAppDispatch } from '@hooks/useRedux';
-import { setCredentials } from '@store/slices/authSlice';
-import { authApi } from '@api/authApi';
+import { useAuth } from '@hooks/useAuth';
 
 const LoginPage: FC = () => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const dispatch = useAppDispatch();
+    const { login, isLoggingIn } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-
-        try {
-            const response = await authApi.login({ email, password });
-
-            // Decode JWT to get user info
-            if (!response.accessToken) {
-                throw new Error('No token received');
-            }
-
-            const tokenPayload = JSON.parse(atob(response.accessToken.split('.')[1]));
-            const user = {
-                id: tokenPayload.nameid,
-                email: tokenPayload.email,
-                roles: tokenPayload.role ? (Array.isArray(tokenPayload.role) ? tokenPayload.role : [tokenPayload.role]) : [],
-            };
-
-            // Save to Redux and localStorage
-            dispatch(setCredentials({ user, token: response.accessToken }));
-            localStorage.setItem('refreshToken', response.refreshToken);
-
-            toast.success(t('loginSuccess'));
-
-            // Navigate to return URL or home
-            const from = (location.state as any)?.from?.pathname || '/';
-            navigate(from, { replace: true });
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.message || error.message || t('loginFailed');
-            toast.error(errorMessage);
-        } finally {
-            setIsLoading(false);
-        }
+        login({ email, password });
     };
 
     return (
@@ -104,9 +67,9 @@ const LoginPage: FC = () => {
                                     <button
                                         type="submit"
                                         className="btn btn-primary btn-lg"
-                                        disabled={isLoading}
+                                        disabled={isLoggingIn}
                                     >
-                                        {isLoading ? (
+                                        {isLoggingIn ? (
                                             <>
                                                 <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                                 {t('loading')}...
