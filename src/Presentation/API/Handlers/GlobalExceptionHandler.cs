@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using ShoppingProject.Application.Common.Constants;
 using ShoppingProject.Application.Common.Exceptions;
 using ShoppingProject.Domain.Enums;
+using ShoppingProject.Infrastructure.Constants;
 
 namespace ShoppingProject.WebApi.Handlers;
 
@@ -74,7 +74,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 StatusCodes.Status404NotFound,
                 "Resource Not Found",
                 notFound.Message,
-                RfcTypes.NotFound,
+                ConfigurationConstants.RfcTypes.NotFound,
                 ErrorType.NotFound
             ),
             ForbiddenAccessException forbidden => CreateProblem(
@@ -82,7 +82,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 StatusCodes.Status403Forbidden,
                 "Access Forbidden",
                 forbidden.Message,
-                RfcTypes.Forbidden,
+                ConfigurationConstants.RfcTypes.Forbidden,
                 ErrorType.Forbidden
             ),
             BadRequestException badRequest => CreateProblem(
@@ -90,7 +90,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 StatusCodes.Status400BadRequest,
                 "Bad Request",
                 badRequest.Message,
-                RfcTypes.BadRequest,
+                ConfigurationConstants.RfcTypes.BadRequest,
                 ErrorType.Conflict
             ),
             ValidationException validation => CreateProblem(
@@ -98,7 +98,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 StatusCodes.Status422UnprocessableEntity,
                 "Validation Failed",
                 validation.Message,
-                RfcTypes.Validation,
+                ConfigurationConstants.RfcTypes.Validation,
                 ErrorType.Validation,
                 ("errors", validation.Errors)
             ),
@@ -107,7 +107,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 StatusCodes.Status401Unauthorized,
                 "Unauthorized",
                 unauthorized.Message,
-                RfcTypes.Unauthorized,
+                ConfigurationConstants.RfcTypes.Unauthorized,
                 ErrorType.Unauthorized
             ),
             _ => CreateDefaultProblem(httpContext, exception),
@@ -136,6 +136,17 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         // Domain-specific error type
         problem.Extensions["errorType"] = errorType.ToString();
 
+        // Add correlation ID for request tracking
+        if (
+            httpContext.Items.TryGetValue(
+                ConfigurationConstants.CorrelationId.ItemsKey,
+                out var correlationId
+            )
+        )
+        {
+            problem.Extensions["correlationId"] = correlationId?.ToString() ?? string.Empty;
+        }
+
         if (extension.HasValue)
         {
             problem.Extensions[extension.Value.key] = extension.Value.value;
@@ -154,10 +165,21 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
             Detail = _environment.IsProduction()
                 ? "An internal server error occurred. Please try again later."
                 : exception.Message,
-            Type = RfcTypes.InternalServerError,
+            Type = ConfigurationConstants.RfcTypes.InternalServerError,
         };
 
         problem.Extensions["errorType"] = ErrorType.Internal.ToString();
+
+        // Add correlation ID for request tracking
+        if (
+            httpContext.Items.TryGetValue(
+                ConfigurationConstants.CorrelationId.ItemsKey,
+                out var correlationId
+            )
+        )
+        {
+            problem.Extensions["correlationId"] = correlationId?.ToString() ?? string.Empty;
+        }
 
         if (!_environment.IsProduction())
         {

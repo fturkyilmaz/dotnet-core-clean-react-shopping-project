@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopping-backend
+  labels:
+    app: shopping-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shopping-backend
+  template:
+    metadata:
+      labels:
+        app: shopping-backend
+    spec:
+      containers:
+      - name: shopping-backend
+        image: your-docker-username/shoppingproject:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: shopping-secrets
+              key: defaultConnection

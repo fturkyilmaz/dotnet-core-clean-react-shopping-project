@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ShoppingProject.Application.Common.Exceptions;
-using ShoppingProject.Application.Handlers;
+using ShoppingProject.WebApi.Handlers;
 using Xunit;
 
 public class GlobalExceptionHandlerTests

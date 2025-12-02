@@ -24,6 +24,8 @@ public class IdentityController : ControllerBase
 
     [HttpPost("login")]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(ServiceResult<AuthResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceResult<AuthResponse>), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ServiceResult<AuthResponse>>> Login(LoginRequest request)
     {
         var (result, response) = await _identityService.LoginAsync(request.Email, request.Password);
@@ -38,6 +40,8 @@ public class IdentityController : ControllerBase
 
     [HttpPost("refresh-token")]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(ServiceResult<AuthResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceResult<AuthResponse>), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ServiceResult<AuthResponse>>> RefreshToken(
         RefreshTokenRequest request
     )
@@ -57,6 +61,8 @@ public class IdentityController : ControllerBase
 
     [HttpPost("register")]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ServiceResult<string>>> Register(RegisterRequest request)
     {
         var (result, userId) = await _identityService.CreateUserAsync(
@@ -74,6 +80,10 @@ public class IdentityController : ControllerBase
 
     [HttpPost("{userId}/assign-admin-role")]
     [Authorize(Policy = Policies.RequireAdministratorRole)]
+    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<ServiceResult<string>>> AssignAdminRole(string userId)
     {
         var result = await _identityService.AddUserToRoleAsync(userId, "Administrator");
@@ -88,6 +98,10 @@ public class IdentityController : ControllerBase
 
     [HttpPost("roles/{roleName}")]
     [Authorize(Policy = Policies.RequireAdministratorRole)]
+    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<ServiceResult<string>>> CreateRole(string roleName)
     {
         var result = await _identityService.CreateRoleAsync(roleName);
@@ -102,6 +116,9 @@ public class IdentityController : ControllerBase
 
     [HttpGet("me")]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(ServiceResult<UserInfoResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserInfoResponse>> GetCurrentUserInfo()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -132,6 +149,9 @@ public class IdentityController : ControllerBase
 
     [HttpPut("me")]
     [Authorize]
+    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ServiceResult<string>>> UpdateUser(UpdateUserRequest request)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

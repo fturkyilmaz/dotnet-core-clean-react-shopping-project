@@ -10,10 +10,12 @@ namespace ShoppingProject.WebApi.Middleware;
 public class ApiKeyMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<ApiKeyMiddleware> _logger;
 
-    public ApiKeyMiddleware(RequestDelegate next)
+    public ApiKeyMiddleware(RequestDelegate next, ILogger<ApiKeyMiddleware> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -25,6 +27,12 @@ public class ApiKeyMiddleware
             )
         )
         {
+            _logger.LogWarning(
+                "API Key missing from request. IP: {IpAddress}, Path: {Path}",
+                context.Connection.RemoteIpAddress,
+                context.Request.Path
+            );
+
             await WriteProblemDetails(
                 context,
                 StatusCodes.Status401Unauthorized,
@@ -40,6 +48,12 @@ public class ApiKeyMiddleware
 
         if (string.IsNullOrEmpty(apiKey) || !apiKey.Equals(extractedApiKey))
         {
+            _logger.LogWarning(
+                "Unauthorized API access attempt with invalid API key. IP: {IpAddress}, Path: {Path}",
+                context.Connection.RemoteIpAddress,
+                context.Request.Path
+            );
+
             await WriteProblemDetails(
                 context,
                 StatusCodes.Status401Unauthorized,
@@ -67,10 +81,21 @@ public class ApiKeyMiddleware
             Title = title,
             Detail = detail,
             Instance = context.Request.Path,
-            Type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+            Type = ConfigurationConstants.RfcTypes.Unauthorized,
         };
 
         problem.Extensions["errorType"] = errorType.ToString();
+
+        // Add correlation ID for request tracking
+        if (
+            context.Items.TryGetValue(
+                ConfigurationConstants.CorrelationId.ItemsKey,
+                out var correlationId
+            )
+        )
+        {
+            problem.Extensions["correlationId"] = correlationId?.ToString() ?? string.Empty;
+        }
 
         context.Response.StatusCode = status;
         context.Response.ContentType = "application/problem+json";

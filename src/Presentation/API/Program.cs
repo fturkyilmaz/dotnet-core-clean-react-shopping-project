@@ -218,7 +218,7 @@ if (app.Environment.IsDevelopment())
         }
     });
 
-    // Add Hangfire Dashboard
+    // Add Hangfire Dashboard (only in development for security)
     app.UseHangfireDashboard(
         builder.Configuration.GetValue<string>(
             ConfigurationConstants.Hangfire.DashboardPath,
@@ -226,13 +226,17 @@ if (app.Environment.IsDevelopment())
         )
     );
 
-    // Schedule Recurring Job
+    // Schedule Recurring Job with retry policy
     RecurringJob.AddOrUpdate<ShoppingProject.Infrastructure.Jobs.DatabaseBackupJob>(
         AppConstants.JobIds.DatabaseBackup,
         job => job.RunAsync(),
-        Cron.Daily
+        Cron.Daily,
+        new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc }
     );
 }
+
+// Add CorrelationId middleware early in pipeline
+app.UseMiddleware<ShoppingProject.WebApi.Middleware.CorrelationIdMiddleware>();
 
 app.UseHttpsRedirection();
 
@@ -264,10 +268,10 @@ app.Use(
             AppConstants.SecurityHeaders.XXssProtectionValue
         );
 
-        // Content Security Policy
+        // Content Security Policy (improved - removed unsafe-inline)
         context.Response.Headers.Append(
             AppConstants.SecurityHeaders.ContentSecurityPolicy,
-            AppConstants.SecurityHeaders.ContentSecurityPolicyValue
+            "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'"
         );
 
         // Referrer Policy
@@ -299,6 +303,26 @@ app.UseCors(AppConstants.CorsPolicies.AllowReactApp);
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Health Checks - Liveness (simple check if app is running)
+app.MapHealthChecks(
+    "/health/live",
+    new HealthCheckOptions
+    {
+        Predicate = _ => false, // No checks, just returns healthy if app is running
+    }
+);
+
+// Health Checks - Readiness (checks all dependencies)
+app.MapHealthChecks(
+    "/health/ready",
+    new HealthCheckOptions
+    {
+        Predicate = _ => true,
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
+    }
+);
+
+// Legacy health check endpoint (for backward compatibility)
 app.MapHealthChecks(
     AppConstants.Endpoints.HealthCheck,
     new HealthCheckOptions

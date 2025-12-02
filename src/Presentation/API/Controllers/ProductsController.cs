@@ -29,6 +29,7 @@ namespace ShoppingProject.WebApi.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Microsoft.AspNetCore.OutputCaching.OutputCache(PolicyName = "ProductsList")]
+        [ProducesResponseType(typeof(List<ProductDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<ProductDto>>> GetAll()
         {
             var products = await _sender.Send(new GetProductsQuery());
@@ -38,6 +39,8 @@ namespace ShoppingProject.WebApi.Controllers
         [HttpGet("{id}")]
         [AllowAnonymous]
         [Microsoft.AspNetCore.OutputCaching.OutputCache(PolicyName = "ProductDetail")]
+        [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductDto>> GetById(int id)
         {
             var product = await _sender.Send(new GetProductByIdQuery(id));
@@ -46,6 +49,10 @@ namespace ShoppingProject.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Policy = Policies.CanManageProducts)]
+        [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<int>> Create(CreateProductCommand command)
         {
             var id = await _sender.Send(command);
@@ -54,6 +61,11 @@ namespace ShoppingProject.WebApi.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Policy = Policies.CanManageProducts)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, UpdateProductCommand command)
         {
             if (id != command.Id)
@@ -67,6 +79,10 @@ namespace ShoppingProject.WebApi.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Policy = Policies.CanManageProducts)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             await _sender.Send(new DeleteProductCommand(id));
@@ -75,6 +91,8 @@ namespace ShoppingProject.WebApi.Controllers
 
         [HttpPost("search")]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(IPaginate<ProductDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<IPaginate<ProductDto>>> Search(
             [FromBody] DynamicQuery dynamicQuery,
             [FromQuery] int index = 0,

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
@@ -22,13 +23,15 @@ public class IdentityService : IIdentityService
     private readonly IConfiguration _configuration;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly JwtOptions _jwtOptions;
+    private readonly ILogger<IdentityService> _logger;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
         IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
         IAuthorizationService authorizationService,
         IConfiguration configuration,
-        RoleManager<IdentityRole> roleManager
+        RoleManager<IdentityRole> roleManager,
+        ILogger<IdentityService> logger
     )
     {
         _userManager = userManager;
@@ -36,6 +39,7 @@ public class IdentityService : IIdentityService
         _authorizationService = authorizationService;
         _configuration = configuration;
         _roleManager = roleManager;
+        _logger = logger;
 
         _jwtOptions = new JwtOptions();
         configuration.GetSection(JwtOptions.SectionName).Bind(_jwtOptions);
@@ -128,16 +132,20 @@ public class IdentityService : IIdentityService
 
         if (user == null || !await _userManager.CheckPasswordAsync(user, password))
         {
+            _logger.LogWarning("Failed login attempt for email: {Email}", email);
             return (Result.Failure(new[] { "Invalid email or password." }), null);
         }
 
         var token = await GenerateJwtToken(user);
         var refreshToken = GenerateRefreshToken();
 
-        user.RefreshToken = refreshToken;
+        // Hash refresh token before storing
+        user.RefreshToken = HashRefreshToken(refreshToken);
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryDays);
 
         await _userManager.UpdateAsync(user);
+
+        _logger.LogInformation("User {UserId} logged in successfully", user.Id);
 
         return (
             Result.Success(),
@@ -158,26 +166,39 @@ public class IdentityService : IIdentityService
         var principal = GetPrincipalFromExpiredToken(token);
         if (principal == null)
         {
+            _logger.LogWarning("Invalid access token provided for refresh");
             return (Result.Failure(new[] { "Invalid access token or refresh token" }), null);
         }
 
         var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
         var user = await _userManager.FindByIdAsync(userId!);
 
+        if (user == null)
+        {
+            _logger.LogWarning("Refresh token attempt for non-existent user: {UserId}", userId);
+            return (Result.Failure(new[] { "Invalid access token or refresh token" }), null);
+        }
+
+        // Verify hashed refresh token
+        var hashedRefreshToken = HashRefreshToken(refreshToken);
         if (
-            user == null
-            || user.RefreshToken != refreshToken
+            user.RefreshToken != hashedRefreshToken
             || user.RefreshTokenExpiryTime <= DateTime.UtcNow
         )
         {
+            _logger.LogWarning("Invalid or expired refresh token for user: {UserId}", userId);
             return (Result.Failure(new[] { "Invalid access token or refresh token" }), null);
         }
 
         var newAccessToken = await GenerateJwtToken(user);
         var newRefreshToken = GenerateRefreshToken();
 
-        user.RefreshToken = newRefreshToken;
+        // Refresh token rotation: invalidate old token and issue new one
+        user.RefreshToken = HashRefreshToken(newRefreshToken);
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryDays);
         await _userManager.UpdateAsync(user);
+
+        _logger.LogInformation("Refresh token successfully rotated for user: {UserId}", userId);
 
         return (
             Result.Success(),
@@ -208,7 +229,8 @@ public class IdentityService : IIdentityService
             ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateLifetime = false, // Important: we want to validate expired tokens
+            // Only for refresh flow - normal API calls should validate lifetime
+            ValidateLifetime = false,
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -279,7 +301,14 @@ public class IdentityService : IIdentityService
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Name, user.UserName!),
             new Claim(ClaimTypes.Email, user.Email!),
+            new Claim("CorrelationId", Guid.NewGuid().ToString()),
         };
+
+        // Add TenantId if available
+        if (!string.IsNullOrEmpty(user.TenantId))
+        {
+            claims.Add(new Claim("TenantId", user.TenantId));
+        }
 
         // Add role claims
         var roles = await _userManager.GetRolesAsync(user);
@@ -362,5 +391,15 @@ public class IdentityService : IIdentityService
         var result = await _userManager.UpdateAsync(user);
 
         return result.ToApplicationResult();
+    }
+
+    /// <summary>
+    /// Hashes a refresh token using SHA256 for secure storage.
+    /// </summary>
+    private string HashRefreshToken(string refreshToken)
+    {
+        using var sha256 = SHA256.Create();
+        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
+        return Convert.ToBase64String(bytes);
     }
 }
