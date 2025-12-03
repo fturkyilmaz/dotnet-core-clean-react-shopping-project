@@ -1,7 +1,7 @@
-import { FC, FormEvent, useState } from 'react';
+import { FC, useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useCreateProduct } from '@hooks';
+import { useCreateProduct } from '@/presentation/features/product/hooks/useProducts';
 
 interface ProductFormData {
     title: string;

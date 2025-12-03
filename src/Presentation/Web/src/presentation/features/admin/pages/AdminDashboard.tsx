@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useProducts, useDeleteProduct } from '@hooks';
-import Loader from '@components/Loader';
+import { useProducts, useDeleteProduct } from '@/presentation/features/product/hooks/useProducts';
+import Loader from '@/presentation/shared/components/Loader';
 
 const AdminDashboard: FC = () => {
     const navigate = useNavigate();

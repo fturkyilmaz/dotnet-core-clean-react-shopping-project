@@ -1,11 +1,11 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import authReducer from '@store/slices/authSlice';
-import cartReducer from '@store/slices/cartSlice';
-import uiReducer from '@store/slices/uiSlice';
-import preferencesReducer from '@store/slices/preferencesSlice';
-import productsReducer from '@store/slices/productsSlice';
+import authReducer from './slices/authSlice';
+import cartReducer from './slices/cartSlice';
+import uiReducer from './slices/uiSlice';
+import preferencesReducer from './slices/preferencesSlice';
+import productsReducer from './slices/productsSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,

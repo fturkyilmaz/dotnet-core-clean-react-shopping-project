@@ -1,8 +1,8 @@
 import type { FC } from "react";
 import { useCallback, useMemo } from "react";
-import { useProducts } from "@hooks";
+import { useProducts } from "../hooks/useProducts";
 import { useNavigate } from "react-router-dom";
-import Loader from "../components/Loader";
+import Loader from "@/presentation/shared/components/Loader";
 
 interface CategoryIcons {
   [key: string]: string;

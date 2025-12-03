@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { authService } from '@services/dependencyInjector';
 import type { LoginCredentials, RegisterData } from '@core/domain/ports/IAuthService';
-import { setCredentials, logout as logoutAction } from '@/store/slices/authSlice';
+import { setCredentials, logout as logoutAction } from '@/presentation/store/slices/authSlice';
 
 export const useAuth = () => {
   const dispatch = useDispatch();

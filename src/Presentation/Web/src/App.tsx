@@ -8,7 +8,7 @@ import './i18n/config'; // Initialize i18n
 
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './presentation/store';
-import { queryClient } from '@/api/queryClient';
+import { queryClient } from '@/services/queryClient';
 import Header from '@/presentation/shared/components/Header';
 import ProtectedRoute from '@/presentation/shared/components/ProtectedRoute';
 import ErrorBoundary from '@/presentation/shared/components/ErrorBoundary';
@@ -22,7 +22,7 @@ const LoginPage = lazy(() => import('@/presentation/features/auth/pages/LoginPag
 const RegisterPage = lazy(() => import('@/presentation/features/auth/pages/RegisterPage'));
 const AdminDashboard = lazy(() => import('@/presentation/features/admin/pages/AdminDashboard'));
 const AddProductPage = lazy(() => import('@/presentation/features/admin/pages/AddProductPage'));
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+const NotFoundPage = lazy(() => import('@/presentation/shared/pages/NotFoundPage'));
 
 // Loading fallback component
 const PageLoader = () => (

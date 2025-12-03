@@ -1,28 +1,19 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useProduct, useBasket } from '@hooks';
-import { useAppDispatch } from '@hooks/useRedux';
-import { addToRecentlyViewed } from '@store/slices/productsSlice';
+import { useProduct } from '../hooks/useProducts';
+import { useBasket } from '@/hooks';
 import { toast } from 'react-toastify';
-import Loader from '@components/Loader';
+import Loader from '@/presentation/shared/components/Loader';
 
 const ProductDetailPage: FC = () => {
     const { id } = useParams<{ id: string }>();
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
     const { addToBasket } = useBasket();
 
     // Fetch product from API using React Query hook
     const { data: product, isLoading, isError } = useProduct(Number(id));
-
-    // Add to recently viewed
-    useEffect(() => {
-        if (id && product) {
-            dispatch(addToRecentlyViewed(Number(id)));
-        }
-    }, [id, product, dispatch]);
 
     const handleAddToCart = (): void => {
         if (product) {

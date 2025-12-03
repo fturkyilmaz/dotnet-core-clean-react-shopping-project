@@ -1,7 +1,7 @@
-import { useProducts } from '@hooks/useProducts';
+import { useProducts } from '../hooks/useProducts';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '@store/slices/cartSlice';
+import { addToCart } from '@/presentation/store/slices/cartSlice';
 import { toast } from 'react-toastify';
 import type { Product } from '@/types/product';
 

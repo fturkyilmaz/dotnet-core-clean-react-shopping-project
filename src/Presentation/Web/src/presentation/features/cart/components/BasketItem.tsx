@@ -1,4 +1,4 @@
-import { CartItem } from "../types";
+import type { CartItem } from '@core/domain/entities/Cart';
 
 interface BasketItemProps {
   item: CartItem;

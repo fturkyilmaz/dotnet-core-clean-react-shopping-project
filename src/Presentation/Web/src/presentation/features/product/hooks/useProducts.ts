@@ -5,7 +5,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { productRepository } from '@services/dependencyInjector';
-import type { Product, CreateProduct, UpdateProduct } from '@core/domain/entities/Product';
+import type { CreateProduct, UpdateProduct } from '@core/domain/entities/Product';
 
 export const productKeys = {
   all: ['products'] as const,

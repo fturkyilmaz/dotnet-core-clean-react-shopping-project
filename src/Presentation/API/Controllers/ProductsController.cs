@@ -12,6 +12,7 @@ using ShoppingProject.Application.Products.Queries.GetProducts;
 using ShoppingProject.Application.Products.Queries.SearchProducts;
 using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Constants;
+using ShoppingProject.Infrastructure.Constants;
 
 namespace ShoppingProject.WebApi.Controllers
 {
@@ -21,10 +22,12 @@ namespace ShoppingProject.WebApi.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly ISender _sender;
+        private readonly IOutputCacheStore _outputCacheStore;
 
-        public ProductsController(ISender sender)
+        public ProductsController(ISender sender, IOutputCacheStore outputCacheStore)
         {
             _sender = sender;
+            _outputCacheStore = outputCacheStore;
         }
 
         [HttpGet]
@@ -54,9 +57,14 @@ namespace ShoppingProject.WebApi.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<int>> Create(CreateProductCommand command)
+        public async Task<ActionResult<int>> Create(
+            CreateProductCommand command,
+            CancellationToken token
+        )
         {
             var id = await _sender.Send(command);
+            // Cache invalidation
+            await _outputCacheStore.EvictByTagAsync(AppConstants.CacheTags.Products, token);
             return CreatedAtAction(nameof(GetById), new { id }, id);
         }
 
@@ -67,14 +75,20 @@ namespace ShoppingProject.WebApi.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, UpdateProductCommand command)
+        public async Task<IActionResult> Update(
+            int id,
+            UpdateProductCommand command,
+            CancellationToken token
+        )
         {
             if (id != command.Id)
-            {
                 return BadRequest();
-            }
 
             await _sender.Send(command);
+
+            // Cache invalidation
+            await _outputCacheStore.EvictByTagAsync(AppConstants.CacheTags.Products, token);
+
             return NoContent();
         }
 
@@ -84,9 +98,13 @@ namespace ShoppingProject.WebApi.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, CancellationToken token)
         {
             await _sender.Send(new DeleteProductCommand(id));
+
+            // Cache invalidation
+            await _outputCacheStore.EvictByTagAsync(AppConstants.CacheTags.Products, token);
+
             return NoContent();
         }
 

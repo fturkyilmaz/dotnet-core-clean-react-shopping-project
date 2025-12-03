@@ -2,7 +2,7 @@ import { FC, FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useAuth } from '@hooks/useAuth';
+import { useAuth } from '../hooks/useAuth';
 
 const RegisterPage: FC = () => {
     const { t } = useTranslation();
