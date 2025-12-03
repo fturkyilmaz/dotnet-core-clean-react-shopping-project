@@ -15,7 +15,7 @@ sidebar_position: 2
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/furkanturkyilmaz/ShoppingProject.git
+   git clone https://github.com/fturkyilmaz/ShoppingProject.git
    ```
 
 2. Start Infrastructure:

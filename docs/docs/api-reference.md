@@ -58,8 +58,8 @@ The API uses the **RFC 7807 Problem Details** standard for error responses.
 {
   "email": "user@example.com",
   "password": "Password123!",
-  "firstName": "John",
-  "lastName": "Doe"
+  "firstName": "Furkan",
+  "lastName": "Türkyılmaz"
 }
 ```
 

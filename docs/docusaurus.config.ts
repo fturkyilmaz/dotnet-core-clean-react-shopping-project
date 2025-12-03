@@ -22,7 +22,7 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'furkanturkyilmaz', // Usually your GitHub org/user name.
+  organizationName: 'fturkyilmaz', // Usually your GitHub org/user name.
   projectName: 'ShoppingProject', // Usually your repo name.
 
   onBrokenLinks: 'throw',
@@ -75,7 +75,7 @@ const config: Config = {
           label: 'Documentation',
         },
         {
-          href: 'https://github.com/furkanturkyilmaz/ShoppingProject',
+          href: 'https://github.com/fturkyilmaz/ShoppingProject',
           label: 'GitHub',
           position: 'right',
         },
@@ -111,7 +111,7 @@ const config: Config = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/furkanturkyilmaz/ShoppingProject',
+              href: 'https://github.com/fturkyilmaz/ShoppingProject',
             },
           ],
         },

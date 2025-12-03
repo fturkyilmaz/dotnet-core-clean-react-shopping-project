@@ -15,14 +15,10 @@ Create a file at `blog/2021-02-28-greetings.md`:
 slug: greetings
 title: Greetings!
 authors:
-  - name: Joel Marcey
+  - name: Furkan Türkyılmaz
     title: Co-creator of Docusaurus 1
-    url: https://github.com/JoelMarcey
-    image_url: https://github.com/JoelMarcey.png
-  - name: Sébastien Lorber
-    title: Docusaurus maintainer
-    url: https://sebastienlorber.com
-    image_url: https://github.com/slorber.png
+    url: https://github.com/fturkyilmaz
+    image_url: https://github.com/fturkyilmaz.png
 tags: [greetings]
 ---
 
