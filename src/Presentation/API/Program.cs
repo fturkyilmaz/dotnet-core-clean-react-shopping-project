@@ -224,6 +224,12 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
+// Seed Identity data
+using (var scope = app.Services.CreateScope())
+{
+    await DataSeeder.SeedAsync(scope.ServiceProvider, app.Environment.IsDevelopment());
+}
+
 // Exception Handling
 app.UseExceptionHandler();
 

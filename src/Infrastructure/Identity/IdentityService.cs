@@ -74,10 +74,21 @@ public class IdentityService : IIdentityService
 
     public async Task<(Result Result, string UserId)> CreateUserAsync(
         string userName,
-        string password
+        string password,
+        string? firstName = null,
+        string? lastName = null,
+        string? gender = null,
+        string role = Roles.Client
     )
     {
-        var user = new ApplicationUser { UserName = userName, Email = userName };
+        var user = new ApplicationUser
+        {
+            UserName = userName,
+            Email = userName,
+            FirstName = firstName,
+            LastName = lastName,
+            Gender = gender,
+        };
         var result = await _userManager.CreateAsync(user, password);
         return (result.ToApplicationResult(), user.Id);
     }
@@ -264,6 +275,7 @@ public class IdentityService : IIdentityService
             Email = email,
             FirstName = firstName,
             LastName = lastName,
+            Gender = "men",
         };
 
         var result = await _userManager.CreateAsync(user, password);
@@ -272,6 +284,11 @@ public class IdentityService : IIdentityService
 
         if (!string.IsNullOrEmpty(role))
             await _userManager.AddToRoleAsync(user, role);
+
+        var refreshToken = GenerateRefreshToken();
+        user.RefreshToken = HashRefreshToken(refreshToken);
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        await _userManager.UpdateAsync(user);
 
         return Result.Success();
     }
@@ -285,11 +302,27 @@ public class IdentityService : IIdentityService
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
             new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")), // ✅ standard jti
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
         };
 
+        // Roles
         var roles = await _userManager.GetRolesAsync(user);
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+        // User claims
+        var userClaims = await _userManager.GetClaimsAsync(user);
+        claims.AddRange(userClaims);
+
+        // Role claims
+        foreach (var role in roles)
+        {
+            var identityRole = await _roleManager.FindByNameAsync(role);
+            if (identityRole != null)
+            {
+                var roleClaims = await _roleManager.GetClaimsAsync(identityRole);
+                claims.AddRange(roleClaims);
+            }
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

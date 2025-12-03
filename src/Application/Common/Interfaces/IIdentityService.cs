@@ -1,4 +1,5 @@
 ﻿using ShoppingProject.Application.Common.Models;
+using ShoppingProject.Domain.Constants;
 
 namespace ShoppingProject.Application.Common.Interfaces
 {
@@ -12,7 +13,14 @@ namespace ShoppingProject.Application.Common.Interfaces
 
         Task<bool> AuthorizeAsync(string userId, string policyName);
 
-        Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password);
+        Task<(Result Result, string UserId)> CreateUserAsync(
+            string userName,
+            string password,
+            string? firstName = null,
+            string? lastName = null,
+            string? gender = null,
+            string role = Roles.Client
+        );
 
         Task<Result> DeleteUserAsync(string userId);
 

@@ -60,7 +60,11 @@ public class IdentityController : ControllerBase
     {
         var (result, userId) = await _identityService.CreateUserAsync(
             request.Email,
-            request.Password
+            request.Password,
+            request.FirstName,
+            request.LastName,
+            request.Gender ?? "Unknown", // default gender
+            Roles.Client
         );
 
         if (!result.Succeeded)
@@ -96,8 +100,9 @@ public class IdentityController : ControllerBase
     }
 
     [HttpGet("me")]
-    [Authorize] // kullanıcı bilgisi için login gerekli
+    [Authorize]
     [ProducesResponseType(typeof(ServiceResult<UserInfoResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ServiceResult<UserInfoResponse>>> GetCurrentUserInfo()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

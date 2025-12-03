@@ -17,6 +17,17 @@ This issue documents the comprehensive improvements made to the .NET Core Clean 
 - [ ] Expand OpenTelemetry instrumentation (DB, Redis, RabbitMQ)
 - [ ] Add Polly resilience policies (retry, circuit breaker, timeout)
 - [ ] RabbitMQ DLQ + poison message handling
+- [ ] Refactor all entity, value object, and domain service usages for full DDD (no primitive obsession, explicit value objects, business rules in domain, clear invariants)
+- [ ] Consolidate all MediatR behaviors (logging, validation, exception) for DRYness and clarity
+- [ ] Enforce single-responsibility principle in all commands/queries/handlers (avoid fat handlers)
+- [ ] Ensure error-handling standardized with proper error responses (no ad-hoc throws; use Result/Error wrapper everywhere)
+- [ ] Rename and standardize all repository/service interfaces for naming consistency
+- [ ] Remove all unused/useless legacy code, DTOs, or mapping spaghetti (especially in Application/DTOs and mapping layers)
+- [ ] Rework test coverage: Add/strengthen unit, integration, and API tests for all critical domain and application flows
+- [ ] Ensure all API endpoints are RESTful (resource nouns, HTTP codes, no action verbs)
+- [ ] Consolidate caching and cache invalidation strategies (consistency, separation between CQRS read/write models)
+- [ ] Add XML documenting comments to all public interfaces/classes and configure StyleCop for linting
+- [ ] Review migrations, DB context configuration, resilience/retry, and transactional boundaries
 
 #### 🔴 High Priority (kritik, hemen yapılmalı)
 - [ ] **Consul & HTTPS Config**  
@@ -69,10 +80,36 @@ This issue documents the comprehensive improvements made to the .NET Core Clean 
   - Add matrix builds for multiple .NET versions  
   - Publish test coverage reports to GitHub Pages or dashboard  
 
+### Frontend (Web/React)
+- [ ] Refactor store and API usages for uniformity (use TanStack Query everywhere, avoid ad-hoc fetch/axios in components)
+- [ ] Use atomic & presentational/container component separation, memoization and hooks best practices
+- [ ] Consolidate theme/context APIs for clarity (move to single context provider per concern)
+- [ ] Remove dead/duplicated states or legacy Redux code
+- [ ] Strengthen TypeScript typing across all components, hooks, and stores (no implicit anys, type all responses, migrate to stricter tsconfig)
+- [ ] Standardize component and file naming conventions
+- [ ] Add/improve i18n (localization) and accessibility (ARIA, keyboard navigation support) where missing
+- [ ] Add automated a11y tests (Jest/RTL + axe or similar)
+- [ ] Review and improve global error boundary and error presentation flows
+- [ ] Remove all console.logs/debug code; add error/log tracking SDK if needed
+- [ ] Optimize image and bundle loading (use next-gen formats, lazy loading everywhere, preconnect/preload for external assets)
+- [ ] Add missing unit, integration and e2e tests; enforce code coverage thresholds
+
+### Mobile (React Native)
+- [ ] Standardize all redux slices (naming, async thunk usage, match web logic)
+- [ ] Ensure all API requests use a single abstraction/config (avoid repeated base URLs, interceptor duplication)
+- [ ] Remove any business logic from components, move to slice/thunk/service
+- [ ] Add/strengthen tests for slices, thunks and major screens/components
+- [ ] Clean up navigation usage (type safe, deep link capable, single root navigator setup)
+- [ ] Add/strengthen error boundaries & loading states for major screens
+- [ ] Standardize and optimize all image loading and caching; use responsive images where possible
+- [ ] Ensure a11y/voice-over support at least for checkout and critical flows
+
 ### Deployment & Documentation
 - [ ] Helm deploy with environment-specific values  
 - [ ] Document environment setup  
 - [ ] Add Architecture Decision Records (ADRs)  
+- [ ] Update/expand all READMEs, including API docs, domain model diagrams, developer onboarding  
+- [ ] Document all project-wide architectural decisions and best practices in docs/architecture.md  
 
 ---
 
@@ -94,4 +131,4 @@ This issue documents the comprehensive improvements made to the .NET Core Clean 
 - [ ] Verify correlation IDs in error responses  
 - [ ] Check health endpoints (`/health/live`, `/health/ready`)  
 - [ ] Test cart operations (add, update, remove, purchase)  
-- [ ] Verify CSP headers in browser DevTools  
+- [ ] Verify CSP headers in browser 
