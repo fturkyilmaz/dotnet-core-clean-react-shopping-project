@@ -7,22 +7,22 @@ import 'react-toastify/dist/ReactToastify.css';
 import './i18n/config'; // Initialize i18n
 
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from '@store';
-import { queryClient } from '@api/queryClient';
-import Header from '@components/Header';
-import ProtectedRoute from '@components/ProtectedRoute';
-import ErrorBoundary from '@components/ErrorBoundary';
+import { store, persistor } from './presentation/store';
+import { queryClient } from '@/api/queryClient';
+import Header from '@/presentation/shared/components/Header';
+import ProtectedRoute from '@/presentation/shared/components/ProtectedRoute';
+import ErrorBoundary from '@/presentation/shared/components/ErrorBoundary';
 
 // Lazy load pages for better performance
-const HomePage = lazy(() => import('@pages/HomePage'));
-const CartsPage = lazy(() => import('@pages/CartsPage'));
-const Category = lazy(() => import('@pages/CategoryPage'));
-const ProductDetailPage = lazy(() => import('@pages/ProductDetailPage'));
-const LoginPage = lazy(() => import('@pages/LoginPage'));
-const RegisterPage = lazy(() => import('@pages/RegisterPage'));
-const AdminDashboard = lazy(() => import('@pages/AdminDashboard'));
-const AddProductPage = lazy(() => import('@pages/AddProductPage'));
-const NotFoundPage = lazy(() => import('@pages/NotFoundPage'));
+const HomePage = lazy(() => import('@/presentation/features/product/pages/HomePage'));
+const CartsPage = lazy(() => import('@/presentation/features/cart/pages/CartsPage'));
+const Category = lazy(() => import('@/presentation/features/product/pages/CategoryPage'));
+const ProductDetailPage = lazy(() => import('@/presentation/features/product/pages/ProductDetailPage'));
+const LoginPage = lazy(() => import('@/presentation/features/auth/pages/LoginPage'));
+const RegisterPage = lazy(() => import('@/presentation/features/auth/pages/RegisterPage'));
+const AdminDashboard = lazy(() => import('@/presentation/features/admin/pages/AdminDashboard'));
+const AddProductPage = lazy(() => import('@/presentation/features/admin/pages/AddProductPage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 // Loading fallback component
 const PageLoader = () => (
