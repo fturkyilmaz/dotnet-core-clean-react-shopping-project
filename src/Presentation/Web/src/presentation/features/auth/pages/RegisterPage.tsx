@@ -1,32 +1,25 @@
-import { FC, FormEvent, useState } from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { registerSchema, RegisterFormData } from '../validation/registerSchema';
 
 const RegisterPage: FC = () => {
     const { t } = useTranslation();
-    const { register, isRegistering } = useAuth();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const { register: registerUser, isRegistering } = useAuth();
 
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<RegisterFormData>({
+        resolver: zodResolver(registerSchema),
+    });
 
-        // Validate passwords match
-        if (password !== confirmPassword) {
-            toast.error("Passwords don't match");
-            return;
-        }
-
-        // Validate password length
-        if (password.length < 6) {
-            toast.error('Password must be at least 6 characters');
-            return;
-        }
-
-        register({ email, password, confirmPassword });
+    const onSubmit = (data: RegisterFormData) => {
+        registerUser(data);
     };
 
     return (
@@ -47,7 +40,7 @@ const RegisterPage: FC = () => {
                             </div>
 
                             {/* Register Form */}
-                            <form onSubmit={handleSubmit}>
+                            <form onSubmit={handleSubmit(onSubmit)}>
                                 <div className="mb-3">
                                     <label htmlFor="email" className="form-label fw-semibold">
                                         {t('email')}
@@ -56,11 +49,9 @@ const RegisterPage: FC = () => {
                                         type="email"
                                         className="form-control form-control-lg"
                                         id="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="name@example.com"
-                                        required
+                                        {...register('email')}
                                     />
+                                    {errors.email && <small className="text-danger">{errors.email.message}</small>}
                                 </div>
 
                                 <div className="mb-3">
@@ -71,13 +62,9 @@ const RegisterPage: FC = () => {
                                         type="password"
                                         className="form-control form-control-lg"
                                         id="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="••••••••"
-                                        required
-                                        minLength={6}
+                                        {...register('password')}
                                     />
-                                    <small className="text-muted">Minimum 6 characters</small>
+                                    {errors.password && <small className="text-danger">{errors.password.message}</small>}
                                 </div>
 
                                 <div className="mb-4">
@@ -88,12 +75,11 @@ const RegisterPage: FC = () => {
                                         type="password"
                                         className="form-control form-control-lg"
                                         id="confirmPassword"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        placeholder="••••••••"
-                                        required
-                                        minLength={6}
+                                        {...register('confirmPassword')}
                                     />
+                                    {errors.confirmPassword && (
+                                        <small className="text-danger">{errors.confirmPassword.message}</small>
+                                    )}
                                 </div>
 
                                 <div className="d-grid">
@@ -113,30 +99,6 @@ const RegisterPage: FC = () => {
                                     </button>
                                 </div>
                             </form>
-
-                            {/* Divider */}
-                            <div className="position-relative my-4">
-                                <hr />
-                                <span className="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">
-                                    or
-                                </span>
-                            </div>
-
-                            {/* Social Register */}
-                            <div className="d-grid gap-2">
-                                <button className="btn btn-outline-secondary">
-                                    <i className="bi bi-google me-2"></i>
-                                    Continue with Google
-                                </button>
-                            </div>
-
-                            {/* Terms */}
-                            <p className="text-center text-muted mt-4 small">
-                                By signing up, you agree to our{' '}
-                                <a href="#" className="text-primary text-decoration-none">Terms of Service</a>
-                                {' '}and{' '}
-                                <a href="#" className="text-primary text-decoration-none">Privacy Policy</a>
-                            </p>
                         </div>
                     </div>
                 </div>

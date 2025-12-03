@@ -5,8 +5,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cartRepository } from '@services/dependencyInjector';
 import type { AddCartItem, UpdateCartItem } from '@core/domain/entities/Cart';
+import { useAppSelector } from '@/hooks/useRedux';
 
 export const useCart = () => {
   const queryClient = useQueryClient();
@@ -16,14 +18,27 @@ export const useCart = () => {
     queryFn: () => cartRepository.getAll(),
   });
 
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+
   const addToCartMutation = useMutation({
-    mutationFn: (data: AddCartItem) => cartRepository.add(data),
+    mutationFn: (data: AddCartItem) => {
+      if (!isAuthenticated) {
+        throw new Error('Please login to add items to cart');
+      }
+      return cartRepository.add(data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
       toast.success('Product added to cart');
     },
-    onError: () => {
-      toast.error('Failed to add product to cart');
+    onError: (error: any) => {
+      if (error.message === 'Please login to add items to cart') {
+        toast.info('Please login to add items to cart');
+        navigate('/login');
+      } else {
+        toast.error('Failed to add product to cart');
+      }
     },
   });
 

@@ -1,17 +1,25 @@
-import { FC, FormEvent, useState } from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, LoginFormData } from '../validation/loginSchema';
 
 const LoginPage: FC = () => {
     const { t } = useTranslation();
     const { login, isLoggingIn } = useAuth();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
 
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        login({ email, password });
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<LoginFormData>({
+        resolver: zodResolver(loginSchema),
+    });
+
+    const onSubmit = (data: LoginFormData) => {
+        login(data);
     };
 
     return (
@@ -32,7 +40,7 @@ const LoginPage: FC = () => {
                             </div>
 
                             {/* Login Form */}
-                            <form onSubmit={handleSubmit}>
+                            <form onSubmit={handleSubmit(onSubmit)}>
                                 <div className="mb-3">
                                     <label htmlFor="email" className="form-label fw-semibold">
                                         {t('email')}
@@ -41,11 +49,10 @@ const LoginPage: FC = () => {
                                         type="email"
                                         className="form-control form-control-lg"
                                         id="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
                                         placeholder="name@example.com"
-                                        required
+                                        {...register('email')}
                                     />
+                                    {errors.email && <small className="text-danger">{errors.email.message}</small>}
                                 </div>
 
                                 <div className="mb-4">
@@ -56,11 +63,10 @@ const LoginPage: FC = () => {
                                         type="password"
                                         className="form-control form-control-lg"
                                         id="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        required
+                                        {...register('password')}
                                     />
+                                    {errors.password && <small className="text-danger">{errors.password.message}</small>}
                                 </div>
 
                                 <div className="d-grid">
