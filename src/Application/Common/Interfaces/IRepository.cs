@@ -5,7 +5,7 @@ namespace ShoppingProject.Application.Common.Interfaces;
 public interface IRepository<T>
     where T : class
 {
-    Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<T>> ListAllAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<T>> ListAsync(
         ISpecification<T> spec,

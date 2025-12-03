@@ -1,6 +1,6 @@
+using System.Net;
 using System.Security.Claims;
 using Asp.Versioning;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingProject.Application.Common.Interfaces;
@@ -25,15 +25,12 @@ public class IdentityController : ControllerBase
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ServiceResult<AuthResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ServiceResult<AuthResponse>>> Login(LoginRequest request)
     {
         var (result, response) = await _identityService.LoginAsync(request.Email, request.Password);
 
         if (!result.Succeeded)
-        {
             return BadRequest(ServiceResult<AuthResponse>.Fail(string.Join(", ", result.Errors)));
-        }
 
         return Ok(ServiceResult<AuthResponse>.Success(response!));
     }
@@ -41,7 +38,6 @@ public class IdentityController : ControllerBase
     [HttpPost("refresh-token")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ServiceResult<AuthResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ServiceResult<AuthResponse>>> RefreshToken(
         RefreshTokenRequest request
     )
@@ -52,9 +48,7 @@ public class IdentityController : ControllerBase
         );
 
         if (!result.Succeeded)
-        {
             return BadRequest(ServiceResult<AuthResponse>.Fail(string.Join(", ", result.Errors)));
-        }
 
         return Ok(ServiceResult<AuthResponse>.Success(response!));
     }
@@ -62,7 +56,6 @@ public class IdentityController : ControllerBase
     [HttpPost("register")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ServiceResult<string>>> Register(RegisterRequest request)
     {
         var (result, userId) = await _identityService.CreateUserAsync(
@@ -71,9 +64,7 @@ public class IdentityController : ControllerBase
         );
 
         if (!result.Succeeded)
-        {
             return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
-        }
 
         return Ok(ServiceResult<string>.Success("User registered successfully"));
     }
@@ -81,17 +72,12 @@ public class IdentityController : ControllerBase
     [HttpPost("{userId}/assign-admin-role")]
     [Authorize(Policy = Policies.RequireAdministratorRole)]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<ServiceResult<string>>> AssignAdminRole(string userId)
     {
         var result = await _identityService.AddUserToRoleAsync(userId, "Administrator");
 
         if (!result.Succeeded)
-        {
             return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
-        }
 
         return Ok(ServiceResult<string>.Success("Administrator role assigned successfully"));
     }
@@ -99,41 +85,35 @@ public class IdentityController : ControllerBase
     [HttpPost("roles/{roleName}")]
     [Authorize(Policy = Policies.RequireAdministratorRole)]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ServiceResult<string>>> CreateRole(string roleName)
     {
         var result = await _identityService.CreateRoleAsync(roleName);
 
         if (!result.Succeeded)
-        {
             return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
-        }
 
         return Ok(ServiceResult<string>.Success($"Role '{roleName}' created successfully"));
     }
 
     [HttpGet("me")]
-    [AllowAnonymous]
+    [Authorize] // kullanıcı bilgisi için login gerekli
     [ProducesResponseType(typeof(ServiceResult<UserInfoResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserInfoResponse>> GetCurrentUserInfo()
+    public async Task<ActionResult<ServiceResult<UserInfoResponse>>> GetCurrentUserInfo()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized();
-        }
+            return Unauthorized(
+                ServiceResult<UserInfoResponse>.Fail(
+                    "User not authorized",
+                    HttpStatusCode.Unauthorized
+                )
+            );
 
         var user = await _identityService.GetUserByIdAsync(userId);
-        if (user.Result.Succeeded == false || user.Response == null)
-        {
-            return NotFound();
-        }
+        if (!user.Result.Succeeded || user.Response == null)
+            return NotFound(
+                ServiceResult<UserInfoResponse>.Fail("User not found", HttpStatusCode.NotFound)
+            );
 
         var response = new UserInfoResponse
         {
@@ -151,16 +131,13 @@ public class IdentityController : ControllerBase
     [HttpPut("me")]
     [Authorize]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ServiceResult<string>>> UpdateUser(UpdateUserRequest request)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized();
-        }
+            return Unauthorized(
+                ServiceResult<string>.Fail("User not authorized", HttpStatusCode.Unauthorized)
+            );
 
         var result = await _identityService.UpdateUserAsync(
             userId,
@@ -170,9 +147,7 @@ public class IdentityController : ControllerBase
         );
 
         if (!result.Succeeded)
-        {
             return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
-        }
 
         return Ok(ServiceResult<string>.Success("User updated successfully"));
     }
@@ -180,7 +155,6 @@ public class IdentityController : ControllerBase
     [HttpPost("forgot-password")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ServiceResult<string>>> ForgotPassword(
         ForgotPasswordRequest request
     )
@@ -195,7 +169,6 @@ public class IdentityController : ControllerBase
     [HttpPost("reset-password")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ServiceResult<string>>> ResetPassword(
         ResetPasswordRequest request
     )

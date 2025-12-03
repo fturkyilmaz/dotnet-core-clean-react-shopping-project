@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
-import LoginPage from '@pages/LoginPage';
+import LoginPage from '@/presentation/features/auth/pages/LoginPage';
 
 // Mock react-toastify
 vi.mock('react-toastify', () => ({

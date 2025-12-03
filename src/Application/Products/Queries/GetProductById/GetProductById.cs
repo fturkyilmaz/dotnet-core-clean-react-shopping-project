@@ -34,10 +34,7 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             key,
             async () =>
             {
-                var entity = await _productRepository.GetByIdAsync(
-                    Guid.Parse(request.Id.ToString()),
-                    cancellationToken
-                );
+                var entity = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
 
                 if (entity == null)
                     return null;

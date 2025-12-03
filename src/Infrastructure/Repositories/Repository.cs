@@ -16,7 +16,7 @@ public class Repository<T> : IRepository<T>
     }
 
     public virtual async Task<T?> GetByIdAsync(
-        Guid id,
+        int id,
         CancellationToken cancellationToken = default
     )
     {

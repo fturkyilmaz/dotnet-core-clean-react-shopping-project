@@ -1,3 +1,4 @@
+using System.Net;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,77 +29,67 @@ namespace ShoppingProject.WebApi.Controllers
 
         [HttpGet]
         [Authorize]
-        [ProducesResponseType(typeof(List<CartBriefDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<List<CartBriefDto>>> GetAll()
+        [ProducesResponseType(typeof(ServiceResult<List<CartBriefDto>>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<ServiceResult<List<CartBriefDto>>>> GetAll()
         {
             var carts = await _sender.Send(new GetCartsQuery());
-            return Ok(carts);
+            return ServiceResult<List<CartBriefDto>>.Success(carts);
         }
 
         [HttpGet("{id}")]
         [Authorize]
-        [ProducesResponseType(typeof(CartBriefDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<CartBriefDto>> GetById(int id)
+        [ProducesResponseType(typeof(ServiceResult<CartBriefDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResult<CartBriefDto>), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceResult<CartBriefDto>>> GetById(int id)
         {
             var cart = await _sender.Send(new GetCartByIdQuery(id));
-            return Ok(cart);
+            if (cart == null)
+                return ServiceResult<CartBriefDto>.Fail("Cart not found", HttpStatusCode.NotFound);
+
+            return ServiceResult<CartBriefDto>.Success(cart);
         }
 
         [HttpPost]
         [Authorize]
         [ProducesResponseType(typeof(ServiceResult<int>), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<int>> Create(CreateCartCommand command)
+        public async Task<ActionResult<ServiceResult<int>>> Create(CreateCartCommand command)
         {
             var id = await _sender.Send(command);
-            return CreatedAtAction(nameof(GetById), new { id }, id);
+            var location = Url.Action(nameof(GetById), new { id });
+            return ServiceResult<int>.SuccessAsCreated(id, location!);
         }
 
         [HttpPut("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Update(int id, UpdateCartCommand command)
+        [ProducesResponseType(typeof(ServiceResult<bool>), StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<ServiceResult<bool>>> Update(
+            int id,
+            UpdateCartCommand command
+        )
         {
             if (id != command.Id)
-            {
-                return BadRequest();
-            }
+                return ServiceResult<bool>.Fail("Id mismatch", HttpStatusCode.BadRequest);
 
             await _sender.Send(command);
-            return NoContent();
+            return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);
         }
 
         [HttpDelete("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Delete(int id)
+        [ProducesResponseType(typeof(ServiceResult<bool>), StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<ServiceResult<bool>>> Delete(int id)
         {
             await _sender.Send(new DeleteCartCommand(id));
-            return NoContent();
+            return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);
         }
 
         [HttpDelete("delete-all")]
         [Authorize(Policy = Policies.CanPurge)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> DeleteAll()
+        [ProducesResponseType(typeof(ServiceResult<bool>), StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<ServiceResult<bool>>> DeleteAll()
         {
             await _sender.Send(new DeleteAllCartsCommand());
-            return NoContent();
+            return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);
         }
     }
 }

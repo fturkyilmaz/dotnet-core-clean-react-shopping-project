@@ -1,9 +1,10 @@
+using System.Net;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Application.DTOs;
-using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Constants;
 
 namespace ShoppingProject.WebApi.Controllers
@@ -22,41 +23,45 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpGet("{key}")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Get(string key)
+        [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceResult<string>>> Get(string key)
         {
             var value = await _redisCacheService.GetValueAsync(key);
             if (value == null)
-                return NotFound();
-            return Ok(value);
+                return ServiceResult<string>.Fail("Cache key not found", HttpStatusCode.NotFound);
+
+            return ServiceResult<string>.Success(value);
         }
 
         [HttpPost("set")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Set([FromBody] RedisCacheRequest redisCacheRequestModel)
+        [ProducesResponseType(typeof(ServiceResult<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResult<bool>), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<ServiceResult<bool>>> Set(
+            [FromBody] RedisCacheRequest redisCacheRequestModel
+        )
         {
+            if (string.IsNullOrWhiteSpace(redisCacheRequestModel.Key))
+                return ServiceResult<bool>.Fail("Key cannot be empty", HttpStatusCode.BadRequest);
+
             await _redisCacheService.SetValueAsync(
                 redisCacheRequestModel.Key,
                 redisCacheRequestModel.Value
             );
-            return Ok();
+            return ServiceResult<bool>.Success(true);
         }
 
         [HttpDelete("{key}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Delete(string key)
+        [ProducesResponseType(typeof(ServiceResult<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResult<bool>), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceResult<bool>>> Delete(string key)
         {
+            var existing = await _redisCacheService.GetValueAsync(key);
+            if (existing == null)
+                return ServiceResult<bool>.Fail("Cache key not found", HttpStatusCode.NotFound);
+
             await _redisCacheService.Clear(key);
-            return Ok();
+            return ServiceResult<bool>.Success(true);
         }
     }
 }

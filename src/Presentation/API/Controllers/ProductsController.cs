@@ -1,8 +1,10 @@
-﻿using Asp.Versioning;
+﻿using System.Net;
+using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Products.Commands.CreateProduct;
 using ShoppingProject.Application.Products.Commands.DeleteProduct;
@@ -33,93 +35,85 @@ namespace ShoppingProject.WebApi.Controllers
         [HttpGet]
         [AllowAnonymous]
         [OutputCache(PolicyName = "ProductsList")]
-        [ProducesResponseType(typeof(List<ProductDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<ProductDto>>> GetAll()
+        [ProducesResponseType(typeof(ServiceResult<List<ProductDto>>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<ServiceResult<List<ProductDto>>>> GetAll()
         {
             var products = await _sender.Send(new GetProductsQuery());
-            return Ok(products);
+            return ServiceResult<List<ProductDto>>.Success(products);
         }
 
         [HttpGet("{id}")]
         [AllowAnonymous]
         [OutputCache(PolicyName = "ProductDetail")]
-        [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ProductDto>> GetById(int id)
+        [ProducesResponseType(typeof(ServiceResult<ProductDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResult<ProductDto>), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceResult<ProductDto>>> GetById(int id)
         {
             var product = await _sender.Send(new GetProductByIdQuery(id));
-            return Ok(product);
+            if (product == null)
+                return ServiceResult<ProductDto>.Fail("Product not found", HttpStatusCode.NotFound);
+
+            return ServiceResult<ProductDto>.Success(product);
         }
 
         [HttpPost]
         [Authorize(Policy = Policies.CanManageProducts)]
-        [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<int>> Create(
+        [ProducesResponseType(typeof(ServiceResult<int>), StatusCodes.Status201Created)]
+        public async Task<ActionResult<ServiceResult<int>>> Create(
             CreateProductCommand command,
             CancellationToken token
         )
         {
             var id = await _sender.Send(command);
-            // Cache invalidation
             await _outputCacheStore.EvictByTagAsync(AppConstants.CacheTags.Products, token);
-            return CreatedAtAction(nameof(GetById), new { id }, id);
+
+            var location = Url.Action(nameof(GetById), new { id });
+            return ServiceResult<int>.SuccessAsCreated(id, location!);
         }
 
         [HttpPut("{id}")]
         [Authorize(Policy = Policies.CanManageProducts)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(
+        [ProducesResponseType(typeof(ServiceResult<bool>), StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<ServiceResult<bool>>> Update(
             int id,
             UpdateProductCommand command,
             CancellationToken token
         )
         {
             if (id != command.Id)
-                return BadRequest();
+                return ServiceResult<bool>.Fail("Id mismatch", HttpStatusCode.BadRequest);
 
             await _sender.Send(command);
-
-            // Cache invalidation
             await _outputCacheStore.EvictByTagAsync(AppConstants.CacheTags.Products, token);
 
-            return NoContent();
+            return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);
         }
 
         [HttpDelete("{id}")]
         [Authorize(Policy = Policies.CanManageProducts)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id, CancellationToken token)
+        [ProducesResponseType(typeof(ServiceResult<bool>), StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<ServiceResult<bool>>> Delete(int id, CancellationToken token)
         {
             await _sender.Send(new DeleteProductCommand(id));
-
-            // Cache invalidation
             await _outputCacheStore.EvictByTagAsync(AppConstants.CacheTags.Products, token);
 
-            return NoContent();
+            return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);
         }
 
         [HttpPost("search")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(IPaginate<ProductDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IPaginate<ProductDto>>> Search(
+        [ProducesResponseType(
+            typeof(ServiceResult<IPaginate<ProductDto>>),
+            StatusCodes.Status200OK
+        )]
+        public async Task<ActionResult<ServiceResult<IPaginate<ProductDto>>>> Search(
             [FromBody] DynamicQuery dynamicQuery,
             [FromQuery] int index = 0,
             [FromQuery] int size = 10
         )
         {
             var result = await _sender.Send(new SearchProductsQuery(dynamicQuery, index, size));
-            return Ok(result);
+            return ServiceResult<IPaginate<ProductDto>>.Success(result);
         }
     }
 }

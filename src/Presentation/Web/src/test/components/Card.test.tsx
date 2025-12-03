@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
-import Card from '@components/Card';
-import type { Product } from '@/types/product';
+import Card from '@/presentation/features/product/components/ProductCard';
+import type { Product } from '@core/domain/entities/Product';
 
 const mockProduct: Product = {
     id: 1,

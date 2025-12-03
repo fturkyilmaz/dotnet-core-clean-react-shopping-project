@@ -1,4 +1,4 @@
-namespace ShoppingProject.Domain.Common;
+namespace ShoppingProject.Application.Common.Models;
 
 public class RedisCacheRequest
 {
