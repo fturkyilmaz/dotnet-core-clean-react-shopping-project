@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "@/services/api";
-import { Cart, CartItem } from "@/types";
+import { Cart, CartItem, ApiResponse } from "@/types";
 
 interface CartState {
   cart: CartItem[] | null;
@@ -18,7 +18,7 @@ const initialState: CartState = {
 export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (username: string) => {
-    const response = await api.get<{ isSuccess: boolean; data: CartItem[] }>(`/carts`);
+    const response = await api.get<ApiResponse<CartItem[]>>(`/carts`);
     return response.data?.data || [];
   }
 );
@@ -28,8 +28,8 @@ export const addToCart = createAsyncThunk(
   "cart/addCartItemAsync",
   async (request: CartItem, { rejectWithValue }) => {
     try {
-      const response = await api.post<{ isSuccess: boolean; data: CartItem[] }>("/carts", request);
-      return response.data?.data || [];
+      const response = await api.post<ApiResponse<number>>("/carts", request);
+      return { ...request, id: response.data.data };
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
@@ -52,8 +52,7 @@ export const updateCartItem = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      await api.put<{ isSuccess: boolean; data: boolean }>(`/carts/${cartId}`, { quantity });
-      // Return the updated data so we can update local state
+      await api.put<ApiResponse<boolean>>(`/carts/${cartId}`, { quantity });
       return { cartId, quantity };
     } catch (error: any) {
       return rejectWithValue(
@@ -73,11 +72,9 @@ export const removeCartItem = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      // Yeni API endpoint'ine uygun olarak DELETE isteği
-      await api.delete<{ isSuccess: boolean; data: boolean }>(
+      await api.delete<ApiResponse<boolean>>(
         `/carts/${id}`
       );
-      // Return the id so we can remove it from local state
       return { id };
     } catch (error: any) {
       return rejectWithValue(
@@ -141,6 +138,11 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.loading = false;
+        if (state.cart) {
+            state.cart.push(action.payload);
+        } else {
+            state.cart = [action.payload];
+        }
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.loading = false;

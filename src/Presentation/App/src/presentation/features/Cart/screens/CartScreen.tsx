@@ -18,7 +18,11 @@ import { useEffect } from 'react';
 import { useNetworkStatus } from '@/presentation/shared/hooks/useNetworkStatus';
 import { OfflineMessage, SyncBadge } from '@/presentation/shared/components/OfflineIndicator';
 
+import { useNavigation } from '@react-navigation/native';
+import { NavigationProp } from '@/types';
+
 export default function CartScreen() {
+    const navigation = useNavigation<NavigationProp>();
     const { t } = useTranslation();
     const { theme } = useTheme();
     const dispatch = useDispatch<AppDispatch>();
@@ -207,6 +211,7 @@ export default function CartScreen() {
                     <AccessibleTouchable
                         accessibilityLabel={t('cart.checkout')}
                         className="bg-primary dark:bg-primary rounded-xl py-4 items-center shadow-lg shadow-slate-200 dark:shadow-none active:bg-primary-700 dark:active:bg-primary-700"
+                        onPress={() => navigation.navigate('Checkout')}
                     >
                         <Text className="text-white font-bold text-lg">{t('cart.checkout')}</Text>
                     </AccessibleTouchable>

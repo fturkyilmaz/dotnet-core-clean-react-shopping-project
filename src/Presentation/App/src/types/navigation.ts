@@ -14,6 +14,7 @@ export type RootStackParamList = {
   Notifications: undefined;
   Profile: undefined;
   OrderSuccess: undefined;
+  Checkout: undefined;
 };
 
 export type NavigationProp = NativeStackNavigationProp<RootStackParamList>;

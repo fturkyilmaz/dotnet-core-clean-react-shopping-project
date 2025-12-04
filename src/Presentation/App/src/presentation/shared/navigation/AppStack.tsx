@@ -10,6 +10,7 @@ import ProfileScreen from '@/presentation/features/Auth/screens/ProfileScreen';
 import CategoryScreen from '@/presentation/features/Product/screens/CategoryScreen';
 import ProductDetailScreen from '@/presentation/features/Product/screens/ProductDetailScreen';
 import OrderSuccessScreen from '@/presentation/features/Cart/screens/OrderSuccessScreen';
+import CheckoutScreen from '@/presentation/features/Cart/screens/CheckoutScreen';
 import CustomHeader from '@/presentation/shared/components/CustomHeader';
 
 const Tab = createBottomTabNavigator();
@@ -108,6 +109,14 @@ export default function AppStack() {
             <Stack.Screen
                 name="ProductDetails"
                 component={ProductDetailScreen}
+                options={{
+                    headerShown: false,
+                    presentation: 'card',
+                }}
+            />
+            <Stack.Screen
+                name="Checkout"
+                component={CheckoutScreen}
                 options={{
                     headerShown: false,
                     presentation: 'card',
