@@ -7,9 +7,9 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { externalApi } from "@/services/api";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/presentation/store";
-import { addToCart } from "@/presentation/store/slices/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/presentation/store";
+import { addToCart, updateCartItem } from "@/presentation/store/slices/cartSlice";
 import Toast from "react-native-toast-message";
 import { CartItem, Product } from "@/types";
 
@@ -19,6 +19,7 @@ export default function ProductDetailScreen({ route, navigation }: any) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
+  const cart = useSelector((state: RootState) => state.cart.cart);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", productId],
@@ -30,18 +31,29 @@ export default function ProductDetailScreen({ route, navigation }: any) {
 
   const handleAddToCart = () => {
     if (product) {
-      dispatch(
-        addToCart({
-          id: product.id,
-          title: product.title,
-          price: product.price,
-          description: product.description,
-          category: product.category,
-          image: product.image,
-          rating: product.rating,
-          quantity: 1,
-        } as CartItem)
-      );
+      const existingItem = cart && cart.items.find((item) => item.id === product.id);
+      if (existingItem) {
+        dispatch(
+          updateCartItem({
+            cartId: existingItem.id,
+            productId: product.id,
+            quantity: existingItem.quantity + 1,
+          })
+        );
+      } else {
+        dispatch(
+          addToCart({
+            id: product.id,
+            title: product.title,
+            price: product.price,
+            description: product.description,
+            category: product.category,
+            image: product.image,
+            rating: product.rating,
+            quantity: 1,
+          } as CartItem)
+        );
+      }
       Toast.show({
         type: "success",
         text1: t("products.addedToCart"),

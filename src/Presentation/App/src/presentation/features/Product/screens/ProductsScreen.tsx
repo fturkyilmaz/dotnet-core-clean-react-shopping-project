@@ -9,9 +9,9 @@ import Toast from 'react-native-toast-message';
 import { useNavigation } from '@react-navigation/native';
 import { useNetworkStatus } from '@/presentation/shared/hooks/useNetworkStatus';
 import { OfflineMessage } from '@/presentation/shared/components/OfflineIndicator';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/presentation/store';
-import { addToCart } from '@/presentation/store/slices/cartSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/presentation/store';
+import { addToCart, updateCartItem } from '@/presentation/store/slices/cartSlice';
 
 export default function ProductsScreen() {
     const navigation = useNavigation<NavigationProp>();
@@ -20,12 +20,22 @@ export default function ProductsScreen() {
     const { theme } = useTheme();
     const { isOnline } = useNetworkStatus();
     const dispatch = useDispatch<AppDispatch>();
+    const cart = useSelector((state: RootState) => state.cart.cart);
 
     const handleAddToCart = (product: Product) => {
-        dispatch(addToCart({
-            ...product,
-            quantity: 1,
-        }));
+        const existingItem = cart && cart.items.find((item) => item.id === product.id);
+        if (existingItem) {
+            dispatch(updateCartItem({
+                cartId: existingItem.id,
+                productId: product.id,
+                quantity: existingItem.quantity + 1,
+            }));
+        } else {
+            dispatch(addToCart({
+                ...product,
+                quantity: 1,
+            }));
+        }
         Toast.show({
             type: 'success',
             text1: t('products.addedToCart'),

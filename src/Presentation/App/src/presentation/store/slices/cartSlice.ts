@@ -86,12 +86,12 @@ export const removeCartItem = createAsyncThunk(
     }
   }
 );
-// DELETE /carts/delete-all (Sepetten tüm ürünleri çıkarma)
+// POST /carts/clear (Sepetten tüm ürünleri çıkarma)
 export const removeAllCartItems = createAsyncThunk(
   'cart/removeAllCartItems',
   async (_, { rejectWithValue }) => {
     try {
-      await api.delete<Cart>('/carts/delete-all');
+      await api.post<Cart>('/carts/clear');
       return true;
     } catch (error: any) {
       return rejectWithValue(

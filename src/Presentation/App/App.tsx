@@ -12,6 +12,7 @@ import i18n from 'i18n';
 import { View } from 'react-native';
 import { OfflineIndicator } from '@/presentation/shared/components/OfflineIndicator';
 import { useNetworkStatus } from '@/presentation/shared/hooks/useNetworkStatus';
+import { useSignalRConnection } from '@/presentation/shared/hooks/useSignalRConnection';
 import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
 import analyticsService from '@/infrastructure/services/AnalyticsService';
 // import { initializeFirebaseAnalytics } from '@/services/firebaseAnalytics'; // TODO: Migrate this
@@ -20,7 +21,7 @@ const queryClient = new QueryClient();
 
 function AppContent() {
     const { isOnline, isSyncing, pendingCount } = useNetworkStatus();
-
+    useSignalRConnection();
     useEffect(() => {
         // Initialize SQLite database on app start
         const initDB = async () => {
