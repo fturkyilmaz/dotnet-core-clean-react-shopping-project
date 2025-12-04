@@ -1,4 +1,77 @@
 # Architecture Overview
+---
+
+### 🏗️ `architecture-overview.md`
+
+```markdown
+---
+sidebar_position: 3
+---
+
+ShoppingProject follows **Clean Architecture** principles with clear separation of concerns.
+
+## Layers
+
+### Domain
+- Contains **Entities**, **Value Objects**, and **Domain Services**.
+- Business rules and invariants live here.
+- Examples: `Product`, `Cart`, `Order`, `User`.
+
+### Application
+- Contains **CQRS Handlers** (Commands & Queries).
+- Uses **MediatR** for request/response pipeline.
+- Validation with **FluentValidation**.
+- Defines **DTOs** and **Interfaces** for repositories/services.
+- Responsible for orchestrating domain logic without knowing infrastructure details.
+
+### Infrastructure
+- Implements repository interfaces using **EF Core**.
+- Provides integrations (Redis, RabbitMQ, Email, Consul).
+- Handles persistence, caching, and external services.
+- Contains configuration for resilience (Polly) and observability (OpenTelemetry).
+
+### Presentation (API)
+- ASP.NET Core Web API layer.
+- Configures authentication/authorization (JWT, roles, claims).
+- Exposes RESTful endpoints.
+- Uses Swagger/OpenAPI for documentation.
+- Responsible for API contract and API-specific logic.
+
+### Presentation (Mobile)
+- React Native layer.
+- Unified API layer, type-safe navigation, shared DTOs.
+- Responsible for mobile-specific logic.
+
+### Presentation (Web)
+- React/Vite layer.
+- Unified API layer, type-safe navigation, shared DTOs.
+- Responsible for web-specific logic.
+
+## Cross-Cutting Concerns
+
+- **Security**: JWT, refresh tokens, role/claim-based authorization.
+- **Resiliency**: Polly policies (retry, circuit breaker, timeout).
+- **Observability**: OpenTelemetry, Prometheus, Grafana, Jaeger.
+- **Caching**: Redis (cache-aside), output caching.
+- **Logging**: Serilog + ELK stack for structured logs.
+
+## Frontend Integration
+
+- **Web (React/Vite)**: Redux Toolkit + TanStack Query, strict TypeScript.
+- **Mobile (React Native)**: Unified API layer, type-safe navigation, shared DTOs.
+- Both platforms consume consistent DTO contracts from backend.
+
+## Testing Strategy
+
+- **Unit Tests**: Domain invariants and value objects.
+- **Integration Tests**: API + DB + Redis + RabbitMQ (Testcontainers).
+- **Architecture Tests**: Naming conventions, dependency rules.
+- **E2E Tests**: Web and mobile flows with critical path coverage.
+
+---
+
+## Diagram
+
 
 ## High-Level Architecture Diagram
 
@@ -72,3 +145,53 @@ The application uses a **Relational Data Model** with PostgreSQL, but is designe
 ### 5. Specification Pattern
 -   **Why**: Encapsulates query logic (filtering, sorting, paging) into reusable objects.
 -   **Implementation**: `ISpecification<T>` used by Repositories to build queries dynamically.
+
+Data Model Design
+The application uses a Relational Data Model with PostgreSQL, designed with future sharding in mind.
+
+Key Entities & Partitioning Rationale
+Entity	Partition Key	Rationale
+Product	CategoryId	Products are queried by category; partitioning ensures efficient reads.
+Cart	UserId	Carts are user-scoped; partitioning guarantees single-shard operations.
+Order	UserId	Orders are accessed by the user who created them.
+Simplified Schema
+Products: Id, Name, Description, Price, CategoryId, Rating.
+
+Carts: Id, UserId, Items (Collection).
+
+Identity: AspNetUsers, AspNetRoles, AspNetUserRoles, AspNetUserClaims.
+
+Technology Stack Justification
+Technology	Role	Justification
+.NET 10	Backend Framework	High performance, strong typing, enterprise-ready ecosystem.
+PostgreSQL	Primary Database	Robust, open-source, supports JSONB for flexible schemas.
+Redis	Caching	Industry standard for distributed caching, low latency.
+RabbitMQ	Message Broker	Reliable, supports Pub/Sub, easy local setup via Docker.
+MediatR	In-Process Messaging	Implements CQRS/Mediator, decouples controllers from business logic.
+FluentValidation	Validation	Clean separation of validation rules, testable.
+Serilog + ELK	Observability	Structured logging, powerful analysis with ELK stack.
+Design Patterns
+1. CQRS (Command Query Responsibility Segregation)
+Why: Separates read and write workloads; optimizes queries independently of domain-heavy commands.
+
+Implementation: IRequest<T> for Commands/Queries, IRequestHandler<T, R> for handlers.
+
+2. Clean Architecture
+Why: Keeps Domain independent of frameworks, UI, and DB.
+
+Implementation: 4 Layers (Domain, Application, Infrastructure, Presentation).
+
+3. Repository Pattern
+Why: Abstracts data access; enables mocking and swapping data sources.
+
+Implementation: IRepository<T> interfaces implemented in Infrastructure.
+
+4. Outbox Pattern
+Why: Ensures atomic DB updates and message publishing.
+
+Implementation: OutboxMessage table + background job publishing to RabbitMQ.
+
+5. Specification Pattern
+Why: Encapsulates query logic (filtering, sorting, paging).
+
+Implementation: ISpecification<T> used by repositories to build queries dynamically.

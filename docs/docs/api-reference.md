@@ -10,10 +10,10 @@ The API uses **JWT (JSON Web Token)** for authentication.
 - **Refresh Token**: Long-lived refresh tokens for obtaining new access tokens.
 
 ### Authentication Flow
-1.  **Register**: Create a new user account.
-2.  **Login**: Exchange credentials (email/password) for an Access Token and Refresh Token.
-3.  **Access Resources**: Use the Access Token in the `Authorization` header to access protected endpoints.
-4.  **Refresh**: When the Access Token expires, use the Refresh Token to get a new pair.
+1. **Register**: Create a new user account.
+2. **Login**: Exchange credentials (email/password) for an Access Token and Refresh Token.
+3. **Access Resources**: Use the Access Token in the `Authorization` header to access protected endpoints.
+4. **Refresh**: When the Access Token expires, use the Refresh Token to get a new pair.
 
 ## Error Handling
 The API uses the **RFC 7807 Problem Details** standard for error responses.
@@ -48,7 +48,7 @@ The API uses the **RFC 7807 Problem Details** standard for error responses.
 **Login:**
 ```json
 {
-  "email": "user@example.com",
+  "email": "trkyilmazfurkan@gmail.com",
   "password": "Password123!"
 }
 ```
@@ -56,7 +56,7 @@ The API uses the **RFC 7807 Problem Details** standard for error responses.
 **Register:**
 ```json
 {
-  "email": "user@example.com",
+  "email": "trkyilmazfurkan@gmail.com",
   "password": "Password123!",
   "firstName": "Furkan",
   "lastName": "Türkyılmaz"
