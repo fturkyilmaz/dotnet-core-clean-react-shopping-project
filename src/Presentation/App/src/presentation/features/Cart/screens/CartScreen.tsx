@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, Image, Alert, ActivityIndicator } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
@@ -130,7 +130,7 @@ export default function CartScreen() {
         </View>
     );
 
-    if (loading) {
+    if (loading && !cart) {
         return (
             <View className="flex-1 items-center justify-center bg-slate-50 dark:bg-background-dark">
                 <ActivityIndicator size="large" color={theme === 'dark' ? '#60a5fa' : '#0f172a'} />
@@ -138,8 +138,7 @@ export default function CartScreen() {
         );
     }
 
-    // Ensure displayItems is always an array of CartItem
-    const displayItems = Array.isArray(cart?.items) ? cart.items : [];
+    const displayItems = Array.isArray(cart) ? cart : [];
     const totalPrice = displayItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const itemsWithQuantity = displayItems.filter(item => item.quantity > 0);
 

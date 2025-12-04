@@ -6,8 +6,8 @@ export const useProducts = () => {
   return useQuery({
     queryKey: ['products'],
     queryFn: async () => {
-      const response = await api.get<Product[]>('/products');
-      return response.data;
+      const response = await api.get<ApiResponse<Product[]>>('/products');
+      return response.data?.data || [];
     },
   });
 };
@@ -33,8 +33,6 @@ export const useFeaturedProducts = () => {
         size: 5,
       });
 
-      console.log("Featured Products API Response:", response.data?.data?.items);
-      // Return the items array from the paginated response
       return response.data?.data?.items || [];
     },
   });

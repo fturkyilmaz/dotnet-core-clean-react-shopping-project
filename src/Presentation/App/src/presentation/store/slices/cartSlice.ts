@@ -3,7 +3,7 @@ import api from "@/services/api";
 import { Cart, CartItem } from "@/types";
 
 interface CartState {
-  cart: Cart | null;
+  cart: CartItem[] | null;
   loading: boolean;
   error: string | null;
 }
@@ -18,8 +18,8 @@ const initialState: CartState = {
 export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (username: string) => {
-    const response = await api.get<Cart>(`/carts`);
-    return response.data;
+    const response = await api.get<{ isSuccess: boolean; data: CartItem[] }>(`/carts`);
+    return response.data?.data || [];
   }
 );
 
@@ -28,8 +28,8 @@ export const addToCart = createAsyncThunk(
   "cart/addCartItemAsync",
   async (request: CartItem, { rejectWithValue }) => {
     try {
-      const response = await api.post<Cart>("/carts", request);
-      return response.data;
+      const response = await api.post<{ isSuccess: boolean; data: CartItem[] }>("/carts", request);
+      return response.data?.data || [];
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
@@ -52,8 +52,9 @@ export const updateCartItem = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await api.put<Cart>(`/carts/${cartId}`, { quantity });
-      return response.data;
+      await api.put<{ isSuccess: boolean; data: boolean }>(`/carts/${cartId}`, { quantity });
+      // Return the updated data so we can update local state
+      return { cartId, quantity };
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
@@ -73,10 +74,11 @@ export const removeCartItem = createAsyncThunk(
   ) => {
     try {
       // Yeni API endpoint'ine uygun olarak DELETE isteği
-      const response = await api.delete<Cart>(
+      await api.delete<{ isSuccess: boolean; data: boolean }>(
         `/carts/${id}`
       );
-      return response.data;
+      // Return the id so we can remove it from local state
+      return { id };
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
@@ -139,7 +141,6 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.cart = action.payload;
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.loading = false;
@@ -151,31 +152,33 @@ const cartSlice = createSlice({
 
       // UPDATE CART ITEM (PUT)
       .addCase(updateCartItem.pending, (state) => {
-        state.loading = true;
         state.error = null;
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
-        state.loading = false;
-        state.cart = action.payload;
+        if (state.cart) {
+            const itemIndex = state.cart.findIndex(item => item.id === action.payload.cartId);
+            if (itemIndex !== -1) {
+                state.cart[itemIndex].quantity = action.payload.quantity;
+            }
+        }
       })
       .addCase(updateCartItem.rejected, (state, action) => {
-        state.loading = false;
         state.error =
           (action.payload as string) ||
           action.error.message ||
           "Failed to update cart item";
       })
 
+      // REMOVE CART ITEM (DELETE)
       .addCase(removeCartItem.pending, (state) => {
-        state.loading = true;
         state.error = null;
       })
       .addCase(removeCartItem.fulfilled, (state, action) => {
-        state.loading = false;
-        state.cart = action.payload;
+        if (state.cart) {
+            state.cart = state.cart.filter(item => item.id !== action.payload.id);
+        }
       })
       .addCase(removeCartItem.rejected, (state, action) => {
-        state.loading = false;
         state.error =
           (action.payload as string) ||
           action.error.message ||
@@ -189,7 +192,7 @@ const cartSlice = createSlice({
       })
       .addCase(removeAllCartItems.fulfilled, (state) => {
         state.loading = false;
-        state.cart = { ...state.cart, items: [] } as Cart;
+        state.cart = [];
       })
       .addCase(removeAllCartItems.rejected, (state, action) => {
         state.loading = false;

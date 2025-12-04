@@ -1,4 +1,5 @@
-import { View, Text, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { View, Text, Platform, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';

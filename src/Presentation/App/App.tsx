@@ -1,5 +1,5 @@
 import './global.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -9,8 +9,9 @@ import { ThemeProvider } from '@/presentation/shared/context/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { I18nextProvider } from 'react-i18next';
 import i18n from 'i18n';
-import { View } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { OfflineIndicator } from '@/presentation/shared/components/OfflineIndicator';
+import { useSignalRConnection } from '@/presentation/shared/hooks/useSignalRConnection';
 import { useNetworkStatus } from '@/presentation/shared/hooks/useNetworkStatus';
 import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
 import analyticsService from '@/infrastructure/services/AnalyticsService';
@@ -18,26 +19,9 @@ import analyticsService from '@/infrastructure/services/AnalyticsService';
 
 const queryClient = new QueryClient();
 
-function AppContent() {
+function MainApp() {
     const { isOnline, isSyncing, pendingCount } = useNetworkStatus();
-
-    useEffect(() => {
-        // Initialize SQLite database on app start
-        const initDB = async () => {
-            try {
-                await sqliteRepository.initialize();
-                console.log('App: SQLite database initialized');
-            } catch (error) {
-                console.error('App: Failed to initialize SQLite database:', error);
-            }
-        };
-        initDB();
-
-        return () => {
-            // Cleanup on app unmount
-            sqliteRepository.close();
-        };
-    }, []);
+    useSignalRConnection();
 
     useEffect(() => {
         // Initialize analytics services
@@ -74,6 +58,42 @@ function AppContent() {
             <Toast />
         </View>
     );
+}
+
+function AppContent() {
+    const [isDbReady, setIsDbReady] = useState(false);
+
+    useEffect(() => {
+        // Initialize SQLite database on app start
+        const initDB = async () => {
+            try {
+                await sqliteRepository.initialize();
+                console.log('App: SQLite database initialized');
+                setIsDbReady(true);
+            } catch (error) {
+                console.error('App: Failed to initialize SQLite database:', error);
+                // Even if it fails, we might want to let the app load so user can see error or retry
+                // But for now, let's set ready to true or maybe handle error state
+                setIsDbReady(true);
+            }
+        };
+        initDB();
+
+        return () => {
+            // Cleanup on app unmount
+            sqliteRepository.close();
+        };
+    }, []);
+
+    if (!isDbReady) {
+        return (
+            <View className="flex-1 justify-center items-center bg-white">
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
+    }
+
+    return <MainApp />;
 }
 
 export default function App() {
