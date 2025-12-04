@@ -52,7 +52,7 @@ function MainApp() {
     }, []);
 
     return (
-        <View className="flex-1">
+        <View className="flex-1 bg-background dark:bg-background-dark">
             <OfflineIndicator isOnline={isOnline} isSyncing={isSyncing} pendingCount={pendingCount} />
             <RootNavigator />
             <Toast />

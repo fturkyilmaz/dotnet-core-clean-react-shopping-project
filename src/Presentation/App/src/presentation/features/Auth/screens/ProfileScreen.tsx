@@ -7,12 +7,18 @@ import { logout, fetchUserProfile } from '@/presentation/store/slices/authSlice'
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks/useRedux';
+import { colorScheme } from 'nativewind';
 
 const ProfileScreen = () => {
     const { t, i18n } = useTranslation();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const { theme, toggleTheme } = useTheme();
+
+    const handleToggleTheme = () => {
+        toggleTheme();
+        colorScheme.set(theme);
+    };
 
     useEffect(() => {
         dispatch(fetchUserProfile());
@@ -116,7 +122,7 @@ const ProfileScreen = () => {
                                 trackColor={{ false: '#cbd5e1', true: '#2563eb' }}
                                 thumbColor={'#f4f3f4'}
                                 ios_backgroundColor="#cbd5e1"
-                                onValueChange={toggleTheme}
+                                onValueChange={handleToggleTheme}
                                 value={theme === 'dark'}
                             />
                         </View>
