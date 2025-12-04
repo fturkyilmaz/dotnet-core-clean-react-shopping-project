@@ -1,10 +1,12 @@
 import type { FC } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { useCart } from "../hooks/useCart";
 import BasketItem from "../components/BasketItem";
-import { Link } from "react-router-dom";
 import Loader from "@/presentation/shared/components/Loader";
 
 const CartsPage: FC = () => {
+  const { t } = useTranslation();
   const {
     cartItems,
     isLoading,
@@ -20,7 +22,7 @@ const CartsPage: FC = () => {
 
   if (isLoading) {
     return (
-      <div className="container my-5">
+      <div className="container my-5" role="status" aria-live="polite">
         <Loader />
       </div>
     );
@@ -37,10 +39,10 @@ const CartsPage: FC = () => {
                 🛒
               </div>
 
-              <h1 className="display-5 fw-bold mb-3">Sepetiniz Boş</h1>
+              <h1 className="display-5 fw-bold mb-3">{t("cartEmptyTitle")}</h1>
 
               <p className="lead text-muted mb-4">
-                Henüz sepetinize ürün eklemediniz. Harika ürünlerimizi keşfetmek için alışverişe başlayın!
+                {t("cartEmptySubtitle")}
               </p>
 
               <div className="d-grid gap-3">
@@ -50,7 +52,7 @@ const CartsPage: FC = () => {
                   style={{ transition: "all 0.3s ease" }}
                 >
                   <i className="bi bi-shop me-2"></i>
-                  Alışverişe Başla
+                  {t("startShopping")}
                 </Link>
 
                 <Link
@@ -58,7 +60,7 @@ const CartsPage: FC = () => {
                   className="btn btn-outline-secondary btn-lg px-5 py-2 rounded-pill"
                 >
                   <i className="bi bi-grid-3x3 me-2"></i>
-                  Kategorilere Göz At
+                  {t("browseCategories")}
                 </Link>
               </div>
 
@@ -69,8 +71,8 @@ const CartsPage: FC = () => {
                     <div className="d-flex align-items-start">
                       <div className="fs-3 me-3">🚚</div>
                       <div>
-                        <h6 className="fw-bold mb-1">Ücretsiz Kargo</h6>
-                        <small className="text-muted">500₺ üzeri alışverişlerde</small>
+                        <h6 className="fw-bold mb-1">{t("freeShippingTitle")}</h6>
+                        <small className="text-muted">{t("freeShippingSubtitle")}</small>
                       </div>
                     </div>
                   </div>
@@ -131,7 +133,7 @@ const CartsPage: FC = () => {
 
   return (
     <div className="container my-5">
-      <h2 className="mb-4 fw-bold">Alışveriş Sepetim</h2>
+      <h2 className="mb-4 fw-bold">{t("cart")}</h2>
       <div className="row g-4">
         {/* Cart Items Section */}
         <div className="col-lg-8">
@@ -160,12 +162,12 @@ const CartsPage: FC = () => {
               <h4 className="card-title fw-bold mb-4">Sipariş Özeti</h4>
 
               <div className="d-flex justify-content-between mb-3">
-                <span className="text-muted">Toplam Ürün</span>
-                <span className="fw-semibold">{totalItems} adet</span>
+                <span className="text-muted">{t("quantity")}</span>
+                <span className="fw-semibold">{totalItems}</span>
               </div>
 
               <div className="d-flex justify-content-between mb-3">
-                <span className="text-muted">Ara Toplam</span>
+                <span className="text-muted">{t("subtotal")}</span>
                 <span className="fw-semibold">{totalPrice.toFixed(2)} ₺</span>
               </div>
 
@@ -177,7 +179,7 @@ const CartsPage: FC = () => {
               <hr className="my-4" />
 
               <div className="d-flex justify-content-between mb-4 align-items-center">
-                <span className="fs-5 fw-bold">Toplam</span>
+                <span className="fs-5 fw-bold">{t("total")}</span>
                 <span className="fs-4 fw-bold text-primary">{grandTotal.toFixed(2)} ₺</span>
               </div>
 
@@ -189,8 +191,8 @@ const CartsPage: FC = () => {
               </button>
 
               <Link to="/" className="btn btn-outline-secondary w-100 mt-3 py-2 border-0">
-                <i className="bi bi-arrow-left me-2"></i>
-                Alışverişe Devam Et
+                <i className="bi bi-arrow-left me-2" aria-hidden="true"></i>
+                {t("continueShopping")}
               </Link>
             </div>
           </div>

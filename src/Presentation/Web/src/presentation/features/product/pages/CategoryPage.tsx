@@ -1,8 +1,9 @@
 import type { FC } from "react";
 import { useCallback, useMemo } from "react";
-import { useProducts } from "../hooks/useProducts";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Loader from "@/presentation/shared/components/Loader";
+import { useProducts } from "../hooks/useProducts";
 
 interface CategoryIcons {
   [key: string]: string;
@@ -28,11 +29,10 @@ const categoryColors: CategoryColors = {
   "women's clothing": "danger"
 };
 
-import { useSearchParams } from "react-router-dom";
-
 const CategoryPage: FC = () => {
   const navigate = useNavigate();
-  const { data: products, isLoading } = useProducts();
+  const { t } = useTranslation();
+  const { data: products, isLoading, isError } = useProducts();
   const [searchParams] = useSearchParams();
   const category = searchParams.get("category") || "all";
 
@@ -48,16 +48,19 @@ const CategoryPage: FC = () => {
 
   if (isLoading) {
     return (
-      <div className="container my-5">
+      <div className="container my-5" role="status" aria-live="polite">
         <Loader />
       </div>
     );
   }
 
-  if (categories.length === 0) {
+  if (isError || categories.length === 0) {
     return (
-      <div className="container my-5">
-        <Loader />
+      <div className="container my-5 text-center" role="alert">
+        <div className="p-5 bg-light rounded-3 shadow-sm">
+          <h2 className="display-6 text-secondary mb-3">{t("error")}</h2>
+          <p className="text-muted">{t("productNotFound")}</p>
+        </div>
       </div>
     );
   }
@@ -65,8 +68,10 @@ const CategoryPage: FC = () => {
   return (
     <div className="container my-5">
       <div className="text-center mb-5">
-        <h1 className="display-4 fw-bold mb-3">Kategoriler</h1>
-        <p className="text-muted fs-5">İlgilendiğiniz kategoriyi seçin ve alışverişe başlayın</p>
+        <h1 className="display-4 fw-bold mb-3">{t("categories")}</h1>
+        <p className="text-muted fs-5">
+          {t("selectCategory") ?? "Select a category to start shopping"}
+        </p>
       </div>
 
       <div className="row g-4">
@@ -82,8 +87,10 @@ const CategoryPage: FC = () => {
           >
             <div className="card-body text-center p-4">
               <div className="category-icon fs-1 mb-3">{categoryIcons["all"]}</div>
-              <h3 className="card-title fw-bold text-capitalize mb-2">Tüm Ürünler</h3>
-              <p className="text-muted small mb-0">Tüm kategorilerdeki ürünleri görüntüleyin</p>
+              <h3 className="card-title fw-bold text-capitalize mb-2">{t("products")}</h3>
+              <p className="text-muted small mb-0">
+                {t("viewAllProducts") ?? "View products from all categories"}
+              </p>
             </div>
           </div>
         </div>
@@ -105,7 +112,7 @@ const CategoryPage: FC = () => {
                 </div>
                 <h3 className="card-title fw-bold text-capitalize mb-2">{cat}</h3>
                 <span className={`badge bg-${categoryColors[cat] || "primary"} px-3 py-2`}>
-                  Kategoriye Git
+                  {t("viewDetails")}
                 </span>
               </div>
             </div>

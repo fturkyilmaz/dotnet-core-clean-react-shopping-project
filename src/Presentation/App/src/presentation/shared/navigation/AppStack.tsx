@@ -1,0 +1,118 @@
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/presentation/shared/context/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import HomeScreen from '@/presentation/features/Product/screens/HomeScreen';
+import ProductsScreen from '@/presentation/features/Product/screens/ProductsScreen';
+import CartScreen from '@/presentation/features/Cart/screens/CartScreen';
+import ProfileScreen from '@/presentation/features/Auth/screens/ProfileScreen';
+import CategoryScreen from '@/presentation/features/Product/screens/CategoryScreen';
+import ProductDetailScreen from '@/presentation/features/Product/screens/ProductDetailScreen';
+import OrderSuccessScreen from '@/presentation/features/Cart/screens/OrderSuccessScreen';
+import CustomHeader from '@/presentation/shared/components/CustomHeader';
+
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+function TabNavigator() {
+    const { theme } = useTheme();
+    const { t } = useTranslation();
+    const isDark = theme === 'dark';
+
+    return (
+        <Tab.Navigator
+            screenOptions={{
+                header: ({ route, options }) => (
+                    <CustomHeader
+                        title={options.title || route.name}
+                        showBack={route.name === 'Products' && (route.params as any)?.category}
+                    />
+                ),
+                tabBarStyle: {
+                    backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                    borderTopColor: isDark ? '#1e293b' : '#e2e8f0',
+                },
+                tabBarActiveTintColor: isDark ? '#60a5fa' : '#2563eb',
+                tabBarInactiveTintColor: isDark ? '#64748b' : '#94a3b8',
+                tabBarShowLabel: true,
+            }}
+        >
+            <Tab.Screen
+                name="Home"
+                component={HomeScreen}
+                options={{
+                    title: t('navigation.home'),
+                    tabBarLabel: t('navigation.home'),
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="home-outline" size={size} color={color} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="Categories"
+                component={CategoryScreen}
+                options={{
+                    title: t('navigation.categories'),
+                    tabBarLabel: t('navigation.categories'),
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="grid-outline" size={size} color={color} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="Products"
+                component={ProductsScreen}
+                options={{
+                    title: t('navigation.products'),
+                    tabBarLabel: t('navigation.products'),
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="bag-handle-outline" size={size} color={color} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="Cart"
+                component={CartScreen}
+                options={{
+                    title: t('navigation.cart'),
+                    tabBarLabel: t('navigation.cart'),
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="cart-outline" size={size} color={color} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="Profile"
+                component={ProfileScreen}
+                options={{
+                    title: t('navigation.profile'),
+                    tabBarLabel: t('navigation.profile'),
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="person-outline" size={size} color={color} />
+                    ),
+                }}
+            />
+        </Tab.Navigator>
+    );
+}
+
+export default function AppStack() {
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerShown: false,
+            }}
+        >
+            <Stack.Screen name="MainTabs" component={TabNavigator} />
+            <Stack.Screen
+                name="ProductDetails"
+                component={ProductDetailScreen}
+                options={{
+                    headerShown: false,
+                    presentation: 'card',
+                }}
+            />
+        </Stack.Navigator>
+    );
+}

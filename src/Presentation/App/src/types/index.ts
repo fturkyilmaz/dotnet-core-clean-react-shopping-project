@@ -52,10 +52,22 @@ export interface LoginRequest {
 }
 
 export interface ApiResponse<T> {
-  data: T;
   isSuccess: boolean;
-  message: string | null;
-  errors: string[] | null;
+  data: T;
+  message: string;
+  statusCode: number;
+  location: string;
+}
+
+export interface PaginatedData<T> {
+  from: number;
+  index: number;
+  size: number;
+  count: number;
+  pages: number;
+  items: T[];
+  hasPrevious: boolean;
+  hasNext: boolean;
 }
 
 export * from './navigation';

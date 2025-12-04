@@ -37,11 +37,15 @@ const ProductDetailPage: FC = () => {
 
     if (isError || !product) {
         return (
-            <div className="container text-center py-5">
+            <div className="container text-center py-5" role="status" aria-live="polite">
                 <div className="alert alert-warning" role="alert">
                     <h4 className="alert-heading">{t('error')}</h4>
-                    <p>Product not found</p>
-                    <button className="btn btn-primary mt-3" onClick={() => navigate('/')}>
+                    <p>{t('productNotFound')}</p>
+                    <button
+                        className="btn btn-primary mt-3"
+                        onClick={() => navigate('/')}
+                        aria-label={t('continueShopping')}
+                    >
                         {t('continueShopping')}
                     </button>
                 </div>
@@ -95,7 +99,7 @@ const ProductDetailPage: FC = () => {
 
                         {/* Description */}
                         <div className="mb-4">
-                            <h5 className="fw-bold mb-2">Description</h5>
+                            <h5 className="fw-bold mb-2">{t('description')}</h5>
                             <p className="text-muted">{product.description}</p>
                         </div>
 
@@ -113,9 +117,10 @@ const ProductDetailPage: FC = () => {
                                 <button
                                     className="btn btn-primary btn-lg"
                                     onClick={handleBuyNow}
+                                    aria-label={t('buyNow')}
                                 >
                                     <i className="bi bi-lightning-fill me-2"></i>
-                                    Buy Now
+                                    {t('buyNow')}
                                 </button>
                                 <button
                                     className="btn btn-outline-primary btn-lg"
@@ -132,19 +137,19 @@ const ProductDetailPage: FC = () => {
                             <div className="row g-3">
                                 <div className="col-6">
                                     <div className="d-flex align-items-center">
-                                        <i className="bi bi-truck fs-4 text-primary me-2"></i>
+                                        <i className="bi bi-truck fs-4 text-primary me-2" aria-hidden="true"></i>
                                         <div>
-                                            <small className="text-muted d-block">Free Shipping</small>
-                                            <small className="fw-bold">Orders over $50</small>
+                                            <small className="text-muted d-block">{t('freeShippingTitle')}</small>
+                                            <small className="fw-bold">{t('freeShippingSubtitle')}</small>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-6">
                                     <div className="d-flex align-items-center">
-                                        <i className="bi bi-arrow-repeat fs-4 text-primary me-2"></i>
+                                        <i className="bi bi-arrow-repeat fs-4 text-primary me-2" aria-hidden="true"></i>
                                         <div>
-                                            <small className="text-muted d-block">Easy Returns</small>
-                                            <small className="fw-bold">30 Days Return</small>
+                                            <small className="text-muted d-block">{t('easyReturnsTitle')}</small>
+                                            <small className="fw-bold">{t('easyReturnsSubtitle')}</small>
                                         </div>
                                     </div>
                                 </div>

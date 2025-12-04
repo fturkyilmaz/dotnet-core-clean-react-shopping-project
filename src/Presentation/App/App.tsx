@@ -3,18 +3,18 @@ import { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from '@/store';
-import RootNavigator from '@/navigation/RootNavigator';
-import { ThemeProvider } from '@/context/ThemeContext';
+import { store, persistor } from '@/presentation/store';
+import RootNavigator from '@/presentation/shared/navigation/RootNavigator';
+import { ThemeProvider } from '@/presentation/shared/context/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { I18nextProvider } from 'react-i18next';
 import i18n from 'i18n';
 import { View } from 'react-native';
-import { OfflineIndicator } from '@/components/OfflineIndicator';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import sqliteDb from '@/services/sqlite';
-import UnifiedAnalyticsManager from '@/services/unifiedAnalytics';
-import { initializeFirebaseAnalytics } from '@/services/firebaseAnalytics';
+import { OfflineIndicator } from '@/presentation/shared/components/OfflineIndicator';
+import { useNetworkStatus } from '@/presentation/shared/hooks/useNetworkStatus';
+import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
+import analyticsService from '@/infrastructure/services/AnalyticsService';
+// import { initializeFirebaseAnalytics } from '@/services/firebaseAnalytics'; // TODO: Migrate this
 
 const queryClient = new QueryClient();
 
@@ -25,7 +25,7 @@ function AppContent() {
         // Initialize SQLite database on app start
         const initDB = async () => {
             try {
-                await sqliteDb.initialize();
+                await sqliteRepository.initialize();
                 console.log('App: SQLite database initialized');
             } catch (error) {
                 console.error('App: Failed to initialize SQLite database:', error);
@@ -35,7 +35,7 @@ function AppContent() {
 
         return () => {
             // Cleanup on app unmount
-            sqliteDb.close();
+            sqliteRepository.close();
         };
     }, []);
 
@@ -44,26 +44,26 @@ function AppContent() {
         const initAnalytics = async () => {
             try {
                 // Initialize Firebase Analytics
-                await initializeFirebaseAnalytics();
-                
+                // await initializeFirebaseAnalytics();
+
                 // Initialize Unified Analytics Manager
-                await UnifiedAnalyticsManager.initialize({
-                    enableFirebase: true,
-                    enableLocal: true,
-                    enableCrashlytics: true,
-                });
-                
+                // await UnifiedAnalyticsManager.initialize({
+                //     enableFirebase: true,
+                //     enableLocal: true,
+                //     enableCrashlytics: true,
+                // });
+
                 console.log('✅ App: Analytics initialized');
-                
+
                 // Track app launch
-                UnifiedAnalyticsManager.trackEvent('app_launched', {
+                analyticsService.logEvent('app_launched', {
                     timestamp: new Date().toISOString(),
                 });
             } catch (error) {
                 console.error('App: Failed to initialize analytics:', error);
             }
         };
-        
+
         initAnalytics();
     }, []);
 

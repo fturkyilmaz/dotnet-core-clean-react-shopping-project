@@ -34,11 +34,22 @@ const resources = {
       category: 'Category',
       rating: 'Rating',
       reviews: 'Reviews',
+      description: 'Description',
       inStock: 'In Stock',
       outOfStock: 'Out of Stock',
+      productNotFound: 'Product not found',
+      buyNow: 'Buy Now',
+      freeShippingTitle: 'Free Shipping',
+      freeShippingSubtitle: 'Orders over $50',
+      easyReturnsTitle: 'Easy Returns',
+      easyReturnsSubtitle: '30 Days Return',
       
       // Cart
       cartEmpty: 'Your cart is empty',
+      cartEmptyTitle: 'Your cart is empty',
+      cartEmptySubtitle: 'You have not added any items to your cart yet. Start shopping to discover our great products!',
+      startShopping: 'Start Shopping',
+      browseCategories: 'Browse Categories',
       continueShopping: 'Continue Shopping',
       subtotal: 'Subtotal',
       total: 'Total',
@@ -73,6 +84,10 @@ const resources = {
       preferences: 'Preferences',
       currency: 'Currency',
       notifications: 'Notifications',
+      
+      // Category
+      selectCategory: 'Select a category to start shopping',
+      viewAllProducts: 'View products from all categories',
     },
   },
   tr: {
@@ -105,11 +120,22 @@ const resources = {
       category: 'Kategori',
       rating: 'Değerlendirme',
       reviews: 'İncelemeler',
+      description: 'Açıklama',
       inStock: 'Stokta Var',
       outOfStock: 'Stokta Yok',
+      productNotFound: 'Ürün bulunamadı',
+      buyNow: 'Hemen Satın Al',
+      freeShippingTitle: 'Ücretsiz Kargo',
+      freeShippingSubtitle: '500₺ üzeri alışverişlerde',
+      easyReturnsTitle: 'Kolay İade',
+      easyReturnsSubtitle: '30 gün içinde iade',
       
       // Cart
       cartEmpty: 'Sepetiniz boş',
+      cartEmptyTitle: 'Sepetiniz Boş',
+      cartEmptySubtitle: 'Henüz sepetinize ürün eklemediniz. Harika ürünlerimizi keşfetmek için alışverişe başlayın!',
+      startShopping: 'Alışverişe Başla',
+      browseCategories: 'Kategorilere Göz At',
       continueShopping: 'Alışverişe Devam Et',
       subtotal: 'Ara Toplam',
       total: 'Toplam',
@@ -144,6 +170,10 @@ const resources = {
       preferences: 'Tercihler',
       currency: 'Para Birimi',
       notifications: 'Bildirimler',
+      
+      // Category
+      selectCategory: 'İlgilendiğiniz kategoriyi seçin ve alışverişe başlayın',
+      viewAllProducts: 'Tüm kategorilerdeki ürünleri görüntüleyin',
     },
   },
 };

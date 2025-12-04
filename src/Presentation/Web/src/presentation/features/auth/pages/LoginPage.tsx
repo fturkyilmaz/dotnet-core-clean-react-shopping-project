@@ -50,9 +50,15 @@ const LoginPage: FC = () => {
                                         className="form-control form-control-lg"
                                         id="email"
                                         placeholder="name@example.com"
+                                        aria-invalid={!!errors.email}
+                                        aria-describedby={errors.email ? 'email-error' : undefined}
                                         {...register('email')}
                                     />
-                                    {errors.email && <small className="text-danger">{errors.email.message}</small>}
+                                    {errors.email && (
+                                        <small id="email-error" className="text-danger">
+                                            {errors.email.message}
+                                        </small>
+                                    )}
                                 </div>
 
                                 <div className="mb-4">
@@ -64,9 +70,15 @@ const LoginPage: FC = () => {
                                         className="form-control form-control-lg"
                                         id="password"
                                         placeholder="••••••••"
+                                        aria-invalid={!!errors.password}
+                                        aria-describedby={errors.password ? 'password-error' : undefined}
                                         {...register('password')}
                                     />
-                                    {errors.password && <small className="text-danger">{errors.password.message}</small>}
+                                    {errors.password && (
+                                        <small id="password-error" className="text-danger">
+                                            {errors.password.message}
+                                        </small>
+                                    )}
                                 </div>
 
                                 <div className="d-grid">
@@ -91,13 +103,13 @@ const LoginPage: FC = () => {
                             <div className="position-relative my-4">
                                 <hr />
                                 <span className="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">
-                                    or
+                                    {t('or') ?? 'or'}
                                 </span>
                             </div>
 
                             {/* Social Login */}
                             <div className="d-grid gap-2">
-                                <button className="btn btn-outline-secondary">
+                                <button className="btn btn-outline-secondary" type="button" aria-label="Continue with Google">
                                     <i className="bi bi-google me-2"></i>
                                     Continue with Google
                                 </button>
