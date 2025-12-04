@@ -3,16 +3,15 @@ import { View, Text, ScrollView } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { useDispatch, useSelector } from 'react-redux';
 import { logout, fetchUserProfile } from '@/presentation/store/slices/authSlice';
-import { RootState, AppDispatch } from '@/presentation/store';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks/useRedux';
 
 const ProfileScreen = () => {
     const { t, i18n } = useTranslation();
-    const dispatch = useDispatch<AppDispatch>();
-    const { user } = useSelector((state: RootState) => state.auth);
+    const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state) => state.auth);
     const { theme, toggleTheme } = useTheme();
 
     useEffect(() => {

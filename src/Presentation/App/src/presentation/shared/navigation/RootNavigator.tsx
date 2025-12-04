@@ -1,16 +1,15 @@
-import { useSelector, useDispatch } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { RootState } from '@/presentation/store';
 import { setToken } from '@/presentation/store/slices/authSlice';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
+import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks';
 
 export default function RootNavigator() {
-    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-    const dispatch = useDispatch();
+    const { isAuthenticated } = useAppSelector((state) => state.auth);
+    const dispatch = useAppDispatch();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {

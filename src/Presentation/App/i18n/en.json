@@ -108,5 +108,25 @@
         "products": "Products",
         "cart": "Cart",
         "profile": "Profile"
+    },
+    "checkout": {
+        "title": "Checkout",
+        "orderSummary": "Order Summary",
+        "items": "Items",
+        "shipping": "Shipping",
+        "free": "Free",
+        "total": "Total",
+        "shippingAddress": "Shipping Address",
+        "address": "Address",
+        "city": "City",
+        "zipCode": "Zip Code",
+        "paymentDetails": "Payment Details",
+        "cardNumber": "Card Number",
+        "expiry": "Expiry (MM/YY)",
+        "cvv": "CVV",
+        "placeOrder": "Place Order",
+        "fillAllFields": "Please fill in all fields",
+        "success": "Order Placed!",
+        "successMessage": "Your order has been placed successfully."
     }
 }

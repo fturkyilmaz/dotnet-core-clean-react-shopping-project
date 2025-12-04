@@ -1,6 +1,5 @@
 import { View, Text, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { useState } from 'react';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,52 +7,22 @@ import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import api from '@/services/api';
 import Toast from 'react-native-toast-message';
 import { useForm, Controller } from 'react-hook-form';
-import { z } from 'zod';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
+import { RegisterFormData } from '../validation/registerSchema';
+import { useAppNavigation } from '@/presentation/shared/hooks/useAppNavigation';
 
-type AuthStackParamList = {
-    Login: undefined;
-    Signup: undefined;
-};
-
-type SignupScreenProps = {
-    navigation: NativeStackNavigationProp<AuthStackParamList, 'Signup'>;
-};
-
-// Zod validation schema
-const signupSchema = z.object({
-    name: z.string()
-        .min(2, 'Name must be at least 2 characters')
-        .max(50, 'Name must be less than 50 characters'),
-    email: z.string()
-        .email('Invalid email address')
-        .min(1, 'Email is required'),
-    password: z.string()
-        .min(8, 'Password must be at least 8 characters')
-        .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-        .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-        .regex(/[0-9]/, 'Password must contain at least one number')
-        .regex(/[!@#$%^&*]/, 'Password must contain at least one special character'),
-    confirmPassword: z.string()
-        .min(1, 'Please confirm your password'),
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-});
-
-type SignupFormData = z.infer<typeof signupSchema>;
-
-export default function SignupScreen({ navigation }: SignupScreenProps) {
+export default function SignupScreen() {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState('');
+    const navigation = useAppNavigation();
 
     const {
         control,
         handleSubmit,
         formState: { errors },
-    } = useForm<SignupFormData>({
+    } = useForm<RegisterFormData>({
         defaultValues: {
             name: '',
             email: '',
@@ -62,7 +31,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
         },
     });
 
-    const onSubmit = async (data: SignupFormData) => {
+    const onSubmit = async (data: RegisterFormData) => {
         setApiError('');
         setLoading(true);
 

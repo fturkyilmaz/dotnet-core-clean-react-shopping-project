@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",
+    "@hookform/resolvers": "^5.2.2",
     "@microsoft/signalr": "^8.0.7",
     "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-native-community/netinfo": "^11.4.1",

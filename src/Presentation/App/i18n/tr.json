@@ -108,5 +108,25 @@
         "products": "Ürünler",
         "cart": "Sepet",
         "profile": "Profil"
+    },
+    "checkout": {
+        "title": "Ödeme",
+        "orderSummary": "Sipariş Özeti",
+        "items": "Ürünler",
+        "shipping": "Kargo",
+        "free": "Ücretsiz",
+        "total": "Toplam",
+        "shippingAddress": "Teslimat Adresi",
+        "address": "Adres",
+        "city": "Şehir",
+        "zipCode": "Posta Kodu",
+        "paymentDetails": "Ödeme Bilgileri",
+        "cardNumber": "Kart Numarası",
+        "expiry": "Son Kullanma (AA/YY)",
+        "cvv": "CVV",
+        "placeOrder": "Siparişi Tamamla",
+        "fillAllFields": "Lütfen tüm alanları doldurun",
+        "success": "Sipariş Tamamlandı!",
+        "successMessage": "Siparişiniz başarıyla oluşturuldu."
     }
 }

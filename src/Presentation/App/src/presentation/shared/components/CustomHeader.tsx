@@ -1,12 +1,11 @@
-import { View, Text, Platform, StatusBar } from 'react-native';
+import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { Ionicons } from '@expo/vector-icons';
-import { useDispatch } from 'react-redux';
 import { logout } from '@/presentation/store/slices/authSlice';
-import { RootState, AppDispatch } from '@/presentation/store';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { useNavigation } from '@react-navigation/native';
+import { useAppDispatch } from '@/presentation/store/hooks';
 
 interface CustomHeaderProps {
     title: string;
@@ -14,7 +13,7 @@ interface CustomHeaderProps {
 }
 
 export default function CustomHeader({ title, showBack = false }: CustomHeaderProps) {
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
     const { theme, toggleTheme } = useTheme();
     const navigation = useNavigation();
 

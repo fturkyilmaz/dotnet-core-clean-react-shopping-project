@@ -2,8 +2,6 @@ import React from 'react';
 import { View, Text, FlatList, Image, Alert, ActivityIndicator } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '@/presentation/store';
 import { CartItem } from '@/types';
 import {
     fetchCart,
@@ -16,18 +14,18 @@ import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { useEffect } from 'react';
 import { useNetworkStatus } from '@/presentation/shared/hooks/useNetworkStatus';
-import { OfflineMessage, SyncBadge } from '@/presentation/shared/components/OfflineIndicator';
-
+import { OfflineMessage } from '@/presentation/shared/components/OfflineIndicator';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '@/types';
+import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks';
 
 export default function CartScreen() {
     const navigation = useNavigation<NavigationProp>();
     const { t } = useTranslation();
     const { theme } = useTheme();
-    const dispatch = useDispatch<AppDispatch>();
-    const cart = useSelector((state: RootState) => state.cart.cart);
-    const loading = useSelector((state: RootState) => state.cart.loading);
+    const dispatch = useAppDispatch();
+    const cart = useAppSelector((state) => state.cart.cart);
+    const loading = useAppSelector((state) => state.cart.loading);
     const { isOnline, isSyncing, pendingCount, manualSync } = useNetworkStatus();
 
     useEffect(() => {
