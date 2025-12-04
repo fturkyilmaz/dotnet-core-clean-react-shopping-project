@@ -45,7 +45,9 @@ export default function CheckoutScreen() {
             Alert.alert(
                 t('checkout.success') || 'Order Placed!',
                 t('checkout.successMessage') || 'Your order has been placed successfully.',
-                [{ text: 'OK', onPress: () => navigation.navigate('Home') }]
+                [{
+                    text: 'OK', onPress: () => navigation.navigate('OrderSuccess')
+                }]
             );
         }, 2000);
     };

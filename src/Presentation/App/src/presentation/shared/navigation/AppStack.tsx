@@ -122,6 +122,14 @@ export default function AppStack() {
                     presentation: 'card',
                 }}
             />
+            <Stack.Screen
+                name="OrderSuccess"
+                component={OrderSuccessScreen}
+                options={{
+                    headerShown: false,
+                    presentation: 'card',
+                }}
+            />
         </Stack.Navigator>
     );
 }

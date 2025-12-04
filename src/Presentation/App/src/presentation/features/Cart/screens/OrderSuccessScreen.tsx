@@ -1,39 +1,43 @@
 import React, { useEffect } from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { useDispatch } from 'react-redux';
 import { clearCart } from '@/presentation/store/slices/cartSlice';
 import LottieView from 'lottie-react-native';
+import { useAppDispatch } from '@/presentation/store/hooks';
+import successAnimation from '../../../../../assets/animations/success.json';
 
 export default function OrderSuccessScreen({ navigation }: any) {
     const { theme } = useTheme();
     const { t } = useTranslation();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
-        // Sepeti temizle
         dispatch(clearCart());
     }, [dispatch]);
 
     return (
         <SafeAreaView className="flex-1 bg-slate-50 dark:bg-background-dark">
             <View className="flex-1 items-center justify-center px-6">
-                {/* Success Icon */}
-                <View className="w-32 h-32 bg-green-100 dark:bg-green-900/30 rounded-full items-center justify-center mb-8">
-                    <Ionicons name="checkmark-circle" size={80} color="#10b981" />
+                {/* Success Animation */}
+                <View className="w-40 h-40 mb-8">
+                    <LottieView
+                        source={successAnimation}
+                        autoPlay
+                        loop={true}
+                        style={{ width: 150, height: 150 }}
+                    />
                 </View>
 
                 {/* Success Message */}
                 <Text className="text-3xl font-bold text-slate-900 dark:text-white text-center mb-4">
-                    Payment Successful!
+                    {t('checkout.success') || 'Payment Successful!'}
                 </Text>
                 <Text className="text-lg text-slate-600 dark:text-slate-300 text-center mb-2">
-                    Your order has been placed
+                    {t('checkout.successMessage') || 'Your order has been placed'}
                 </Text>
                 <Text className="text-slate-500 dark:text-slate-400 text-center mb-8">
                     Thank you for your purchase
@@ -43,19 +47,25 @@ export default function OrderSuccessScreen({ navigation }: any) {
                 <View className="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full mb-8 border border-slate-100 dark:border-slate-700">
                     <View className="flex-row items-center justify-between mb-4 pb-4 border-b border-slate-100 dark:border-slate-700">
                         <Text className="text-slate-600 dark:text-slate-400">Order Number</Text>
-                        <Text className="text-slate-900 dark:text-white font-bold">#ORD-{Math.floor(Math.random() * 10000)}</Text>
+                        <Text className="text-slate-900 dark:text-white font-bold">
+                            #ORD-{Math.floor(Math.random() * 10000)}
+                        </Text>
                     </View>
 
                     <View className="flex-row items-center justify-between mb-4 pb-4 border-b border-slate-100 dark:border-slate-700">
                         <Text className="text-slate-600 dark:text-slate-400">Estimated Delivery</Text>
-                        <Text className="text-slate-900 dark:text-white font-semibold">3-5 business days</Text>
+                        <Text className="text-slate-900 dark:text-white font-semibold">
+                            3-5 business days
+                        </Text>
                     </View>
 
                     <View className="flex-row items-center justify-between">
                         <Text className="text-slate-600 dark:text-slate-400">Status</Text>
                         <View className="flex-row items-center bg-green-50 dark:bg-green-900/20 px-3 py-1.5 rounded-lg">
                             <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                            <Text className="text-green-700 dark:text-green-400 font-semibold">Processing</Text>
+                            <Text className="text-green-700 dark:text-green-400 font-semibold">
+                                Processing
+                            </Text>
                         </View>
                     </View>
                 </View>

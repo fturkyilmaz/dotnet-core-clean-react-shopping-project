@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -6,11 +6,13 @@ import { setToken } from '@/presentation/store/slices/authSlice';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
 import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks';
+import { useTheme } from '@/presentation/shared/context/ThemeContext';
 
 export default function RootNavigator() {
     const { isAuthenticated } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const [isLoading, setIsLoading] = useState(true);
+    const { theme } = useTheme();
 
     useEffect(() => {
         const checkToken = async () => {
@@ -38,7 +40,7 @@ export default function RootNavigator() {
     }
 
     return (
-        <NavigationContainer>
+        <NavigationContainer theme={theme === 'dark' ? DarkTheme : DefaultTheme}>
             {isAuthenticated ? <AppStack /> : <AuthStack />}
         </NavigationContainer>
     );

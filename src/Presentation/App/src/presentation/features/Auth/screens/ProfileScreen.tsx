@@ -113,8 +113,8 @@ const ProfileScreen = () => {
 
                             <Switch
                                 accessibilityLabel={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-                                trackColor={{ false: '#cbd5e1', true: '#cbd5e1' }}
-                                thumbColor={theme === 'dark' ? '#0ccb22ff' : '#ffffffff'}
+                                trackColor={{ false: '#cbd5e1', true: '#2563eb' }}
+                                thumbColor={'#f4f3f4'}
                                 ios_backgroundColor="#cbd5e1"
                                 onValueChange={toggleTheme}
                                 value={theme === 'dark'}
@@ -125,29 +125,29 @@ const ProfileScreen = () => {
                     <Text className="text-slate-900 dark:text-white font-bold text-lg mb-4">{t('profile.account')}</Text>
 
                     <View className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
-                        <AccessibleTouchable accessibilityLabel={t('profile.notifications')} className="flex-row  py-3 border-b border-slate-50 dark:border-slate-700">
+                        <AccessibleTouchable accessibilityLabel={t('profile.notifications')} className="flex-row items-center justify-between py-3 border-b border-slate-50 dark:border-slate-700">
                             <View className="flex-row items-center gap-3">
                                 <View className="w-10 h-10 bg-slate-50 dark:bg-slate-700 rounded-full items-center justify-center">
                                     <Ionicons name="notifications-outline" size={20} color={theme === 'dark' ? '#e2e8f0' : '#334155'} />
                                 </View>
                                 <Text className="text-slate-700 dark:text-slate-200 font-semibold text-base">{t('profile.notifications')}</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color={theme === 'dark' ? '#64748b' : '#cbd5e1'} />
+                            <Ionicons name="chevron-forward" size={20} color={theme === 'dark' ? '#94a3b8' : '#cbd5e1'} />
                         </AccessibleTouchable>
 
-                        <AccessibleTouchable accessibilityLabel={t('profile.privacySecurity')} className="flex-row items-center  py-3 border-b border-slate-50 dark:border-slate-700">
+                        <AccessibleTouchable accessibilityLabel={t('profile.privacySecurity')} className="flex-row items-center justify-between py-3 border-b border-slate-50 dark:border-slate-700">
                             <View className="flex-row items-center gap-3">
                                 <View className="w-10 h-10 bg-slate-50 dark:bg-slate-700 rounded-full items-center justify-center">
                                     <Ionicons name="shield-checkmark-outline" size={20} color={theme === 'dark' ? '#e2e8f0' : '#334155'} />
                                 </View>
                                 <Text className="text-slate-700 dark:text-slate-200 font-semibold text-base">{t('profile.privacySecurity')}</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color={theme === 'dark' ? '#64748b' : '#cbd5e1'} />
+                            <Ionicons name="chevron-forward" size={20} color={theme === 'dark' ? '#94a3b8' : '#cbd5e1'} />
                         </AccessibleTouchable>
 
                         <AccessibleTouchable
                             accessibilityLabel={t('auth.logout')}
-                            className="flex-row py-3 mt-2"
+                            className="flex-row items-center justify-between py-3 mt-2"
                             onPress={handleLogout}
                         >
                             <View className="flex-row items-center gap-3">

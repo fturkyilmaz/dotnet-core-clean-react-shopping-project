@@ -3,17 +3,16 @@ import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouc
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeaturedProducts } from '@/presentation/features/Product/hooks/useProducts';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 
-// Helper function to convert category names to camelCase
 const toCamelCase = (str: string): string => {
     return str
-        .split(/['s\s]+/) // Split by apostrophe+s or spaces
+        .split(/['s\s]+/)
         .map((word, index) => {
             if (index === 0) {
-                return word.toLowerCase(); // First word lowercase
+                return word.toLowerCase();
             }
-            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(); // Capitalize first letter of subsequent words
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
         })
         .join('');
 };
@@ -68,7 +67,7 @@ export default function HomeScreen({ navigation }: any) {
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
                     {['electronics', 'jewelery', 'men\'s clothing', 'women\'s clothing'].map((cat, index) => (
                         <AccessibleTouchable
-                            accessibilityLabel={t(`home.${toCamelCase(cat)} `) || cat}
+                            accessibilityLabel={t(`home.${toCamelCase(cat)}`) || cat}
                             key={index}
                             className="mr-4 items-center"
                             onPress={() => navigation.navigate('Products', { category: cat })}
@@ -81,7 +80,7 @@ export default function HomeScreen({ navigation }: any) {
                                 />
                             </View>
                             <Text className="text-xs font-medium text-slate-600 dark:text-slate-400 capitalize">
-                                {t(`home.${toCamelCase(cat)} `) || cat}
+                                {t(`home.${toCamelCase(cat)}`) || cat}
                             </Text>
                         </AccessibleTouchable>
                     ))}
