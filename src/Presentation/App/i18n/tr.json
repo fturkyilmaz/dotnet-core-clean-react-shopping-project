@@ -20,7 +20,7 @@
         "confirmPassword": "Şifre Tekrar",
         "loginButton": "Giriş Yap",
         "registerButton": "Hesap Oluştur",
-        "dontHaveAccount": "Hesabınız yok mu? Kayıt Olun",
+        "dontHaveAccount": "Hesabınız yok mu?",
         "alreadyHaveAccount": "Zaten hesabınız var mı? Giriş Yapın",
         "logout": "Çıkış Yap",
         "welcome": "Hoş geldiniz!",
