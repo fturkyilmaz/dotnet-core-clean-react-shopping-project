@@ -84,7 +84,7 @@ namespace ShoppingProject.WebApi.Controllers
         }
 
         [HttpDelete("delete-all")]
-        [Authorize(Policy = Policies.CanPurge)]
+        [Authorize]
         [ProducesResponseType(typeof(ServiceResult<bool>), StatusCodes.Status204NoContent)]
         public async Task<ActionResult<ServiceResult<bool>>> DeleteAll()
         {
