@@ -21,7 +21,8 @@
         "NSCameraUsageDescription": "This app uses the camera to scan products.",
         "NSPhotoLibraryUsageDescription": "This app accesses your photos to upload product images.",
         "NSFaceIDUsageDescription": "Allow $(PRODUCT_NAME) to use Face ID for secure authentication"
-      }
+      },
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -65,7 +66,21 @@
       ],
       "expo-localization",
       "expo-sqlite",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "buildReactNativeFromSource": true,
+            "forceStaticLinking": [
+              "RNFBApp",
+              "RNFBAuth",
+              "RNFBFirestore"
+            ]
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {
