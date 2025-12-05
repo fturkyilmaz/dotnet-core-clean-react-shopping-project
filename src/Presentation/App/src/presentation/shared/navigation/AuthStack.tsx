@@ -9,7 +9,7 @@ export default function AuthStack() {
     return (
         <Stack.Navigator
             screenOptions={{
-                // headerShown: false, // This line was removed as per instruction
+                headerShown: false,
             }}
         >
             <Stack.Screen name="Login" component={LoginScreen} />

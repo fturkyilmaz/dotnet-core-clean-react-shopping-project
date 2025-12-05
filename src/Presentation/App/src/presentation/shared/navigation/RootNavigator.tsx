@@ -40,8 +40,6 @@ export default function RootNavigator() {
     }
 
     return (
-        <NavigationContainer theme={theme === 'dark' ? DarkTheme : DefaultTheme}>
-            {isAuthenticated ? <AppStack /> : <AuthStack />}
-        </NavigationContainer>
+        isAuthenticated ? <AppStack /> : <AuthStack />
     );
 }
