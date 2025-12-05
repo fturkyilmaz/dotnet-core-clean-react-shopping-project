@@ -5,10 +5,11 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    Alert,
 } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
-import { login } from '@/presentation/store/slices/authSlice';
+import { login, biometricLogin } from '@/presentation/store/slices/authSlice';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { useForm } from 'react-hook-form';
@@ -17,8 +18,8 @@ import FormInput from '@/presentation/shared/components/FormInput';
 import { LoginFormData, loginSchema } from '../validation/loginSchema';
 import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks/useRedux';
 import { useAppNavigation } from '@/presentation/shared/hooks/useAppNavigation';
-import { useBiometrics } from '@/presentation/shared/hooks/useBiometrics';
 import { Ionicons } from '@expo/vector-icons';
+import { useBiometrics } from '@/presentation/shared/hooks/useBiometrics';
 
 export default function LoginScreen() {
     const { t } = useTranslation();
@@ -27,7 +28,7 @@ export default function LoginScreen() {
     const { theme } = useTheme();
 
     const navigation = useAppNavigation();
-    const { isCompatible, isEnrolled, authenticate, biometricName } = useBiometrics();
+    const { isAvailable, authenticate, biometricName } = useBiometrics();
 
     const {
         control,
@@ -41,19 +42,23 @@ export default function LoginScreen() {
         },
     });
 
+    /**
+     * Normal login flow
+     */
     const onSubmit = async (data: LoginFormData) => {
         await dispatch(login(data));
     };
 
-    const handleBiometricLogin = () => {
-        authenticate(async () => {
-            // In a real app, you would retrieve credentials from SecureStore here
-            // For now, we'll just log in with the default test credentials
-            await dispatch(login({
-                email: 'admin@test.com',
-                password: 'Admin123!',
-            }));
-        });
+    /**
+     * Biometric login flow
+     */
+    const handleBiometricLogin = async () => {
+        const success = await authenticate();
+        if (success) {
+            await dispatch(biometricLogin());
+        } else {
+            Alert.alert('Biometric Login', 'Authentication failed or cancelled.');
+        }
     };
 
     return (
@@ -108,7 +113,7 @@ export default function LoginScreen() {
                                 inputClassName="bg-slate-50 dark:bg-slate-800"
                             />
 
-                            {isCompatible && isEnrolled && (
+                            {isAvailable && (
                                 <AccessibleTouchable
                                     accessibilityLabel={`Login with ${biometricName}`}
                                     className="flex-row items-center justify-center mb-6 py-3 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700"

@@ -1,76 +1,109 @@
 import * as LocalAuthentication from 'expo-local-authentication';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Alert, Platform } from 'react-native';
 
 export const useBiometrics = () => {
-    const [isCompatible, setIsCompatible] = useState(false);
-    const [isEnrolled, setIsEnrolled] = useState(false);
-    const [biometricType, setBiometricType] = useState<LocalAuthentication.AuthenticationType | null>(null);
+  const [isCompatible, setIsCompatible] = useState(false);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [biometricType, setBiometricType] =
+    useState<LocalAuthentication.AuthenticationType | null>(null);
 
-    useEffect(() => {
-        checkDeviceCompatibility();
-    }, []);
+  /**
+   * Resolve biometric type with priority (FaceID > others)
+   */
+  const resolveBiometricType = (types: LocalAuthentication.AuthenticationType[]) => {
+    if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+      return LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION;
+    }
+    return types[0] ?? null;
+  };
 
-    const checkDeviceCompatibility = async () => {
-        try {
-            const compatible = await LocalAuthentication.hasHardwareAsync();
-            setIsCompatible(compatible);
+  /**
+   * Check device compatibility
+   */
+  const checkDeviceCompatibility = useCallback(async () => {
+    try {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      setIsCompatible(compatible);
 
-            if (compatible) {
-                const enrolled = await LocalAuthentication.isEnrolledAsync();
-                setIsEnrolled(enrolled);
+      if (!compatible) return;
 
-                const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
-                if (types.length > 0) {
-                    // Prioritize FaceID if available, otherwise TouchID/Fingerprint
-                    if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
-                        setBiometricType(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
-                    } else {
-                        setBiometricType(types[0]);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Biometrics check failed:', error);
-        }
-    };
+      const enrolled = await LocalAuthentication.isEnrolledAsync();
+      setIsEnrolled(enrolled);
 
-    const authenticate = async (onSuccess: () => void) => {
-        try {
-            if (!isCompatible || !isEnrolled) {
-                Alert.alert(
-                    'Biometrics Unavailable',
-                    'Your device does not support biometrics or none are enrolled.'
-                );
-                return;
-            }
+      const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+      if (types.length > 0) {
+        setBiometricType(resolveBiometricType(types));
+      }
+    } catch (error) {
+      console.error('[Biometrics] Compatibility check failed:', error);
+    }
+  }, []);
 
-            const result = await LocalAuthentication.authenticateAsync({
-                promptMessage: 'Login with Biometrics',
-                fallbackLabel: 'Use Passcode',
-                cancelLabel: 'Cancel',
-                disableDeviceFallback: false,
-            });
+  useEffect(() => {
+    checkDeviceCompatibility();
+  }, [checkDeviceCompatibility]);
 
-            if (result.success) {
-                onSuccess();
-            } else if (result.error !== 'user_cancel') {
-                // Don't show alert for user cancellation
-                Alert.alert('Authentication Failed', 'Please try again.');
-            }
-        } catch (error) {
-            console.error('Biometric authentication error:', error);
-            Alert.alert('Error', 'An error occurred during authentication.');
-        }
-    };
+  /**
+   * Authenticate user with biometrics
+   */
+  const authenticate = useCallback(async (): Promise<boolean> => {
+    try {
+      if (!isCompatible || !isEnrolled) {
+        Alert.alert(
+          'Biometrics Unavailable',
+          'Your device does not support biometrics or none are enrolled.'
+        );
+        return false;
+      }
 
-    return {
-        isCompatible,
-        isEnrolled,
-        biometricType,
-        authenticate,
-        biometricName: biometricType === LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION 
-            ? (Platform.OS === 'ios' ? 'Face ID' : 'Face Unlock')
-            : (Platform.OS === 'ios' ? 'Touch ID' : 'Fingerprint'),
-    };
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Login with Biometrics',
+        fallbackLabel: 'Use Passcode',
+        cancelLabel: 'Cancel',
+        disableDeviceFallback: false,
+      });
+
+      if (result.success) {
+        return true;
+      }
+
+      if (result.error !== 'user_cancel') {
+        Alert.alert('Authentication Failed', 'Please try again.');
+      }
+
+      return false;
+    } catch (error) {
+      console.error('[Biometrics] Authentication error:', error);
+      Alert.alert('Error', 'An error occurred during authentication.');
+      return false;
+    }
+  }, [isCompatible, isEnrolled]);
+
+  /**
+   * Get biometric name for UI
+   */
+  const biometricName =
+    biometricType === LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION
+      ? Platform.OS === 'ios'
+        ? 'Face ID'
+        : 'Face Unlock'
+      : Platform.OS === 'ios'
+      ? 'Touch ID'
+      : 'Fingerprint';
+
+  return {
+    // State
+    isCompatible,
+    isEnrolled,
+    biometricType,
+
+    // Methods
+    checkDeviceCompatibility,
+    authenticate,
+
+    // Helpers
+    biometricName,
+    isAvailable: isCompatible && isEnrolled,
+  };
 };

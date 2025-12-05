@@ -1,5 +1,9 @@
 import { useState, useCallback } from 'react';
-import { biometricAuthService, BiometricAuthResult, BiometricAvailability } from '@/infrastructure/services/BiometricAuthService';
+import {
+  biometricAuthService,
+  BiometricAuthResult,
+  BiometricAvailability,
+} from '@/infrastructure/services/BiometricAuthService';
 
 export const useBiometricAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -7,7 +11,22 @@ export const useBiometricAuth = () => {
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Check biometric availability on component mount
+   * Common availability validation
+   */
+  const validateAvailability = (): BiometricAuthResult | null => {
+    if (!availability?.hasHardware || !availability?.isEnrolled) {
+      const result: BiometricAuthResult = {
+        success: false,
+        error: 'Biometric authentication not available on this device',
+      };
+      setError(result.error);
+      return result;
+    }
+    return null;
+  };
+
+  /**
+   * Check biometric availability
    */
   const checkAvailability = useCallback(async () => {
     try {
@@ -16,7 +35,8 @@ export const useBiometricAuth = () => {
       setAvailability(result);
       return result;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to check biometric availability';
+      const message =
+        err instanceof Error ? err.message : 'Failed to check biometric availability';
       setError(message);
       return null;
     }
@@ -26,33 +46,20 @@ export const useBiometricAuth = () => {
    * Authenticate user with biometric
    */
   const authenticate = useCallback(async (): Promise<BiometricAuthResult> => {
-    try {
-      setIsLoading(true);
-      setError(null);
+    setIsLoading(true);
+    setError(null);
 
-      if (!availability?.hasHardware || !availability?.isEnrolled) {
-        const result: BiometricAuthResult = {
-          success: false,
-          error: 'Biometric authentication not available on this device',
-        };
-        setError(result.error ?? null);
-        return result;
-      }
+    try {
+      const invalid = validateAvailability();
+      if (invalid) return invalid;
 
       const result = await biometricAuthService.authenticate();
-      
-      if (!result.success && result.error) {
-        setError(result.error);
-      }
-
+      if (!result.success && result.error) setError(result.error);
       return result;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Authentication failed';
       setError(message);
-      return {
-        success: false,
-        error: message,
-      };
+      return { success: false, error: message };
     } finally {
       setIsLoading(false);
     }
@@ -67,33 +74,20 @@ export const useBiometricAuth = () => {
       fallbackLabel?: string;
       disableDeviceFallback?: boolean;
     }): Promise<BiometricAuthResult> => {
-      try {
-        setIsLoading(true);
-        setError(null);
+      setIsLoading(true);
+      setError(null);
 
-        if (!availability?.hasHardware || !availability?.isEnrolled) {
-          const result: BiometricAuthResult = {
-            success: false,
-            error: 'Biometric authentication not available on this device',
-          };
-          setError(result.error ?? null);
-          return result;
-        }
+      try {
+        const invalid = validateAvailability();
+        if (invalid) return invalid;
 
         const result = await biometricAuthService.authenticateWithOptions(options);
-        
-        if (!result.success && result.error) {
-          setError(result.error);
-        }
-
+        if (!result.success && result.error) setError(result.error);
         return result;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Authentication failed';
         setError(message);
-        return {
-          success: false,
-          error: message,
-        };
+        return { success: false, error: message };
       } finally {
         setIsLoading(false);
       }
@@ -104,9 +98,7 @@ export const useBiometricAuth = () => {
   /**
    * Clear error state
    */
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+  const clearError = useCallback(() => setError(null), []);
 
   /**
    * Get biometry type name
@@ -121,14 +113,14 @@ export const useBiometricAuth = () => {
     isLoading,
     error,
     availability,
-    
+
     // Methods
     checkAvailability,
     authenticate,
     authenticateWithOptions,
     clearError,
     getBiometryTypeName,
-    
+
     // Helpers
     isAvailable: availability?.hasHardware && availability?.isEnrolled,
     hasHardware: availability?.hasHardware ?? false,
