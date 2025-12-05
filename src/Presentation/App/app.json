@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.shoppingapp.mobile",
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to scan products.",
-        "NSPhotoLibraryUsageDescription": "This app accesses your photos to upload product images."
+        "NSPhotoLibraryUsageDescription": "This app accesses your photos to upload product images.",
+        "NSFaceIDUsageDescription": "Allow $(PRODUCT_NAME) to use Face ID for secure authentication"
       }
     },
     "android": {
@@ -32,7 +33,9 @@
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.NOTIFICATIONS"
+        "android.permission.NOTIFICATIONS",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
       ],
       "googleServicesFile": "./google-services.json"
     },
@@ -43,11 +46,21 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/notification-icon.png",
-          "color": "#ffffff",
-          "sounds": [
-            "./assets/notification-sound.wav"
-          ]
+          "icon": "./assets/favicon.png",
+          "color": "#ffffff"
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID"
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
         }
       ]
     ],

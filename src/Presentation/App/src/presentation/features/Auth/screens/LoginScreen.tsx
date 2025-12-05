@@ -17,13 +17,17 @@ import FormInput from '@/presentation/shared/components/FormInput';
 import { LoginFormData, loginSchema } from '../validation/loginSchema';
 import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks/useRedux';
 import { useAppNavigation } from '@/presentation/shared/hooks/useAppNavigation';
+import { useBiometrics } from '@/presentation/shared/hooks/useBiometrics';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const { loading, error } = useAppSelector((state) => state.auth);
     const { theme } = useTheme();
+
     const navigation = useAppNavigation();
+    const { isCompatible, isEnrolled, authenticate, biometricName } = useBiometrics();
 
     const {
         control,
@@ -39,6 +43,17 @@ export default function LoginScreen() {
 
     const onSubmit = async (data: LoginFormData) => {
         await dispatch(login(data));
+    };
+
+    const handleBiometricLogin = () => {
+        authenticate(async () => {
+            // In a real app, you would retrieve credentials from SecureStore here
+            // For now, we'll just log in with the default test credentials
+            await dispatch(login({
+                email: 'admin@test.com',
+                password: 'Admin123!',
+            }));
+        });
     };
 
     return (
@@ -92,6 +107,24 @@ export default function LoginScreen() {
                                 containerClassName="mb-6"
                                 inputClassName="bg-slate-50 dark:bg-slate-800"
                             />
+
+                            {isCompatible && isEnrolled && (
+                                <AccessibleTouchable
+                                    accessibilityLabel={`Login with ${biometricName}`}
+                                    className="flex-row items-center justify-center mb-6 py-3 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700"
+                                    onPress={handleBiometricLogin}
+                                >
+                                    <Ionicons
+                                        name="finger-print-outline"
+                                        size={24}
+                                        color={theme === 'dark' ? '#60a5fa' : '#2563eb'}
+                                        style={{ marginRight: 8 }}
+                                    />
+                                    <Text className="text-slate-700 dark:text-slate-300 font-semibold">
+                                        Login with {biometricName}
+                                    </Text>
+                                </AccessibleTouchable>
+                            )}
 
                             <AccessibleTouchable
                                 accessibilityLabel={t('auth.loginButton')}

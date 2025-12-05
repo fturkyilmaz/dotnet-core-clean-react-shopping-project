@@ -4,8 +4,8 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "eslint . --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
     "test:e2e": "maestro test .maestro/flows",
@@ -36,6 +36,7 @@
     "expo-local-authentication": "^17.0.7",
     "expo-localization": "^17.0.7",
     "expo-notifications": "~0.29.13",
+    "expo-secure-store": "~15.0.8",
     "expo-sqlite": "^16.0.9",
     "expo-status-bar": "~2.0.0",
     "firebase": "^11.1.0",
@@ -51,7 +52,7 @@
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
     "react-native-toast-message": "^2.3.3",
-    "react-native-worklets": "^0.6.1",
+    "react-native-worklets": "^0.7.1",
     "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0",
     "tailwind-merge": "^3.4.0",
@@ -59,6 +60,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
+    "@testing-library/react-native": "^13.3.3",
     "@types/react": "~19.1.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
@@ -66,6 +68,7 @@
     "eslint": "^9.14.0",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-native": "^5.0.0",
+    "jest": "^30.2.0",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.9.2"

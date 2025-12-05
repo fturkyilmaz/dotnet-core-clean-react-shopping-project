@@ -108,7 +108,7 @@ export default function ProductsScreen() {
             <FlatList
                 data={products}
                 renderItem={renderProduct}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={(item) => item?.id?.toString()}
                 contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
                 showsVerticalScrollIndicator={false}
             />

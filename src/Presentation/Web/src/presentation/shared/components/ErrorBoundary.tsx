@@ -64,7 +64,7 @@ class ErrorBoundary extends Component<Props, State> {
                             <div className="mt-4 p-3 bg-white border rounded text-start">
                                 <h5 className="text-danger">Error Details:</h5>
                                 <pre className="text-danger small mb-0">
-                                    {this.state.error.toString()}
+                                    {this.state?.error?.toString()}
                                 </pre>
                             </div>
                         )}

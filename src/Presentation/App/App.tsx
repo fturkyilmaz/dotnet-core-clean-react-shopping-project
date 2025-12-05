@@ -1,7 +1,7 @@
 import './global.css';
 import { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '@/presentation/store';
 import RootNavigator from '@/presentation/shared/navigation/RootNavigator';
@@ -17,7 +17,7 @@ import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
 import analyticsService from '@/infrastructure/services/AnalyticsService';
 // import { initializeFirebaseAnalytics } from '@/services/firebaseAnalytics'; // TODO: Migrate this
 
-const queryClient = new QueryClient();
+import { queryClient } from '@/infrastructure/config/queryClient';
 
 function MainApp() {
     const { isOnline, isSyncing, pendingCount } = useNetworkStatus();
