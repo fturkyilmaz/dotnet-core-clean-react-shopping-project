@@ -80,6 +80,7 @@ public static class DependencyInjection
             .AddDefaultTokenProviders();
 
         builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddSingleton<IClock, SystemClock>();
         builder.Services.AddTransient<IIdentityService, IdentityService>();
 
         // Register repositories
