@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Infrastructure.Data;
 
 namespace ShoppingProject.Infrastructure.Jobs;
@@ -9,11 +10,13 @@ public class DatabaseBackupJob
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<DatabaseBackupJob> _logger;
+    private readonly IClock _clock;
 
-    public DatabaseBackupJob(ApplicationDbContext context, ILogger<DatabaseBackupJob> logger)
+    public DatabaseBackupJob(ApplicationDbContext context, ILogger<DatabaseBackupJob> logger, IClock clock)
     {
         _context = context;
         _logger = logger;
+        _clock = clock;
     }
 
     public async Task RunAsync()
@@ -43,7 +46,7 @@ public class DatabaseBackupJob
                     Directory.CreateDirectory(backupDirectory);
                 }
 
-                var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+                var timestamp = _clock.UtcNow.ToString("yyyyMMddHHmmss");
 
                 // Backup Products
                 var products = await _context.Products.AsNoTracking().ToListAsync();

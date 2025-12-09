@@ -11,18 +11,21 @@ public class SignalRService : ISignalRService
     private readonly IHubContext<CartHub> _cartHub;
     private readonly IHubContext<OrderHub> _orderHub;
     private readonly ILogger<SignalRService> _logger;
-
+    private readonly IClock _clock;
+    
     public SignalRService(
         IHubContext<NotificationHub> notificationHub,
         IHubContext<CartHub> cartHub,
         IHubContext<OrderHub> orderHub,
-        ILogger<SignalRService> logger
+        ILogger<SignalRService> logger,
+        IClock clock
     )
     {
         _notificationHub = notificationHub;
         _cartHub = cartHub;
         _orderHub = orderHub;
         _logger = logger;
+        _clock = clock;
     }
 
     // Notifications
@@ -136,7 +139,7 @@ public class SignalRService : ISignalRService
         {
             await _orderHub
                 .Clients.Group($"user_{userId}")
-                .SendAsync("OrderCreated", new { OrderId = orderId, Timestamp = DateTime.UtcNow });
+                .SendAsync("OrderCreated", new { OrderId = orderId, Timestamp = _clock.UtcNow });
 
             _logger.LogInformation(
                 "Notified order created for user {UserId}, order {OrderId}",
@@ -162,7 +165,7 @@ public class SignalRService : ISignalRService
                     {
                         OrderId = orderId,
                         Status = status,
-                        Timestamp = DateTime.UtcNow,
+                        Timestamp = _clock.UtcNow,
                     }
                 );
 
@@ -185,7 +188,7 @@ public class SignalRService : ISignalRService
         {
             await _orderHub
                 .Clients.Group("admins")
-                .SendAsync("NewOrder", new { OrderId = orderId, Timestamp = DateTime.UtcNow });
+                .SendAsync("NewOrder", new { OrderId = orderId, Timestamp = _clock.UtcNow });
 
             _logger.LogInformation("Notified admins of new order {OrderId}", orderId);
         }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using ShoppingProject.Application.Common.Interfaces;
 
 namespace ShoppingProject.Infrastructure.Hubs;
 
@@ -8,10 +9,12 @@ namespace ShoppingProject.Infrastructure.Hubs;
 public class CartHub : Hub
 {
     private readonly ILogger<CartHub> _logger;
+    private readonly IClock _clock;
 
-    public CartHub(ILogger<CartHub> logger)
+    public CartHub(ILogger<CartHub> logger, IClock clock)
     {
         _logger = logger;
+        _clock = clock;
     }
 
     public override async Task OnConnectedAsync()
@@ -75,7 +78,7 @@ public class CartHub : Hub
         // Signal that cart sync is needed - the client should fetch from API
         await Clients.Caller.SendAsync(
             "CartSyncRequested",
-            new { UserId = userId, Timestamp = DateTime.UtcNow }
+            new { UserId = userId, Timestamp = _clock.UtcNow }
         );
     }
 }

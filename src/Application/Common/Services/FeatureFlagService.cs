@@ -11,6 +11,7 @@ public class FeatureFlagService : IFeatureFlagService
     private readonly IMemoryCache _cache;
     private readonly IUser _currentUser;
     private readonly ILogger<FeatureFlagService> _logger;
+    private readonly IClock _clock;
     private const string CacheKeyPrefix = "feature_flag_";
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
@@ -18,13 +19,15 @@ public class FeatureFlagService : IFeatureFlagService
         IFeatureFlagRepository repository,
         IMemoryCache cache,
         IUser currentUser,
-        ILogger<FeatureFlagService> logger
+        ILogger<FeatureFlagService> logger,
+        IClock clock
     )
     {
         _repository = repository;
         _cache = cache;
         _currentUser = currentUser;
         _logger = logger;
+        _clock = clock;
     }
 
     public async Task<bool> IsEnabledAsync(
@@ -58,7 +61,7 @@ public class FeatureFlagService : IFeatureFlagService
             var targetUserId = userId ?? _currentUser.Id ?? "anonymous";
             var userRoles = _currentUser.Roles ?? new List<string>();
 
-            return featureFlag.IsEnabledForUser(targetUserId, userRoles);
+            return featureFlag.IsEnabledForUser(targetUserId, userRoles, _clock.UtcNow);
         }
         catch (Exception ex)
         {
@@ -86,7 +89,7 @@ public class FeatureFlagService : IFeatureFlagService
                 }
             );
 
-            if (featureFlag == null || !featureFlag.IsActive())
+            if (featureFlag == null || !featureFlag.IsActive(_clock.UtcNow))
                 return defaultValue;
 
             if (featureFlag.Metadata.TryGetValue("variant", out var variantJson))

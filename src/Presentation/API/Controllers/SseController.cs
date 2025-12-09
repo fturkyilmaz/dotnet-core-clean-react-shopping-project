@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using ShoppingProject.Application.Common.Interfaces;
 
 namespace ShoppingProject.WebApi.Controllers;
 
@@ -8,6 +9,13 @@ namespace ShoppingProject.WebApi.Controllers;
 [ApiVersion("1.0")]
 public class SseController : ControllerBase
 {
+    private readonly IClock _clock;
+
+    public SseController(IClock clock)
+    {
+        _clock = clock;
+    }
+
     [HttpGet("events")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -19,7 +27,7 @@ public class SseController : ControllerBase
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var message = $"Event at {DateTime.UtcNow}";
+            var message = $"Event at {_clock.UtcNow}";
             await Response.WriteAsync($"data: {message}\n\n", cancellationToken);
             await Response.Body.FlushAsync(cancellationToken);
             await Task.Delay(1000, cancellationToken);

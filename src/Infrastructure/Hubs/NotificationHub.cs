@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using ShoppingProject.Application.Common.Interfaces;
 
 namespace ShoppingProject.Infrastructure.Hubs;
 
@@ -8,10 +9,13 @@ namespace ShoppingProject.Infrastructure.Hubs;
 public class NotificationHub : Hub
 {
     private readonly ILogger<NotificationHub> _logger;
+    private readonly IClock _clock;
 
-    public NotificationHub(ILogger<NotificationHub> logger)
+    // ✅ Constructor injection ile hem logger hem clock alınıyor
+    public NotificationHub(ILogger<NotificationHub> logger, IClock clock)
     {
         _logger = logger;
+        _clock = clock;
     }
 
     public override async Task OnConnectedAsync()
@@ -96,7 +100,7 @@ public class NotificationHub : Hub
                 Type = "test",
                 Message = message,
                 UserId = userId,
-                Timestamp = DateTime.UtcNow,
+                Timestamp = _clock.UtcNow,
             }
         );
 

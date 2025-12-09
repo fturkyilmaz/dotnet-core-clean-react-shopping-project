@@ -16,25 +16,23 @@ public class FeatureFlag : BaseEntity
     public List<string> TargetedRoles { get; set; } = new();
     public Dictionary<string, string> Metadata { get; set; } = new();
 
-    public bool IsActive()
+    public bool IsActive(DateTimeOffset utcNow)
     {
         if (!IsEnabled)
             return false;
-
-        var now = DateTime.UtcNow;
-
-        if (StartDate.HasValue && now < StartDate.Value)
+        
+        if (StartDate.HasValue && utcNow.DateTime < StartDate.Value)
             return false;
 
-        if (EndDate.HasValue && now > EndDate.Value)
+        if (EndDate.HasValue && utcNow.DateTime > EndDate.Value)
             return false;
 
         return true;
     }
 
-    public bool IsEnabledForUser(string userId, List<string> userRoles)
+    public bool IsEnabledForUser(string userId, List<string> userRoles, DateTimeOffset utcNow)
     {
-        if (!IsActive())
+        if (!IsActive(utcNow))
             return false;
 
         // Check if user is specifically targeted

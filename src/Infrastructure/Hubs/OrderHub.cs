@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using ShoppingProject.Application.Common.Interfaces;
 
 namespace ShoppingProject.Infrastructure.Hubs;
 
@@ -8,10 +9,12 @@ namespace ShoppingProject.Infrastructure.Hubs;
 public class OrderHub : Hub
 {
     private readonly ILogger<OrderHub> _logger;
+    private readonly IClock _clock;
 
-    public OrderHub(ILogger<OrderHub> logger)
+    public OrderHub(ILogger<OrderHub> logger, IClock clock)
     {
         _logger = logger;
+        _clock = clock;
     }
 
     public override async Task OnConnectedAsync()
@@ -29,7 +32,6 @@ public class OrderHub : Hub
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
 
-            // If admin, add to admin group
             var isAdmin =
                 Context.User?.IsInRole("Admin") == true
                 || Context.User?.IsInRole("Administrator") == true;
@@ -71,7 +73,6 @@ public class OrderHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    // Client can request order status
     public async Task RequestOrderStatus(int orderId)
     {
         var userId =
@@ -89,10 +90,9 @@ public class OrderHub : Hub
             orderId
         );
 
-        // Signal that order status is needed - the client should fetch from API
         await Clients.Caller.SendAsync(
             "OrderStatusRequested",
-            new { OrderId = orderId, Timestamp = DateTime.UtcNow }
+            new { OrderId = orderId, Timestamp = _clock.UtcNow }
         );
     }
 }

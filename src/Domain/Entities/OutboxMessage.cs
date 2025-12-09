@@ -23,22 +23,24 @@ public class OutboxMessage : BaseEntity
     [NotMapped]
     public bool HasFailed => !string.IsNullOrEmpty(Error);
 
-    [NotMapped]
-    public bool CanRetry =>
-        RetryCount < 5 && (!NextRetryUtc.HasValue || NextRetryUtc.Value <= DateTime.UtcNow);
-
-    public void MarkAsProcessed()
+    // Methodlarda NotMapped gerekmez
+    public bool CanRetry(DateTimeOffset utcNow)
     {
-        ProcessedOnUtc = DateTime.UtcNow;
+        return RetryCount < 5 && (!NextRetryUtc.HasValue || NextRetryUtc.Value <= utcNow.DateTime);
+    }
+    
+    public void MarkAsProcessed(DateTimeOffset utcNow)
+    {
+        ProcessedOnUtc = utcNow.DateTime;
         Error = null;
     }
 
-    public void MarkAsFailed(string error)
+    public void MarkAsFailed(string error, DateTimeOffset utcNow)
     {
         Error = error;
         RetryCount++;
 
         var delayMinutes = Math.Pow(2, RetryCount);
-        NextRetryUtc = DateTime.UtcNow.AddMinutes(delayMinutes);
+        NextRetryUtc = utcNow.DateTime.AddMinutes(delayMinutes);
     }
 }

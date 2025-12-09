@@ -54,6 +54,7 @@ public class OutboxProcessorService : BackgroundService
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
         var messageBus = scope.ServiceProvider.GetRequiredService<IServiceBus>();
+        var clock = scope.ServiceProvider.GetRequiredService<IClock>();
 
         // DB’den raw kolonları çekiyoruz, computed property yok
         var allMessages = await context
@@ -62,7 +63,7 @@ public class OutboxProcessorService : BackgroundService
             .ToListAsync(cancellationToken);
 
         // Client-side filter: IsProcessed ve CanRetry burada kullanılabilir
-        var unprocessedMessages = allMessages.Where(m => !m.IsProcessed && m.CanRetry).ToList();
+        var unprocessedMessages = allMessages.Where(m => !m.IsProcessed && m.CanRetry(clock.UtcNow)).ToList();
 
         if (!unprocessedMessages.Any())
             return;
@@ -82,7 +83,7 @@ public class OutboxProcessorService : BackgroundService
                         message.Type,
                         message.Id
                     );
-                    message.MarkAsFailed($"Event type {message.Type} not found");
+                    message.MarkAsFailed($"Event type {message.Type} not found", clock.UtcNow);
                     continue;
                 }
 
@@ -90,20 +91,20 @@ public class OutboxProcessorService : BackgroundService
                 if (@event == null)
                 {
                     _logger.LogWarning("Failed to deserialize message {Id}", message.Id);
-                    message.MarkAsFailed("Failed to deserialize message");
+                    message.MarkAsFailed("Failed to deserialize message", clock.UtcNow);
                     continue;
                 }
 
                 // Publish to message bus
                 await messageBus.PublishAsync(@event, cancellationToken);
 
-                message.MarkAsProcessed();
+                message.MarkAsProcessed(clock.UtcNow);
                 _logger.LogInformation("Successfully processed outbox message {Id}", message.Id);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing outbox message {Id}", message.Id);
-                message.MarkAsFailed(ex.Message);
+                message.MarkAsFailed(ex.Message, clock.UtcNow);
             }
         }
 

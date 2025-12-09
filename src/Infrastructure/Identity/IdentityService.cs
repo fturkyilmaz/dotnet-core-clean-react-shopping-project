@@ -25,6 +25,7 @@ public class IdentityService : IIdentityService
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly JwtOptions _jwtOptions;
     private readonly ILogger<IdentityService> _logger;
+    private readonly IClock _clock;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
@@ -33,7 +34,8 @@ public class IdentityService : IIdentityService
         IConfiguration configuration,
         RoleManager<IdentityRole> roleManager,
         ILogger<IdentityService> logger,
-        IEmailService emailService
+        IEmailService emailService,
+        IClock clock
     )
     {
         _userManager = userManager;
@@ -43,6 +45,7 @@ public class IdentityService : IIdentityService
         _roleManager = roleManager;
         _logger = logger;
         _emailService = emailService;
+        _clock = clock;
         _jwtOptions = new JwtOptions();
         configuration.GetSection(JwtOptions.SectionName).Bind(_jwtOptions);
     }
@@ -139,7 +142,7 @@ public class IdentityService : IIdentityService
         var refreshToken = GenerateRefreshToken();
 
         user.RefreshToken = HashRefreshToken(refreshToken);
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        user.RefreshTokenExpiryTime = _clock.UtcNow.DateTime.AddDays(_jwtOptions.RefreshTokenExpiryDays);
 
         await _userManager.UpdateAsync(user);
 
@@ -151,7 +154,7 @@ public class IdentityService : IIdentityService
             {
                 AccessToken = token,
                 RefreshToken = refreshToken,
-                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime ?? DateTime.UtcNow,
+                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime ?? _clock.UtcNow.DateTime,
             }
         );
     }
@@ -180,7 +183,7 @@ public class IdentityService : IIdentityService
         var hashedRefreshToken = HashRefreshToken(refreshToken);
         if (
             user.RefreshToken != hashedRefreshToken
-            || user.RefreshTokenExpiryTime <= DateTime.UtcNow
+            || user.RefreshTokenExpiryTime <= _clock.UtcNow.DateTime
         )
         {
             _logger.LogWarning("Invalid or expired refresh token for user: {UserId}", userId);
@@ -191,7 +194,7 @@ public class IdentityService : IIdentityService
         var newRefreshToken = GenerateRefreshToken();
 
         user.RefreshToken = HashRefreshToken(newRefreshToken);
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        user.RefreshTokenExpiryTime = _clock.UtcNow.DateTime.AddDays(_jwtOptions.RefreshTokenExpiryDays);
         await _userManager.UpdateAsync(user);
 
         _logger.LogInformation("Refresh token successfully rotated for user: {UserId}", userId);
@@ -202,7 +205,7 @@ public class IdentityService : IIdentityService
             {
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken,
-                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime ?? DateTime.UtcNow,
+                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime ?? _clock.UtcNow.DateTime,
             }
         );
     }
@@ -287,7 +290,7 @@ public class IdentityService : IIdentityService
 
         var refreshToken = GenerateRefreshToken();
         user.RefreshToken = HashRefreshToken(refreshToken);
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        user.RefreshTokenExpiryTime = _clock.UtcNow.DateTime.AddDays(_jwtOptions.RefreshTokenExpiryDays);
         await _userManager.UpdateAsync(user);
 
         return Result.Success();
@@ -327,7 +330,7 @@ public class IdentityService : IIdentityService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpiryMinutes),
+            Expires = _clock.UtcNow.DateTime.AddMinutes(_jwtOptions.ExpiryMinutes),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature
@@ -392,7 +395,7 @@ public class IdentityService : IIdentityService
         user.FirstName = firstName;
         user.LastName = lastName;
         user.Gender = gender;
-        user.UpdateAt = DateTime.UtcNow;
+        user.UpdateAt = _clock.UtcNow.DateTime;
 
         var result = await _userManager.UpdateAsync(user);
 
