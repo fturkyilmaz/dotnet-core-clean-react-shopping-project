@@ -2,5 +2,5 @@
 
 public abstract class BaseEvent
 {
-    public DateTime DateOccurred { get; protected set; } = DateTime.UtcNow;
+    public DateTimeOffset DateOccurred { get; protected set; } = DateTimeOffset.UtcNow;
 }
