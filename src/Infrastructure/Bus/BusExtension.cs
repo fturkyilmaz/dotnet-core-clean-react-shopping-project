@@ -23,11 +23,17 @@ namespace ShoppingProject.Infrastructure.Bus
                 {
                     cfg.Host(new Uri(serviceBusOption!.Url), h => { });
                     
-                    cfg.ReceiveEndpoint(ServiceBusConst.ProductAddedEventQueueName,
-                        e => { e.ConfigureConsumer<ProductAddedEventConsumer>(context); });
+                    cfg.ReceiveEndpoint(ServiceBusConst.ProductAddedEventQueueName, e =>
+                    {
+                        e.UseMessageRetry(r => r.Interval(5, TimeSpan.FromSeconds(5)));
+                        e.ConfigureConsumer<ProductAddedEventConsumer>(context);
+                    });
                         
-                    cfg.ReceiveEndpoint(ServiceBusConst.CartCreatedEventQueueName,
-                        e => { e.ConfigureConsumer<CartCreatedEventConsumer>(context); });
+                    cfg.ReceiveEndpoint(ServiceBusConst.CartCreatedEventQueueName, e =>
+                    {
+                        e.UseMessageRetry(r => r.Interval(5, TimeSpan.FromSeconds(5)));
+                        e.ConfigureConsumer<CartCreatedEventConsumer>(context);
+                    });
                 });
             });
         }

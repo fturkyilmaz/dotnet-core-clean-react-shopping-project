@@ -11,6 +11,7 @@ public class OutboxMessage : BaseEntity
 {
     public string Type { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
+    public string? CorrelationId { get; set; }
     public DateTime OccurredOnUtc { get; set; }
     public DateTime? ProcessedOnUtc { get; set; }
     public string? Error { get; set; }
@@ -42,5 +43,12 @@ public class OutboxMessage : BaseEntity
 
         var delayMinutes = Math.Pow(2, RetryCount);
         NextRetryUtc = utcNow.DateTime.AddMinutes(delayMinutes);
+    }
+
+    public void MarkAsDeadLetter(string error, DateTimeOffset utcNow)
+    {
+        Error = error;
+        ProcessedOnUtc = utcNow.DateTime; // Mark as processed to prevent further retries
+        RetryCount = 5; // Indicate it has reached max retries
     }
 }

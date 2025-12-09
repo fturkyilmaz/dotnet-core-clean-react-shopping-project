@@ -14,13 +14,26 @@ namespace ShoppingProject.Infrastructure.Bus
             _sendEndpointProvider = sendEndpointProvider;
         }
 
-        public async Task PublishAsync<T>(T @event, CancellationToken cancellation = default) where T : class
+        public async Task PublishAsync<T>(
+            T @event,
+            CancellationToken cancellation = default,
+            string? messageId = null
+        ) where T : class
         {
-            await _publishEndpoint.Publish(@event, cancellation);
+            await _publishEndpoint.Publish(@event, context =>
+            {
+                if (!string.IsNullOrEmpty(messageId) && Guid.TryParse(messageId, out var guid))
+                {
+                    context.MessageId = guid;
+                }
+            }, cancellation);
         }
 
-        public async Task SendAsync<T>(T message, string queueName, CancellationToken cancellation = default)
-            where T : class
+        public async Task SendAsync<T>(
+            T message,
+            string queueName,
+            CancellationToken cancellation = default
+        ) where T : class
         {
             var endpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{queueName}"));
             await endpoint.Send(message, cancellation);

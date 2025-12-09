@@ -87,7 +87,8 @@ public class OutboxProcessorService : BackgroundService
                     continue;
                 }
 
-                var @event = JsonSerializer.Deserialize(message.Content, eventType);
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var @event = JsonSerializer.Deserialize(message.Content, eventType, options);
                 if (@event == null)
                 {
                     _logger.LogWarning("Failed to deserialize message {Id}", message.Id);
@@ -96,15 +97,33 @@ public class OutboxProcessorService : BackgroundService
                 }
 
                 // Publish to message bus
-                await messageBus.PublishAsync(@event, cancellationToken);
+                await messageBus.PublishAsync(@event, cancellationToken, message.Id.ToString());
 
                 message.MarkAsProcessed(clock.UtcNow);
-                _logger.LogInformation("Successfully processed outbox message {Id}", message.Id);
+                _logger.LogInformation(
+                    "Successfully processed outbox message {Id} of type {Type} with CorrelationId {CorrelationId}",
+                    message.Id,
+                    message.Type,
+                    message.CorrelationId
+                );
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing outbox message {Id}", message.Id);
-                message.MarkAsFailed(ex.Message, clock.UtcNow);
+                message.RetryCount++;
+                if (message.RetryCount >= 5)
+                {
+                    message.MarkAsDeadLetter(ex.Message, clock.UtcNow);
+                    _logger.LogError(
+                        "Message {Id} moved to DeadLetter after {RetryCount} retries",
+                        message.Id,
+                        message.RetryCount
+                    );
+                }
+                else
+                {
+                    message.MarkAsFailed(ex.Message, clock.UtcNow);
+                }
             }
         }
 

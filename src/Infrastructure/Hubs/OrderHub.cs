@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using ShoppingProject.Application.Common.Interfaces;
+using System.Security.Claims;
 
 namespace ShoppingProject.Infrastructure.Hubs;
 
@@ -17,16 +18,16 @@ public class OrderHub : Hub
         _clock = clock;
     }
 
+    private string? GetUserId()
+    {
+        return Context.User?.FindFirst("sub")?.Value
+            ?? Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+            ?? Context.User?.Identity?.Name;
+    }
+
     public override async Task OnConnectedAsync()
     {
-        var userId =
-            Context.User?.FindFirst("sub")?.Value
-            ?? Context
-                .User?.FindFirst(
-                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-                )
-                ?.Value
-            ?? Context.User?.Identity?.Name;
+        var userId = GetUserId();
 
         if (!string.IsNullOrEmpty(userId))
         {
@@ -38,12 +39,20 @@ public class OrderHub : Hub
 
             if (isAdmin)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, "admins");
-                _logger.LogInformation("Admin user {UserId} connected to OrderHub", userId);
+                await Groups.AddToGroupAsync(Context.ConnectionId, "role_admins");
+                _logger.LogInformation(
+                    "Admin user {UserId} connected to OrderHub with ConnectionId {ConnectionId}",
+                    userId,
+                    Context.ConnectionId
+                );
             }
             else
             {
-                _logger.LogInformation("User {UserId} connected to OrderHub", userId);
+                _logger.LogInformation(
+                    "User {UserId} connected to OrderHub with ConnectionId {ConnectionId}",
+                    userId,
+                    Context.ConnectionId
+                );
             }
         }
 
@@ -52,20 +61,14 @@ public class OrderHub : Hub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var userId =
-            Context.User?.FindFirst("sub")?.Value
-            ?? Context
-                .User?.FindFirst(
-                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-                )
-                ?.Value
-            ?? Context.User?.Identity?.Name;
+        var userId = GetUserId();
 
         if (!string.IsNullOrEmpty(userId))
         {
             _logger.LogInformation(
-                "User {UserId} disconnected from OrderHub. Exception: {Exception}",
+                "User {UserId} disconnected from OrderHub with ConnectionId {ConnectionId}. Exception: {Exception}",
                 userId,
+                Context.ConnectionId,
                 exception?.Message ?? "None"
             );
         }
@@ -73,26 +76,30 @@ public class OrderHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
+    [Authorize(Roles = "Client,Admin")]
     public async Task RequestOrderStatus(int orderId)
     {
-        var userId =
-            Context.User?.FindFirst("sub")?.Value
-            ?? Context
-                .User?.FindFirst(
-                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-                )
-                ?.Value
-            ?? Context.User?.Identity?.Name;
+        var userId = GetUserId();
 
-        _logger.LogInformation(
-            "Order status requested by user {UserId} for order {OrderId}",
-            userId,
-            orderId
-        );
+        try
+        {
+            _logger.LogInformation(
+                "Order status requested by user {UserId} for order {OrderId} with ConnectionId {ConnectionId}, CorrelationId {CorrelationId}",
+                userId,
+                orderId,
+                Context.ConnectionId,
+                Context.GetHttpContext()?.TraceIdentifier
+            );
 
-        await Clients.Caller.SendAsync(
-            "OrderStatusRequested",
-            new { OrderId = orderId, Timestamp = _clock.UtcNow }
-        );
+            await Clients.Caller.SendAsync(
+                "OrderStatusRequested",
+                new { OrderId = orderId, Timestamp = _clock.UtcNow }
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending order status to user {UserId}", userId);
+            await Clients.Caller.SendAsync("OrderStatusRequestedError", new { Success = false, Message = ex.Message });
+        }
     }
 }

@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching; 
 using Moq;
 using ShoppingProject.Application.Products.Commands.CreateProduct;
 using ShoppingProject.Application.Products.Commands.DeleteProduct;
@@ -16,24 +17,22 @@ namespace ShoppingProject.UnitTests.Presentation.Controllers;
 public class ProductsControllerAuthorizationTests
 {
     private readonly Mock<ISender> _senderMock;
+    private readonly Mock<IOutputCacheStore> _outputCacheStoreMock; 
     private readonly ProductsController _controller;
 
     public ProductsControllerAuthorizationTests()
     {
         _senderMock = new Mock<ISender>();
-        _controller = new ProductsController(_senderMock.Object);
+        _outputCacheStoreMock = new Mock<IOutputCacheStore>(); 
+
+        _controller = new ProductsController(_senderMock.Object, _outputCacheStoreMock.Object); // <-- düzeltildi
     }
 
     [Fact]
     public void GetAll_HasAllowAnonymousAttribute()
     {
-        // Arrange
         var method = typeof(ProductsController).GetMethod(nameof(ProductsController.GetAll));
-
-        // Act
         var attributes = method?.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -41,13 +40,8 @@ public class ProductsControllerAuthorizationTests
     [Fact]
     public void GetById_HasAllowAnonymousAttribute()
     {
-        // Arrange
         var method = typeof(ProductsController).GetMethod(nameof(ProductsController.GetById));
-
-        // Act
         var attributes = method?.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -55,13 +49,8 @@ public class ProductsControllerAuthorizationTests
     [Fact]
     public void Search_HasAllowAnonymousAttribute()
     {
-        // Arrange
         var method = typeof(ProductsController).GetMethod(nameof(ProductsController.Search));
-
-        // Act
         var attributes = method?.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -69,16 +58,10 @@ public class ProductsControllerAuthorizationTests
     [Fact]
     public void Create_HasAuthorizeAttributeWithCanManageProductsPolicy()
     {
-        // Arrange
         var method = typeof(ProductsController).GetMethod(nameof(ProductsController.Create));
-
-        // Act
-        var attributes = method
-            ?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
+        var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
             .Cast<AuthorizeAttribute>()
             .ToArray();
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
         Assert.Contains(attributes, a => a.Policy == Policies.CanManageProducts);
@@ -87,16 +70,10 @@ public class ProductsControllerAuthorizationTests
     [Fact]
     public void Update_HasAuthorizeAttributeWithCanManageProductsPolicy()
     {
-        // Arrange
         var method = typeof(ProductsController).GetMethod(nameof(ProductsController.Update));
-
-        // Act
-        var attributes = method
-            ?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
+        var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
             .Cast<AuthorizeAttribute>()
             .ToArray();
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
         Assert.Contains(attributes, a => a.Policy == Policies.CanManageProducts);
@@ -105,16 +82,10 @@ public class ProductsControllerAuthorizationTests
     [Fact]
     public void Delete_HasAuthorizeAttributeWithCanManageProductsPolicy()
     {
-        // Arrange
         var method = typeof(ProductsController).GetMethod(nameof(ProductsController.Delete));
-
-        // Act
-        var attributes = method
-            ?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
+        var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
             .Cast<AuthorizeAttribute>()
             .ToArray();
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
         Assert.Contains(attributes, a => a.Policy == Policies.CanManageProducts);

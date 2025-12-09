@@ -195,6 +195,7 @@ public class IdentityService : IIdentityService
 
         user.RefreshToken = HashRefreshToken(newRefreshToken);
         user.RefreshTokenExpiryTime = _clock.UtcNow.DateTime.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        // TODO: Add refresh token revocation list (invalidate old tokens)
         await _userManager.UpdateAsync(user);
 
         _logger.LogInformation("Refresh token successfully rotated for user: {UserId}", userId);
@@ -291,6 +292,7 @@ public class IdentityService : IIdentityService
         var refreshToken = GenerateRefreshToken();
         user.RefreshToken = HashRefreshToken(refreshToken);
         user.RefreshTokenExpiryTime = _clock.UtcNow.DateTime.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        // TODO: Add refresh token revocation list (invalidate old tokens)
         await _userManager.UpdateAsync(user);
 
         return Result.Success();
@@ -306,6 +308,8 @@ public class IdentityService : IIdentityService
             new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
             new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
+            new Claim("CorrelationId", Guid.NewGuid().ToString()),
+            new Claim("TenantId", user.TenantId ?? string.Empty),
         };
 
         // Roles
