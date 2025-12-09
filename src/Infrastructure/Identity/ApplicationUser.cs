@@ -8,8 +8,30 @@ public class ApplicationUser : IdentityUser
     public string? LastName { get; set; }
     public string? Gender { get; set; }
     public string? RefreshToken { get; set; }
-    public DateTime? RefreshTokenExpiryTime { get; set; }
+
+    private DateTime? _refreshTokenExpiryTime;
+    public DateTime? RefreshTokenExpiryTime
+    {
+        get => _refreshTokenExpiryTime;
+        set =>
+            _refreshTokenExpiryTime = value.HasValue
+                ? DateTime.SpecifyKind(value.Value, DateTimeKind.Utc)
+                : null;
+    }
+
     public string? TenantId { get; set; }
-    public DateTime CreateAt { get; set; }
-    public DateTime UpdateAt { get; set; }
+
+    private DateTime _createAt;
+    public DateTime CreateAt
+    {
+        get => _createAt;
+        set => _createAt = DateTime.SpecifyKind(value, DateTimeKind.Utc);
+    }
+
+    private DateTime _updateAt;
+    public DateTime UpdateAt
+    {
+        get => _updateAt;
+        set => _updateAt = DateTime.SpecifyKind(value, DateTimeKind.Utc);
+    }
 }
