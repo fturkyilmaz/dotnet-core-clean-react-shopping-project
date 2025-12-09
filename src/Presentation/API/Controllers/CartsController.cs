@@ -71,6 +71,7 @@ namespace ShoppingProject.WebApi.Controllers
                 return ServiceResult<bool>.Fail("Id mismatch", HttpStatusCode.BadRequest);
 
             await _sender.Send(command);
+
             return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);
         }
 
