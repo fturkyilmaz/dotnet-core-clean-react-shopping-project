@@ -142,7 +142,10 @@ public class IdentityService : IIdentityService
         var refreshToken = GenerateRefreshToken();
 
         user.RefreshToken = HashRefreshToken(refreshToken);
-        user.RefreshTokenExpiryTime = _clock.UtcNow.DateTime.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        user.RefreshTokenExpiryTime = _clock.UtcNow.UtcDateTime.AddDays(
+            _jwtOptions.RefreshTokenExpiryDays
+        );
+        user.UpdateAt = _clock.UtcNow.UtcDateTime;
 
         await _userManager.UpdateAsync(user);
 
@@ -154,7 +157,7 @@ public class IdentityService : IIdentityService
             {
                 AccessToken = token,
                 RefreshToken = refreshToken,
-                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime ?? _clock.UtcNow.DateTime,
+                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime ?? _clock.UtcNow.UtcDateTime,
             }
         );
     }
@@ -181,9 +184,10 @@ public class IdentityService : IIdentityService
         }
 
         var hashedRefreshToken = HashRefreshToken(refreshToken);
+
         if (
             user.RefreshToken != hashedRefreshToken
-            || user.RefreshTokenExpiryTime <= _clock.UtcNow.DateTime
+            || user.RefreshTokenExpiryTime <= _clock.UtcNow.UtcDateTime
         )
         {
             _logger.LogWarning("Invalid or expired refresh token for user: {UserId}", userId);
@@ -194,7 +198,11 @@ public class IdentityService : IIdentityService
         var newRefreshToken = GenerateRefreshToken();
 
         user.RefreshToken = HashRefreshToken(newRefreshToken);
-        user.RefreshTokenExpiryTime = _clock.UtcNow.DateTime.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        user.RefreshTokenExpiryTime = _clock.UtcNow.UtcDateTime.AddDays(
+            _jwtOptions.RefreshTokenExpiryDays
+        );
+        user.UpdateAt = _clock.UtcNow.UtcDateTime;
+
         // TODO: Add refresh token revocation list (invalidate old tokens)
         await _userManager.UpdateAsync(user);
 
@@ -290,8 +298,13 @@ public class IdentityService : IIdentityService
             await _userManager.AddToRoleAsync(user, role);
 
         var refreshToken = GenerateRefreshToken();
+        user.CreateAt = _clock.UtcNow.UtcDateTime;
+        user.UpdateAt = _clock.UtcNow.UtcDateTime;
         user.RefreshToken = HashRefreshToken(refreshToken);
-        user.RefreshTokenExpiryTime = _clock.UtcNow.DateTime.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        user.RefreshTokenExpiryTime = _clock.UtcNow.UtcDateTime.AddDays(
+            _jwtOptions.RefreshTokenExpiryDays
+        );
+
         // TODO: Add refresh token revocation list (invalidate old tokens)
         await _userManager.UpdateAsync(user);
 
@@ -334,7 +347,7 @@ public class IdentityService : IIdentityService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = _clock.UtcNow.DateTime.AddMinutes(_jwtOptions.ExpiryMinutes),
+            Expires = _clock.UtcNow.UtcDateTime.AddMinutes(_jwtOptions.ExpiryMinutes),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature
@@ -399,7 +412,7 @@ public class IdentityService : IIdentityService
         user.FirstName = firstName;
         user.LastName = lastName;
         user.Gender = gender;
-        user.UpdateAt = _clock.UtcNow.DateTime;
+        user.UpdateAt = _clock.UtcNow.UtcDateTime;
 
         var result = await _userManager.UpdateAsync(user);
 
