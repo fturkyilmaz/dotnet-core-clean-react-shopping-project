@@ -49,25 +49,26 @@ public class ResourceOwnerRequirementHandler : AuthorizationHandler<ResourceOwne
             return;
         }
 
-        // For resource-based authorization, check ownership
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext == null)
         {
             return;
         }
 
-        // Extract resource ID from route
         var resourceId = httpContext.Request.RouteValues["id"]?.ToString();
         if (string.IsNullOrEmpty(resourceId))
         {
             return;
         }
 
-        // Check ownership based on resource type
-        var isOwner = requirement.ResourceType switch
+        if (!int.TryParse(resourceId, out var id))
         {
-            "Client" => await CheckClientOwnership(userId, resourceId),
-            "Cart" => await CheckCartOwnership(userId, resourceId),
+            return;
+        }
+
+        bool isOwner = requirement.ResourceType switch
+        {
+            "Cart" => await _context.Carts.AnyAsync(c => c.Id == id && c.OwnerId == userId),
             _ => false,
         };
 
@@ -75,20 +76,5 @@ public class ResourceOwnerRequirementHandler : AuthorizationHandler<ResourceOwne
         {
             context.Succeed(requirement);
         }
-    }
-
-    private async Task<bool> CheckClientOwnership(string userId, string clientId)
-    {
-        // For Clients: check if it's their own profile
-        // This is a placeholder - implement based on your domain model
-        // Example: return await _context.Clients.AnyAsync(c => c.Id == clientId && c.DietitianId == userId);
-        return await Task.FromResult(false);
-    }
-
-    private async Task<bool> CheckCartOwnership(string userId, string cartId)
-    {
-        // Check if the cart belongs to the current user
-        // This is a placeholder - implement based on your domain model
-        return await Task.FromResult(false);
     }
 }

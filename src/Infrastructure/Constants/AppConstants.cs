@@ -34,12 +34,6 @@ public static class AppConstants
         public const string Kestrel = "Microsoft.AspNetCore.Server.Kestrel";
     }
 
-    public static class Observability
-    {
-        public const string DefaultOtlpEndpoint = "http://localhost:4317";
-        public const string DefaultElasticsearchUrl = "http://localhost:9200";
-    }
-
     public static class Endpoints
     {
         public const string HangfireDashboard = "/hangfire";

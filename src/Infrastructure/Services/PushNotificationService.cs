@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Infrastructure.Constants;
 
 namespace ShoppingProject.Infrastructure.Services;
 
@@ -9,16 +11,21 @@ public class PushNotificationService : IPushNotificationService
     private readonly ILogger<PushNotificationService> _logger;
     private readonly ICacheService _cacheService;
     private readonly HttpClient _httpClient;
+    private readonly string _expoApiUrl;
 
     public PushNotificationService(
         ILogger<PushNotificationService> logger,
         ICacheService cacheService,
-        IHttpClientFactory httpClientFactory
+        IHttpClientFactory httpClientFactory,
+        IConfiguration configuration
     )
     {
         _logger = logger;
         _cacheService = cacheService;
         _httpClient = httpClientFactory.CreateClient("ExpoNotifications");
+        _expoApiUrl =
+            configuration["PushNotifications:ExpoApiUrl"]
+            ?? throw new InvalidOperationException("ExpoApiUrl not configured");
     }
 
     public async Task SendPushNotificationAsync(
@@ -180,6 +187,8 @@ public class PushNotificationService : IPushNotificationService
     {
         // In production, this should query database for users in role
         // For now, return empty list
+
+        _ = role;
         return await Task.FromResult(new List<string>());
     }
 
@@ -201,10 +210,7 @@ public class PushNotificationService : IPushNotificationService
                 data = data ?? new { },
             };
 
-            var response = await _httpClient.PostAsJsonAsync(
-                "https://exp.host/--/api/v2/push/send",
-                message
-            );
+            var response = await _httpClient.PostAsJsonAsync(_expoApiUrl, message);
 
             if (!response.IsSuccessStatusCode)
             {

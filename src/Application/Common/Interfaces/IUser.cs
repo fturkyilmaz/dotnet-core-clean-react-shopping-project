@@ -1,7 +1,8 @@
-﻿namespace ShoppingProject.Application.Common.Interfaces;
-
-public interface IUser
+﻿namespace ShoppingProject.Application.Common.Interfaces
 {
-    string? Id { get; }
-    List<string>? Roles { get; }
+    public interface IUser
+    {
+        string? Id { get; }
+        IReadOnlyCollection<string> GetRoles();
+    }
 }

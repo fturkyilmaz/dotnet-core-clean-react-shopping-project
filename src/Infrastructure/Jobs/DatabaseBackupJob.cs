@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Infrastructure.Common.Exceptions;
 using ShoppingProject.Infrastructure.Data;
 
 namespace ShoppingProject.Infrastructure.Jobs;
@@ -12,7 +13,11 @@ public class DatabaseBackupJob
     private readonly ILogger<DatabaseBackupJob> _logger;
     private readonly IClock _clock;
 
-    public DatabaseBackupJob(ApplicationDbContext context, ILogger<DatabaseBackupJob> logger, IClock clock)
+    public DatabaseBackupJob(
+        ApplicationDbContext context,
+        ILogger<DatabaseBackupJob> logger,
+        IClock clock
+    )
     {
         _context = context;
         _logger = logger;
@@ -72,7 +77,7 @@ public class DatabaseBackupJob
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred during database backup");
-                throw;
+                throw new InfrastructureException("Error occurred during database backup", ex);
             }
         }
     }

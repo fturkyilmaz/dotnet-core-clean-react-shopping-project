@@ -46,8 +46,7 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
                 {
                     foreach (var role in roles)
                     {
-                        // ✅ Sonar S6617: Contains kullanımı
-                        var isInRole = _user.Roles?.Contains(role) ?? false;
+                        var isInRole = _user.GetRoles().Contains(role);
                         if (isInRole)
                         {
                             authorized = true;

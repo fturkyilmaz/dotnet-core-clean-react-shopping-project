@@ -21,11 +21,11 @@ public class IdentityService : IIdentityService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
     private readonly IAuthorizationService _authorizationService;
-    private readonly IConfiguration _configuration;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly JwtOptions _jwtOptions;
     private readonly ILogger<IdentityService> _logger;
     private readonly IClock _clock;
+    private readonly ICacheService _cacheService;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
@@ -35,17 +35,18 @@ public class IdentityService : IIdentityService
         RoleManager<IdentityRole> roleManager,
         ILogger<IdentityService> logger,
         IEmailService emailService,
-        IClock clock
+        IClock clock,
+        ICacheService cacheService
     )
     {
         _userManager = userManager;
         _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
         _authorizationService = authorizationService;
-        _configuration = configuration;
         _roleManager = roleManager;
         _logger = logger;
         _emailService = emailService;
         _clock = clock;
+        _cacheService = cacheService;
         _jwtOptions = new JwtOptions();
         configuration.GetSection(JwtOptions.SectionName).Bind(_jwtOptions);
     }
@@ -203,7 +204,22 @@ public class IdentityService : IIdentityService
         );
         user.UpdateAt = _clock.UtcNow.UtcDateTime;
 
-        // TODO: Add refresh token revocation list (invalidate old tokens)
+        var jti = principal.FindFirstValue(JwtRegisteredClaimNames.Jti);
+        if (!string.IsNullOrEmpty(jti))
+        {
+            var expClaim = principal.FindFirstValue(JwtRegisteredClaimNames.Exp);
+            if (long.TryParse(expClaim, out var expSeconds))
+            {
+                var expiryDate = DateTimeOffset.FromUnixTimeSeconds(expSeconds);
+                var timeToLive = expiryDate - _clock.UtcNow;
+
+                if (timeToLive > TimeSpan.Zero)
+                {
+                    await _cacheService.SetAsync($"revoked_token:{jti}", "revoked", timeToLive);
+                }
+            }
+        }
+
         await _userManager.UpdateAsync(user);
 
         _logger.LogInformation("Refresh token successfully rotated for user: {UserId}", userId);
@@ -305,7 +321,6 @@ public class IdentityService : IIdentityService
             _jwtOptions.RefreshTokenExpiryDays
         );
 
-        // TODO: Add refresh token revocation list (invalidate old tokens)
         await _userManager.UpdateAsync(user);
 
         return Result.Success();

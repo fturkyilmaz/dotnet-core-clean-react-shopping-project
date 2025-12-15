@@ -33,13 +33,13 @@ namespace ShoppingProject.Infrastructure.Data
             base.Remove(entity);
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
 
-            modelBuilder.Entity<Product>().HasKey(p => p.Id);
-            modelBuilder.Entity<Cart>().HasKey(c => c.Id);
-            modelBuilder.Entity<Product>().OwnsOne(p => p.Rating);
+            builder.Entity<Product>().HasKey(p => p.Id);
+            builder.Entity<Cart>().HasKey(c => c.Id);
+            builder.Entity<Product>().OwnsOne(p => p.Rating);
         }
     }
 }

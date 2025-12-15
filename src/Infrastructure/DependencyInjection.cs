@@ -34,50 +34,32 @@ public static class DependencyInjection
         var connectionString = builder.Configuration.GetConnectionString(
             ConfigurationConstants.ConnectionStrings.DefaultConnection
         );
-        Guard.Against.Null(
-            connectionString,
-            message: "Connection string 'DefaultConnection' not found."
-        );
+        Guard.Against.Null(connectionString);
 
         // DbContexts
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
-        builder.Services.AddDbContext<ApplicationDbContext>(
-            (sp, options) =>
-            {
-                options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-                options.UseNpgsql(connectionString);
-                options.ConfigureWarnings(w =>
-                    w.Ignore(RelationalEventId.PendingModelChangesWarning)
-                );
-            }
-        );
-
-        builder.Services.AddScoped<IApplicationDbContext>(sp =>
-            sp.GetRequiredService<ApplicationDbContext>()
-        );
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString);
+            options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+        });
+        builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
         var readOnlyConnectionString =
             builder.Configuration.GetConnectionString(
                 ConfigurationConstants.ConnectionStrings.DefaultConnectionReadOnly
             ) ?? connectionString;
 
-        builder.Services.AddDbContext<ReadOnlyApplicationDbContext>(
-            (_, options) =>
-            {
-                options.UseNpgsql(readOnlyConnectionString);
-                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-                options.ConfigureWarnings(w =>
-                    w.Ignore(RelationalEventId.PendingModelChangesWarning)
-                );
-            }
-        );
-
-        builder.Services.AddScoped<IReadOnlyApplicationDbContext>(sp =>
-            sp.GetRequiredService<ReadOnlyApplicationDbContext>()
-        );
+        builder.Services.AddDbContext<ReadOnlyApplicationDbContext>(options =>
+        {
+            options.UseNpgsql(readOnlyConnectionString);
+            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+        });
+        builder.Services.AddScoped<IReadOnlyApplicationDbContext, ReadOnlyApplicationDbContext>();
 
         // Identity
         builder
@@ -155,9 +137,34 @@ public static class DependencyInjection
                 var jwtOptions = new JwtOptions();
                 builder.Configuration.GetSection(JwtOptions.SectionName).Bind(jwtOptions);
 
-                Guard.Against.Null(jwtOptions.Issuer, nameof(jwtOptions.Issuer));
-                Guard.Against.Null(jwtOptions.Audience, nameof(jwtOptions.Audience));
-                Guard.Against.Null(jwtOptions.Secret, nameof(jwtOptions.Secret));
+                Guard.Against.Null(jwtOptions.Issuer);
+                Guard.Against.Null(jwtOptions.Audience);
+                Guard.Against.Null(jwtOptions.Secret);
+
+                options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var cacheService =
+                            context.HttpContext.RequestServices.GetRequiredService<ICacheService>();
+                        var jti = context
+                            .Principal?.FindFirst(
+                                System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti
+                            )
+                            ?.Value;
+
+                        if (!string.IsNullOrEmpty(jti))
+                        {
+                            var isRevoked = await cacheService.GetAsync<string>(
+                                $"revoked_token:{jti}"
+                            );
+                            if (!string.IsNullOrEmpty(isRevoked))
+                            {
+                                context.Fail("Token is revoked.");
+                            }
+                        }
+                    },
+                };
 
                 options.TokenValidationParameters =
                     new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -195,9 +202,8 @@ public static class DependencyInjection
         builder.Services.AddScoped<IAuthorizationHandler, ResourceOwnerRequirementHandler>();
         builder.Services.AddScoped<IUser, CurrentUser>();
 
-        // Observability: OpenTelemetry + Serilog + HealthChecks
+        // Observability
         const string serviceName = "ShoppingProject.API";
-
         builder.Services.AddTelemetry(serviceName);
 
         // Validators

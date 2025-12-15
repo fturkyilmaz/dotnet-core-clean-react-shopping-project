@@ -4,6 +4,7 @@ using Polly.CircuitBreaker;
 using Polly.Fallback;
 using Polly.Retry;
 using Polly.Timeout;
+using ShoppingProject.Infrastructure.Common.Exceptions;
 
 namespace ShoppingProject.Infrastructure.Resilience;
 
@@ -13,6 +14,7 @@ public static class ResiliencePolicies
     /// Creates a resilience pipeline with retry, circuit breaker, and timeout policies
     /// </summary>
     public static IAsyncPolicy<TResult> CreateResiliencePipeline<TResult>(
+        ILogger logger,
         int retryCount = 3,
         int circuitBreakerThreshold = 5,
         TimeSpan? circuitBreakerDuration = null,
@@ -28,10 +30,14 @@ public static class ResiliencePolicies
             .WaitAndRetryAsync(
                 retryCount,
                 retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
-                onRetry: (outcome, timespan, retryCount, context) =>
+                onRetry: (outcome, timespan, retryAttempt, context) =>
                 {
-                    Console.WriteLine(
-                        $"Retry {retryCount} after {timespan.TotalSeconds}s due to: {outcome.Exception?.Message}"
+                    logger.LogWarning(
+                        outcome.Exception,
+                        "Retry {RetryAttempt} after {Delay}s due to {Message}",
+                        retryAttempt,
+                        timespan.TotalSeconds,
+                        outcome.Exception?.Message
                     );
                 }
             );
@@ -44,17 +50,20 @@ public static class ResiliencePolicies
                 durationOfBreak: breakerDuration,
                 onBreak: (outcome, duration) =>
                 {
-                    Console.WriteLine(
-                        $"Circuit breaker opened for {duration.TotalSeconds}s due to: {outcome.Exception?.Message}"
+                    logger.LogError(
+                        outcome.Exception,
+                        "Circuit breaker opened for {Duration}s due to {Message}",
+                        duration.TotalSeconds,
+                        outcome.Exception?.Message
                     );
                 },
                 onReset: () =>
                 {
-                    Console.WriteLine("Circuit breaker reset");
+                    logger.LogInformation("Circuit breaker reset");
                 },
                 onHalfOpen: () =>
                 {
-                    Console.WriteLine("Circuit breaker half-open, testing...");
+                    logger.LogInformation("Circuit breaker half-open, testing...");
                 }
             );
 
@@ -82,6 +91,7 @@ public static class ResiliencePolicies
     /// Creates a bulkhead isolation policy to limit concurrent executions
     /// </summary>
     public static IAsyncPolicy CreateBulkheadPolicy(
+        ILogger logger,
         int maxParallelization = 10,
         int maxQueuingActions = 20
     )
@@ -91,7 +101,7 @@ public static class ResiliencePolicies
             maxQueuingActions: maxQueuingActions,
             onBulkheadRejectedAsync: context =>
             {
-                Console.WriteLine("Bulkhead rejected - too many concurrent requests");
+                logger.LogWarning("Bulkhead rejected - too many concurrent requests");
                 return Task.CompletedTask;
             }
         );
@@ -112,8 +122,9 @@ public class ResilientHttpService
         _httpClient = httpClient;
         _logger = logger;
 
-        // Create resilience pipeline
+        // Create resilience pipeline with logger
         _resiliencePolicy = ResiliencePolicies.CreateResiliencePipeline<HttpResponseMessage>(
+            _logger,
             retryCount: 3,
             circuitBreakerThreshold: 5,
             circuitBreakerDuration: TimeSpan.FromSeconds(30),
@@ -139,17 +150,17 @@ public class ResilientHttpService
         catch (BrokenCircuitException ex)
         {
             _logger.LogError(ex, "Circuit breaker is open for {Url}", url);
-            throw;
+            throw new InfrastructureException($"Circuit breaker open for {url}", ex);
         }
         catch (TimeoutRejectedException ex)
         {
             _logger.LogError(ex, "Request timeout for {Url}", url);
-            throw;
+            throw new InfrastructureException($"Request timeout for {url}", ex);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error making request to {Url}", url);
-            throw;
+            throw new InfrastructureException($"Error making request to {url}", ex);
         }
     }
 }

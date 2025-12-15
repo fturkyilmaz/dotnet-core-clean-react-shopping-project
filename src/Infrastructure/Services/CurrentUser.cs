@@ -16,9 +16,11 @@ public class CurrentUser : IUser
     public string? Id =>
         _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    public List<string>? Roles =>
-        _httpContextAccessor
-            .HttpContext?.User?.FindAll(ClaimTypes.Role)
-            .Select(c => c.Value)
-            .ToList();
+    public IReadOnlyCollection<string> GetRoles()
+    {
+        return _httpContextAccessor
+                .HttpContext?.User?.FindAll(ClaimTypes.Role)
+                .Select(c => c.Value)
+                .ToArray() ?? Array.Empty<string>();
+    }
 }

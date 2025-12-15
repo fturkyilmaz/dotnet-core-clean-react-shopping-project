@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using ShoppingProject.Application.Common.Exceptions;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Entities;
 
@@ -59,14 +60,13 @@ public class FeatureFlagService : IFeatureFlagService
             }
 
             var targetUserId = userId ?? _currentUser.Id ?? "anonymous";
-            var userRoles = _currentUser.Roles ?? new List<string>();
-
-            return featureFlag.IsEnabledForUser(targetUserId, userRoles, _clock.UtcNow);
+            var userRoles = _currentUser.GetRoles();
+            return featureFlag.IsEnabledForUser(targetUserId, userRoles.ToList(), _clock.UtcNow);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error checking feature flag {FeatureName}", featureName);
-            return false; // Fail closed - feature disabled on error
+            throw new ApplicationBaseException($"Error checking feature flag {featureName}", ex);
         }
     }
 
@@ -102,7 +102,7 @@ public class FeatureFlagService : IFeatureFlagService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting feature variant {FeatureName}", featureName);
-            return defaultValue;
+            throw new ApplicationBaseException($"Error getting feature variant {featureName}", ex);
         }
     }
 }

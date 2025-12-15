@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using ShoppingProject.Domain.Constants;
 using ShoppingProject.Domain.Entities;
 using ShoppingProject.Domain.ValueObjects;
+using ShoppingProject.Infrastructure.Common.Exceptions;
 using ShoppingProject.Infrastructure.Identity;
 
 namespace ShoppingProject.Infrastructure.Data;
@@ -53,7 +54,7 @@ public class ApplicationDbContextInitialiser
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while initialising the database.");
-            throw;
+            throw new InfrastructureException("Database initialisation failed", ex);
         }
     }
 
@@ -66,7 +67,7 @@ public class ApplicationDbContextInitialiser
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while seeding the database.");
-            throw;
+            throw new InfrastructureException("Database seeding failed", ex);
         }
     }
 

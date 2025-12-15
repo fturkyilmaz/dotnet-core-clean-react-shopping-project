@@ -74,8 +74,6 @@ namespace ShoppingProject.WebApi.Controllers
         public async Task<ActionResult<ServiceResult<ProductDto>>> GetById(int id)
         {
             var product = await _sender.Send(new GetProductByIdQuery(id));
-            if (product == null)
-                return ServiceResult<ProductDto>.Fail("Product not found", HttpStatusCode.NotFound);
 
             return ServiceResult<ProductDto>.Success(product);
         }

@@ -32,14 +32,14 @@ public class RedisCacheService : ICacheService
     public async Task SetAsync<T>(
         string key,
         T value,
-        TimeSpan? expiry = null,
+        TimeSpan? expiration = null,
         CancellationToken cancellationToken = default
     )
     {
         var options = new DistributedCacheEntryOptions();
 
-        if (expiry.HasValue)
-            options.SetAbsoluteExpiration(expiry.Value);
+        if (expiration.HasValue)
+            options.SetAbsoluteExpiration(expiration.Value);
         else
             options.SetAbsoluteExpiration(TimeSpan.FromMinutes(30)); // Default 30 minutes
 
@@ -55,19 +55,19 @@ public class RedisCacheService : ICacheService
     public async Task<T> GetOrCreateAsync<T>(
         string key,
         Func<Task<T>> factory,
-        TimeSpan? expiry = null,
+        TimeSpan? expiration = null,
         CancellationToken cancellationToken = default
     )
     {
         var cachedValue = await GetAsync<T>(key, cancellationToken);
 
-        if (cachedValue != null)
-            return cachedValue;
+        if (!EqualityComparer<T>.Default.Equals(cachedValue, default))
+            return cachedValue!;
 
         var value = await factory();
-        await SetAsync(key, value, expiry, cancellationToken);
+        await SetAsync(key, value, expiration, cancellationToken);
 
-        return value;
+        return value!;
     }
 
     public async Task<T> GetOrSetAsync<T>(
@@ -79,18 +79,18 @@ public class RedisCacheService : ICacheService
     {
         var cachedValue = await GetAsync<T>(key, cancellationToken);
 
-        if (cachedValue is not null)
+        if (!EqualityComparer<T>.Default.Equals(cachedValue, default))
         {
-            return cachedValue;
+            return cachedValue!;
         }
 
         var value = await factory();
 
-        if (value is not null)
+        if (!EqualityComparer<T>.Default.Equals(value, default))
         {
-            await SetAsync(key, value, expiration, cancellationToken);
+            await SetAsync(key, value!, expiration, cancellationToken);
         }
 
-        return value;
+        return value!;
     }
 }

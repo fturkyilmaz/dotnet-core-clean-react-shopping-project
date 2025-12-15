@@ -3,7 +3,7 @@ using ShoppingProject.Application.Common.Specifications;
 
 namespace ShoppingProject.Infrastructure.Repositories;
 
-public class SpecificationEvaluator<T>
+public static class SpecificationEvaluator<T>
     where T : class
 {
     public static IQueryable<T> GetQuery(IQueryable<T> inputQuery, ISpecification<T> specification)

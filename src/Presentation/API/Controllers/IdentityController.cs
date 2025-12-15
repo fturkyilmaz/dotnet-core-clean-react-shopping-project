@@ -58,7 +58,7 @@ public class IdentityController : ControllerBase
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ServiceResult<string>>> Register(RegisterRequest request)
     {
-        var (result, userId) = await _identityService.CreateUserAsync(
+        var (result, _) = await _identityService.CreateUserAsync(
             request.Email,
             request.Password,
             request.FirstName,
