@@ -1,5 +1,5 @@
-using Ardalis.GuardClauses;
 using MediatR;
+using ShoppingProject.Application.Common.Exceptions;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Events;
 
@@ -18,7 +18,10 @@ public class UpdateCartCommandHandler : IRequestHandler<UpdateCartCommand>
     {
         var entity = _context.Carts.FirstOrDefault(c => c.Id == request.Id);
 
-        Guard.Against.NotFound(request.Id, entity);
+        if (entity == null)
+        {
+            throw new NotFoundException(nameof(entity), request.Id);
+        }
 
         entity.Title = request.Title;
         entity.Price = request.Price;

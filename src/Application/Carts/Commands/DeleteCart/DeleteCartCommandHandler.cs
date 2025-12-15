@@ -1,6 +1,7 @@
-using Ardalis.GuardClauses;
 using MediatR;
+using ShoppingProject.Application.Common.Exceptions;
 using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Application.DTOs;
 using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Carts.Commands.DeleteCart;
@@ -18,11 +19,14 @@ public class DeleteCartCommandHandler : IRequestHandler<DeleteCartCommand>
     {
         var entity = _context.Carts.FirstOrDefault(c => c.Id == request.Id);
 
-        Guard.Against.NotFound(request.Id, entity);
+        if (entity == null)
+        {
+            throw new NotFoundException(nameof(CartDto), request.Id);
+        }
 
         _context.Remove(entity);
 
-        entity.AddDomainEvent(new CartDeletedEvent(entity)); // Event to be created later
+        entity.AddDomainEvent(new CartDeletedEvent(entity));
 
         await _context.SaveChangesAsync(cancellationToken);
     }
