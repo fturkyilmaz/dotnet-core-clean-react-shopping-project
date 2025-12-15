@@ -17,36 +17,12 @@ public class MappingProfile : Profile
         CreateMap<Cart, CartDto>().ReverseMap();
         CreateMap<CreateCartDto, Cart>();
         CreateMap<UpdateCartDto, Cart>();
-        
-        // Paginate mappings with inline conversion
+
+        // Generic paginate mappings
         CreateMap<IPaginate<Product>, IPaginate<ProductDto>>()
-            .ConvertUsing((src, dest, context) =>
-            {
-                var items = context.Mapper.Map<IList<Product>, IList<ProductDto>>(src.Items);
-                return new Paginate<ProductDto>
-                {
-                    Index = src.Index,
-                    Size = src.Size,
-                    From = src.From,
-                    Count = src.Count,
-                    Pages = src.Pages,
-                    Items = items
-                };
-            });
-        
+            .ConvertUsing<PaginateConverter<Product, ProductDto>>();
+
         CreateMap<IPaginate<Cart>, IPaginate<CartDto>>()
-            .ConvertUsing((src, dest, context) =>
-            {
-                var items = context.Mapper.Map<IList<Cart>, IList<CartDto>>(src.Items);
-                return new Paginate<CartDto>
-                {
-                    Index = src.Index,
-                    Size = src.Size,
-                    From = src.From,
-                    Count = src.Count,
-                    Pages = src.Pages,
-                    Items = items
-                };
-            });
+            .ConvertUsing<PaginateConverter<Cart, CartDto>>();
     }
 }
