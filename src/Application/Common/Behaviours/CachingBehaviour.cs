@@ -28,14 +28,12 @@ public class CachingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest,
         CancellationToken cancellationToken
     )
     {
-        // Check if request has Cacheable attribute
         var cacheableAttribute =
             typeof(TRequest).GetCustomAttributes(typeof(CacheableAttribute), true).FirstOrDefault()
             as CacheableAttribute;
 
         if (cacheableAttribute == null)
         {
-            // No caching, proceed with next handler
             return await next();
         }
 
@@ -43,31 +41,31 @@ public class CachingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest,
 
         _logger.LogInformation("Checking cache for key: {CacheKey}", cacheKey);
 
-        // Try to get from cache
         var cachedResponse = await _cacheService.GetAsync<TResponse>(cacheKey, cancellationToken);
 
-        if (cachedResponse != null)
+        if (!EqualityComparer<TResponse>.Default.Equals(cachedResponse, default))
         {
             _logger.LogInformation("Cache hit for key: {CacheKey}", cacheKey);
-            return cachedResponse;
+            return cachedResponse!;
         }
 
         _logger.LogInformation("Cache miss for key: {CacheKey}", cacheKey);
 
-        // Execute the handler
         var response = await next();
 
-        // Cache the response
-        await _cacheService.SetAsync(
-            cacheKey,
-            response,
-            TimeSpan.FromMinutes(cacheableAttribute.DurationMinutes),
-            cancellationToken
-        );
+        if (!EqualityComparer<TResponse>.Default.Equals(response, default))
+        {
+            await _cacheService.SetAsync(
+                cacheKey,
+                response!,
+                TimeSpan.FromMinutes(cacheableAttribute.DurationMinutes),
+                cancellationToken
+            );
 
-        _logger.LogInformation("Cached response for key: {CacheKey}", cacheKey);
+            _logger.LogInformation("Cached response for key: {CacheKey}", cacheKey);
+        }
 
-        return response;
+        return response!;
     }
 
     private string GenerateCacheKey(TRequest request, string prefix)
@@ -84,9 +82,6 @@ public class CachingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest,
     }
 }
 
-/// <summary>
-/// Attribute to mark queries as cacheable
-/// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 public class CacheableAttribute : Attribute
 {

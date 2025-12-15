@@ -5,21 +5,23 @@ using ShoppingProject.Application.Common.Security;
 
 namespace ShoppingProject.Application.Common.Behaviours;
 
-public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> 
+public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
     private readonly IUser _user;
     private readonly IIdentityService _identityService;
 
-    public AuthorizationBehaviour(
-        IUser user,
-        IIdentityService identityService)
+    public AuthorizationBehaviour(IUser user, IIdentityService identityService)
     {
         _user = user;
         _identityService = identityService;
     }
 
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken
+    )
     {
         var authorizeAttributes = request.GetType().GetCustomAttributes<AuthorizeAttribute>();
 
@@ -32,7 +34,9 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
             }
 
             // Role-based authorization
-            var authorizeAttributesWithRoles = authorizeAttributes.Where(a => !string.IsNullOrWhiteSpace(a.Roles));
+            var authorizeAttributesWithRoles = authorizeAttributes.Where(a =>
+                !string.IsNullOrWhiteSpace(a.Roles)
+            );
 
             if (authorizeAttributesWithRoles.Any())
             {
@@ -42,16 +46,19 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
                 {
                     foreach (var role in roles)
                     {
-                        var isInRole = _user.Roles?.Any(x => role == x)??false;
+                        // ✅ Sonar S6617: Contains kullanımı
+                        var isInRole = _user.Roles?.Contains(role) ?? false;
                         if (isInRole)
                         {
                             authorized = true;
                             break;
                         }
                     }
+
+                    if (authorized)
+                        break;
                 }
 
-                // Must be a member of at least one role in roles
                 if (!authorized)
                 {
                     throw new ForbiddenAccessException();
@@ -59,22 +66,21 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
             }
 
             // Policy-based authorization
-            var authorizeAttributesWithPolicies = authorizeAttributes.Where(a => !string.IsNullOrWhiteSpace(a.Policy));
-            if (authorizeAttributesWithPolicies.Any())
-            {
-                foreach (var policy in authorizeAttributesWithPolicies.Select(a => a.Policy))
-                {
-                    var authorized = await _identityService.AuthorizeAsync(_user.Id, policy);
+            var authorizeAttributesWithPolicies = authorizeAttributes.Where(a =>
+                !string.IsNullOrWhiteSpace(a.Policy)
+            );
 
-                    if (!authorized)
-                    {
-                        throw new ForbiddenAccessException();
-                    }
+            foreach (var policy in authorizeAttributesWithPolicies.Select(a => a.Policy))
+            {
+                var authorized = await _identityService.AuthorizeAsync(_user.Id, policy);
+
+                if (!authorized)
+                {
+                    throw new ForbiddenAccessException();
                 }
             }
         }
 
-        // User is authorized / authorization not required
         return await next();
     }
 }

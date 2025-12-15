@@ -1,18 +1,26 @@
 ﻿using Microsoft.Extensions.Logging;
+using ShoppingProject.Application.Common.Exceptions;
 
 namespace ShoppingProject.Application.Common.Behaviours;
 
-public class UnhandledExceptionBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public class UnhandledExceptionBehaviour<TRequest, TResponse>
+    : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
-    private readonly ILogger<TRequest> _logger;
+    private readonly ILogger<UnhandledExceptionBehaviour<TRequest, TResponse>> _logger;
 
-    public UnhandledExceptionBehaviour(ILogger<TRequest> logger)
+    public UnhandledExceptionBehaviour(
+        ILogger<UnhandledExceptionBehaviour<TRequest, TResponse>> logger
+    )
     {
         _logger = logger;
     }
 
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
@@ -22,9 +30,15 @@ public class UnhandledExceptionBehaviour<TRequest, TResponse> : IPipelineBehavio
         {
             var requestName = typeof(TRequest).Name;
 
-            _logger.LogError(ex, "ShoppingProject Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
+            _logger.LogError(
+                ex,
+                "Unhandled exception in {Behaviour} for request {RequestName} {@Request}",
+                nameof(UnhandledExceptionBehaviour<TRequest, TResponse>),
+                requestName,
+                request
+            );
 
-            throw;
+            throw new UnhandledRequestException(requestName, request, ex);
         }
     }
 }

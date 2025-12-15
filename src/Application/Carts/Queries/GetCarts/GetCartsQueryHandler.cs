@@ -1,9 +1,9 @@
-using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Application.Common.Mappings;
-using ShoppingProject.Domain.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
+using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Application.Common.Mappings;
+using ShoppingProject.Domain.Entities;
 
 namespace ShoppingProject.Application.Carts.Queries.GetCarts;
 
@@ -14,14 +14,6 @@ public class CartBriefDto
     public decimal Price { get; init; }
     public string Image { get; init; } = "";
     public int Quantity { get; init; } = 1;
-
-    private class Mapping : Profile 
-    {
-        public Mapping()
-        {
-            CreateMap<Cart, CartBriefDto>();
-        }
-    }
 }
 
 public record GetCartsQuery : IRequest<List<CartBriefDto>>;
@@ -37,11 +29,16 @@ public class GetCartsQueryHandler : IRequestHandler<GetCartsQuery, List<CartBrie
         _mapper = mapper;
     }
 
-    public async Task<List<CartBriefDto>> Handle(GetCartsQuery request, CancellationToken cancellationToken)
+    public async Task<List<CartBriefDto>> Handle(
+        GetCartsQuery request,
+        CancellationToken cancellationToken
+    )
     {
-        return await Task.FromResult(_context.Carts
-            .OrderBy(x => x.Title)
-            .ProjectTo<CartBriefDto>(_mapper.ConfigurationProvider)
-            .ToList());
+        return await Task.FromResult(
+            _context
+                .Carts.OrderBy(x => x.Title)
+                .ProjectTo<CartBriefDto>(_mapper.ConfigurationProvider)
+                .ToList()
+        );
     }
 }

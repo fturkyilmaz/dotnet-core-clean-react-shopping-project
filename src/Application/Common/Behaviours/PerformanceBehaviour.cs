@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using ShoppingProject.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
+using ShoppingProject.Application.Common.Interfaces;
 
 namespace ShoppingProject.Application.Common.Behaviours;
 
@@ -8,23 +8,27 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
     where TRequest : notnull
 {
     private readonly Stopwatch _timer;
-    private readonly ILogger<TRequest> _logger;
+    private readonly ILogger<PerformanceBehaviour<TRequest, TResponse>> _logger;
     private readonly IUser _user;
     private readonly IIdentityService _identityService;
 
     public PerformanceBehaviour(
-        ILogger<TRequest> logger,
+        ILogger<PerformanceBehaviour<TRequest, TResponse>> logger,
         IUser user,
-        IIdentityService identityService)
+        IIdentityService identityService
+    )
     {
         _timer = new Stopwatch();
-
         _logger = logger;
         _user = user;
         _identityService = identityService;
     }
 
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken
+    )
     {
         _timer.Start();
 
@@ -45,8 +49,14 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
                 userName = await _identityService.GetUserNameAsync(userId);
             }
 
-            _logger.LogWarning("ShoppingProject Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@UserName} {@Request}",
-                requestName, elapsedMilliseconds, userId, userName, request);
+            _logger.LogWarning(
+                "Long Running Request: {RequestName} took {ElapsedMilliseconds} ms. UserId={UserId}, UserName={UserName}, Request={@Request}",
+                requestName,
+                elapsedMilliseconds,
+                userId,
+                userName,
+                request
+            );
         }
 
         return response;

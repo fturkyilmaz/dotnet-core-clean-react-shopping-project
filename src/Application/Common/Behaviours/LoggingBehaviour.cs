@@ -7,11 +7,15 @@ namespace ShoppingProject.Application.Common.Behaviours;
 public class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest>
     where TRequest : notnull
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<LoggingBehaviour<TRequest>> _logger;
     private readonly IUser _user;
     private readonly IIdentityService _identityService;
 
-    public LoggingBehaviour(ILogger<TRequest> logger, IUser user, IIdentityService identityService)
+    public LoggingBehaviour(
+        ILogger<LoggingBehaviour<TRequest>> logger,
+        IUser user,
+        IIdentityService identityService
+    )
     {
         _logger = logger;
         _user = user;
@@ -30,7 +34,7 @@ public class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest>
         }
 
         _logger.LogInformation(
-            "ShoppingProject Request: {Name} {@UserId} {@UserName} {@Request}",
+            "ShoppingProject Request: {RequestName} UserId={UserId} UserName={UserName} Request={@Request}",
             requestName,
             userId,
             userName,
