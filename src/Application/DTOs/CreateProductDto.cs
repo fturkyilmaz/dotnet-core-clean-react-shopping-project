@@ -11,10 +11,4 @@ namespace ShoppingProject.Application.DTOs
         public string Image { get; set; } = "";
         public RatingDto? Rating { get; set; }
     }
-
-    public class RatingDto
-    {
-        public double Rate { get; set; }
-        public int Count { get; set; }
-    }
 }
