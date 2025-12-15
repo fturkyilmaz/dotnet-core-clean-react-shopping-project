@@ -1,21 +1,9 @@
-using ShoppingProject.Application.Common.Interfaces;
 using Ardalis.GuardClauses;
 using MediatR;
-using ShoppingProject.Domain.Constants;
-using ShoppingProject.Application.Common.Security;
+using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Carts.Commands.UpdateCart;
-
-[Authorize]
-public record UpdateCartCommand : IRequest
-{
-    public int Id { get; init; }
-    public string Title { get; init; } = "";
-    public decimal Price { get; init; }
-    public string Image { get; init; } = "";
-    public int Quantity { get; init; }
-}
 
 public class UpdateCartCommandHandler : IRequestHandler<UpdateCartCommand>
 {
@@ -28,8 +16,7 @@ public class UpdateCartCommandHandler : IRequestHandler<UpdateCartCommand>
 
     public async Task Handle(UpdateCartCommand request, CancellationToken cancellationToken)
     {
-        var entity = _context.Carts
-            .FirstOrDefault(c => c.Id == request.Id);
+        var entity = _context.Carts.FirstOrDefault(c => c.Id == request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 
@@ -38,7 +25,7 @@ public class UpdateCartCommandHandler : IRequestHandler<UpdateCartCommand>
         entity.Image = request.Image;
         entity.Quantity = request.Quantity;
 
-        entity.AddDomainEvent(new CartUpdatedEvent(entity)); // Event to be created later
+        entity.AddDomainEvent(new CartUpdatedEvent(entity));
 
         await _context.SaveChangesAsync(cancellationToken);
     }

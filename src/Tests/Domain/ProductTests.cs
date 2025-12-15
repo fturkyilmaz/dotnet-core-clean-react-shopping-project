@@ -15,14 +15,7 @@ public class ProductTests
         string category = "electronics";
         string image = "https://example.com/image.jpg";
 
-        var product = new Product
-        {
-            Title = title,
-            Description = description,
-            Price = price,
-            Category = category,
-            Image = image,
-        };
+        var product = Product.Create(title, price, description, category, image);
 
         product.Title.Should().Be(title);
         product.Description.Should().Be(description);
@@ -36,13 +29,14 @@ public class ProductTests
     {
         var rating = new Rating(4.5, 120);
 
-        var product = new Product
-        {
-            Title = "Test Product",
-            Description = "Test Description",
-            Price = 29.99m,
-            Rating = rating,
-        };
+        var product = Product.Create(
+            "Test Product",
+            29.99m,
+            "Test Description",
+            string.Empty,
+            string.Empty
+        );
+        product.UpdateRating(rating);
 
         product.Rating.Should().NotBeNull();
         product.Rating.Rate.Should().Be(4.5);
@@ -52,12 +46,7 @@ public class ProductTests
     [Fact]
     public void CreateProduct_DefaultRating_ShouldBeInitialized()
     {
-        var product = new Product
-        {
-            Title = "Test",
-            Price = 10m,
-            Description = "Test",
-        };
+        var product = Product.Create("Test", 10m, "Test", string.Empty, string.Empty);
 
         product.Rating.Should().NotBeNull();
         product.Rating.Rate.Should().Be(0.0);
@@ -70,14 +59,13 @@ public class ProductTests
     [InlineData("books", 14.99)]
     public void CreateProduct_WithDifferentCategories_ShouldSucceed(string category, decimal price)
     {
-        var product = new Product
-        {
-            Title = "Test Product",
-            Description = "Test Description",
-            Price = price,
-            Category = category,
-            Image = "test.jpg",
-        };
+        var product = Product.Create(
+            "Test Product",
+            price,
+            "Test Description",
+            category,
+            "test.jpg"
+        );
 
         product.Category.Should().Be(category);
         product.Price.Should().Be(price);
@@ -86,7 +74,7 @@ public class ProductTests
     [Fact]
     public void Product_ShouldInheritFromBaseAuditableEntity()
     {
-        var product = new Product();
+        var product = Product.Create("Test", 10m, "Desc", "Cat", "Img");
 
         product.Should().BeAssignableTo<ShoppingProject.Domain.Common.BaseAuditableEntity>();
     }
@@ -94,25 +82,23 @@ public class ProductTests
     [Fact]
     public void Product_ShouldHaveIdProperty()
     {
-        var product = new Product
-        {
-            Title = "Test",
-            Price = 100,
-            Rating = new Rating(4.5, 100),
-        };
+        var product = Product.Create("Test", 100, "Desc", "Cat", "Img");
+        product.UpdateRating(new Rating(4.5, 100));
+
         product.Id = 42;
 
         product.Id.Should().Be(42);
     }
 
     [Fact]
-    public void Product_AllStringProperties_ShouldDefaultToEmpty()
+    public void Product_ShouldHaveBehaviorMethods()
     {
-        var product = new Product();
+        // New test to verify behavior
+        var product = Product.Create("Test", 100, "Desc", "Cat", "Img");
+        product.UpdateDetails("New Title", "New Desc", "New Cat", "New Img");
+        product.UpdatePrice(200);
 
-        product.Title.Should().BeEmpty();
-        product.Description.Should().BeEmpty();
-        product.Category.Should().BeEmpty();
-        product.Image.Should().BeEmpty();
+        product.Title.Should().Be("New Title");
+        product.Price.Should().Be(200);
     }
 }

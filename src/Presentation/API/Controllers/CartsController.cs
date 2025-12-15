@@ -10,6 +10,7 @@ using ShoppingProject.Application.Carts.Commands.UpdateCart;
 using ShoppingProject.Application.Carts.Queries.GetCartById;
 using ShoppingProject.Application.Carts.Queries.GetCarts;
 using ShoppingProject.Application.Common.Models;
+using ShoppingProject.Application.DTOs;
 using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Constants;
 
@@ -29,24 +30,24 @@ namespace ShoppingProject.WebApi.Controllers
 
         [HttpGet]
         [Authorize]
-        [ProducesResponseType(typeof(ServiceResult<List<CartBriefDto>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<ServiceResult<List<CartBriefDto>>>> GetAll()
+        [ProducesResponseType(typeof(ServiceResult<List<CartDto>>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<ServiceResult<List<CartDto>>>> GetAll()
         {
             var carts = await _sender.Send(new GetCartsQuery());
-            return ServiceResult<List<CartBriefDto>>.Success(carts);
+            return ServiceResult<List<CartDto>>.Success(carts);
         }
 
         [HttpGet("{id}")]
         [Authorize]
-        [ProducesResponseType(typeof(ServiceResult<CartBriefDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ServiceResult<CartBriefDto>), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ServiceResult<CartBriefDto>>> GetById(int id)
+        [ProducesResponseType(typeof(ServiceResult<CartDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResult<CartDto>), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceResult<CartDto>>> GetById(int id)
         {
             var cart = await _sender.Send(new GetCartByIdQuery(id));
             if (cart == null)
-                return ServiceResult<CartBriefDto>.Fail("Cart not found", HttpStatusCode.NotFound);
+                return ServiceResult<CartDto>.Fail("Cart not found", HttpStatusCode.NotFound);
 
-            return ServiceResult<CartBriefDto>.Success(cart);
+            return ServiceResult<CartDto>.Success(cart);
         }
 
         [HttpPost]

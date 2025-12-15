@@ -21,19 +21,17 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand>
 
         Guard.Against.NotFound(request.Id, entity);
 
-        UpdateEntity(entity!, request);
+        entity!.UpdateDetails(
+            request.Title ?? entity.Title,
+            request.Description ?? entity.Description,
+            request.Category ?? entity.Category,
+            request.Image ?? entity.Image
+        );
+
+        entity.UpdatePrice(request.Price);
 
         await _context.SaveChangesAsync(cancellationToken);
     }
 
     private Product? FindProductById(int id) => _context.Products.FirstOrDefault(p => p.Id == id);
-
-    private static void UpdateEntity(Product entity, UpdateProductCommand request)
-    {
-        entity.Title = request.Title ?? entity.Title;
-        entity.Price = request.Price;
-        entity.Description = request.Description ?? entity.Description;
-        entity.Image = request.Image ?? entity.Image;
-        entity.Category = request.Category ?? entity.Category;
-    }
 }

@@ -9,7 +9,7 @@ import type { BaseEntity } from './common';
 // ============================================================================
 
 /**
- * Item in the shopping cart (matches backend CartBriefDto)
+ * Item in the shopping cart (matches backend CartDto)
  */
 export interface CartItem extends BaseEntity {
   title: string;

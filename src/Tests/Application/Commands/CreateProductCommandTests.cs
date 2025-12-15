@@ -41,10 +41,8 @@ public class CreateProductCommandTests
 
         _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
-        // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
         capturedProduct.Should().NotBeNull();
         capturedProduct!.Title.Should().Be(command.Title);
         capturedProduct.Description.Should().Be(command.Description);
@@ -59,7 +57,6 @@ public class CreateProductCommandTests
     [Fact]
     public async Task Handle_ValidCommand_ShouldRaiseDomainEvent()
     {
-        // Arrange
         var command = new CreateProductCommand
         {
             Title = "Test Product",
@@ -76,10 +73,8 @@ public class CreateProductCommandTests
 
         _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
-        // Act
         await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
         capturedProduct.Should().NotBeNull();
         capturedProduct!.DomainEvents.Should().ContainSingle();
         capturedProduct.DomainEvents.First().Should().BeOfType<ProductCreatedEvent>();
@@ -91,7 +86,6 @@ public class CreateProductCommandTests
     [Fact]
     public async Task Handle_NullValues_ShouldUseEmptyStrings()
     {
-        // Arrange
         var command = new CreateProductCommand
         {
             Title = null,
@@ -108,10 +102,8 @@ public class CreateProductCommandTests
 
         _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
-        // Act
         await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
         capturedProduct.Should().NotBeNull();
         capturedProduct!.Title.Should().BeEmpty();
         capturedProduct.Description.Should().BeEmpty();
@@ -122,7 +114,6 @@ public class CreateProductCommandTests
     [Fact]
     public async Task Handle_ValidCommand_ShouldInitializeRating()
     {
-        // Arrange
         var command = new CreateProductCommand
         {
             Title = "Test",
@@ -139,10 +130,8 @@ public class CreateProductCommandTests
 
         _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
-        // Act
         await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
         capturedProduct.Should().NotBeNull();
         capturedProduct!.Rating.Should().NotBeNull();
         capturedProduct.Rating.Rate.Should().Be(0.0);

@@ -110,7 +110,7 @@ public class ConsulProxyConfigProvider : IProxyConfigProvider
         }
     }
 
-    private class CustomProxyConfig : IProxyConfig
+    private class CustomProxyConfig : IProxyConfig, IDisposable
     {
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
@@ -131,6 +131,11 @@ public class ConsulProxyConfigProvider : IProxyConfigProvider
         public void SignalChange()
         {
             _cts.Cancel();
+        }
+
+        public void Dispose()
+        {
+            _cts.Dispose();
         }
     }
 }
