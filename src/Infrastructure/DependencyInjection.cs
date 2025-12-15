@@ -20,6 +20,7 @@ using ShoppingProject.Infrastructure.Configuration.Validators;
 using ShoppingProject.Infrastructure.Constants;
 using ShoppingProject.Infrastructure.Data;
 using ShoppingProject.Infrastructure.Data.Interceptors;
+using ShoppingProject.Infrastructure.Extensions;
 using ShoppingProject.Infrastructure.Identity;
 using ShoppingProject.Infrastructure.Repositories;
 using ShoppingProject.Infrastructure.Services;
@@ -193,6 +194,11 @@ public static class DependencyInjection
         // Authorization Handlers
         builder.Services.AddScoped<IAuthorizationHandler, ResourceOwnerRequirementHandler>();
         builder.Services.AddScoped<IUser, CurrentUser>();
+
+        // Observability: OpenTelemetry + Serilog + HealthChecks
+        const string serviceName = "ShoppingProject.API";
+
+        builder.Services.AddTelemetry(serviceName);
 
         // Validators
         builder.Services.AddSingleton<IValidator<RabbitMqOptions>, RabbitMqOptionsValidator>();
