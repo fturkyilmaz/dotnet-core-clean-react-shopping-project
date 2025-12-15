@@ -11,6 +11,7 @@ using ShoppingProject.Application.Products.Commands.DeleteProduct;
 using ShoppingProject.Application.Products.Commands.UpdateProduct;
 using ShoppingProject.Application.Products.Queries.GetProductById;
 using ShoppingProject.Application.Products.Queries.GetProducts;
+using ShoppingProject.Application.Products.Queries.GetProductWithPagination;
 using ShoppingProject.Application.Products.Queries.SearchProducts;
 using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Constants;
@@ -35,11 +36,34 @@ namespace ShoppingProject.WebApi.Controllers
         [HttpGet]
         [AllowAnonymous]
         [OutputCache(PolicyName = "ProductsList")]
-        [ProducesResponseType(typeof(ServiceResult<List<ProductDto>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<ServiceResult<List<ProductDto>>>> GetAll()
+        [ProducesResponseType(
+            typeof(ServiceResult<IEnumerable<ProductDto>>),
+            StatusCodes.Status200OK
+        )]
+        public async Task<ActionResult<ServiceResult<IEnumerable<ProductDto>>>> GetAll()
         {
             var products = await _sender.Send(new GetProductsQuery());
-            return ServiceResult<List<ProductDto>>.Success(products);
+            return ServiceResult<IEnumerable<ProductDto>>.Success(products);
+        }
+
+        [HttpGet("paged")]
+        [AllowAnonymous]
+        [OutputCache(PolicyName = "ProductsList")]
+        [ProducesResponseType(
+            typeof(ServiceResult<PaginatedList<ProductDto>>),
+            StatusCodes.Status200OK
+        )]
+        public async Task<ActionResult<ServiceResult<PaginatedList<ProductDto>>>> GetAllPaginate(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            CancellationToken token = default
+        )
+        {
+            var result = await _sender.Send(
+                new GetProductsWithPaginationQuery { PageNumber = pageNumber, PageSize = pageSize }
+            );
+
+            return ServiceResult<PaginatedList<ProductDto>>.Success(result);
         }
 
         [HttpGet("{id}")]
@@ -80,10 +104,7 @@ namespace ShoppingProject.WebApi.Controllers
             CancellationToken token
         )
         {
-            if (id != command.Id)
-                return ServiceResult<bool>.Fail("Id mismatch", HttpStatusCode.BadRequest);
-
-            await _sender.Send(command);
+            await _sender.Send(command with { Id = id });
             await _outputCacheStore.EvictByTagAsync(AppConstants.CacheTags.Products, token);
 
             return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);

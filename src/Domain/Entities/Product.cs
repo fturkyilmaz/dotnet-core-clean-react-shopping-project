@@ -5,17 +5,13 @@ namespace ShoppingProject.Domain.Entities
 {
     public class Product : BaseAuditableEntity
     {
-        public string Title { get; set; } = "";
+        public string Title { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public string Description { get; set; } = "";
-        public string Category { get; set; } = "";
-        public string Image { get; set; } = "";
-        public Rating Rating { get; set; } = new Rating();
+        public string Description { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public string Image { get; set; } = string.Empty;
+        public Rating Rating { get; set; } = new(0, 0);
     }
 
-    public class Rating
-    {
-        public double Rate { get; set; }
-        public int Count { get; set; }
-    }
+    public record Rating(double Rate, int Count);
 }

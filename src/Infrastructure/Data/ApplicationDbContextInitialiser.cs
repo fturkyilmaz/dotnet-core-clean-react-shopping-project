@@ -107,7 +107,7 @@ public class ApplicationDbContextInitialiser
                         "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
                     Category = "men's clothing",
                     Image = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png",
-                    Rating = new Rating { Rate = 3.9, Count = 120 },
+                    Rating = new Rating(3.9, 120),
                 }
             );
 
@@ -122,7 +122,7 @@ public class ApplicationDbContextInitialiser
                     Category = "men's clothing",
                     Image =
                         "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_t.png",
-                    Rating = new Rating { Rate = 4.1, Count = 259 },
+                    Rating = new Rating(4.1, 259),
                 }
             );
 
@@ -136,7 +136,7 @@ public class ApplicationDbContextInitialiser
                         "great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions, such as working, hiking, camping, mountain/rock climbing, cycling, traveling or other outdoors. Good gift choice for you or your family member. A warm hearted love to Father, husband or son in this thanksgiving or Christmas Day.",
                     Category = "men's clothing",
                     Image = "https://fakestoreapi.com/img/71li-ujtlul._AC_UX679_t.png",
-                    Rating = new Rating { Rate = 4.7, Count = 500 },
+                    Rating = new Rating(4.7, 500),
                 }
             );
 
@@ -151,7 +151,7 @@ public class ApplicationDbContextInitialiser
                     Category = "men's clothing",
                     Image =
                         "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_t.png",
-                    Rating = new Rating { Rate = 4.1, Count = 259 },
+                    Rating = new Rating(4.1, 259),
                 }
             );
 
@@ -167,7 +167,7 @@ public class ApplicationDbContextInitialiser
                         "From our Legends Collection, the Naga was inspired by the mythical water dragon that protects the ocean's pearl. Wear facing inward to be bestowed with love and abundance, or outward for protection.",
                     Category = "jewelery",
                     Image = "https://fakestoreapi.com/img/71pWzhdJNwL._AC_UL640_QL65_ML3_.jpg",
-                    Rating = new Rating { Rate = 4.6, Count = 400 },
+                    Rating = new Rating(4.6, 400),
                 }
             );
 
@@ -181,7 +181,7 @@ public class ApplicationDbContextInitialiser
                         "Satisfaction Guaranteed. Return or exchange any order within 30 days.Designed and sold by Hafeez Center in the United States. Satisfaction Guaranteed. Return or exchange any order within 30 days.",
                     Category = "jewelery",
                     Image = "https://fakestoreapi.com/img/61sbMiUnoGL._AC_UL640_QL65_ML3_.jpg",
-                    Rating = new Rating { Rate = 3.9, Count = 70 },
+                    Rating = new Rating(3.9, 70),
                 }
             );
 
@@ -195,7 +195,7 @@ public class ApplicationDbContextInitialiser
                         "Classic Created Wedding Engagement Solitaire Diamond Promise Ring for Her. Gifts to spoil your love more for Engagement, Wedding, Anniversary, Valentine's Day...",
                     Category = "jewelery",
                     Image = "https://fakestoreapi.com/img/71YAIFU48IL._AC_UL640_QL65_ML3_.jpg",
-                    Rating = new Rating { Rate = 3, Count = 400 },
+                    Rating = new Rating(3, 400),
                 }
             );
 
@@ -209,7 +209,7 @@ public class ApplicationDbContextInitialiser
                         "Rose Gold Plated Double Flared Tunnel Plug Earrings. Made of 316L Stainless Steel",
                     Category = "jewelery",
                     Image = "https://fakestoreapi.com/img/51UDEzMJVpL._AC_UL640_QL65_ML3_.jpg",
-                    Rating = new Rating { Rate = 1.9, Count = 100 },
+                    Rating = new Rating(1.9, 100),
                 }
             );
 
@@ -223,7 +223,7 @@ public class ApplicationDbContextInitialiser
                         "USB 3.0 and USB 2.0 Compatibility Fast data transfers Improve PC Performance High Capacity; Compatibility Formatted NTFS for Windows 10, Windows 8.1, Windows 7; Reformatting may be required for other operating systems; Compatibility may vary depending on user’s hardware configuration and operating system",
                     Category = "electronics",
                     Image = "https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_.jpg",
-                    Rating = new Rating { Rate = 3.3, Count = 203 },
+                    Rating = new Rating(3.3, 203),
                 }
             );
 
@@ -237,7 +237,7 @@ public class ApplicationDbContextInitialiser
                         "Easy upgrade for faster boot up, shutdown, application load and response (As compared to 5400 RPM SATA 2.5” hard drive; Based on published specifications and internal benchmarking tests using PCMark vantage scores) Boosts burst write performance, making it ideal for typical PC workloads The perfect balance of performance and reliability Read/write speeds of up to 535MB/s/450MB/s (Based on internal testing; Performance may vary depending upon drive capacity, host device, OS and application.)",
                     Category = "electronics",
                     Image = "https://fakestoreapi.com/img/61U7T1koQqL._AC_SX679_.jpg",
-                    Rating = new Rating { Rate = 2.9, Count = 470 },
+                    Rating = new Rating(2.9, 470),
                 }
             );
 
