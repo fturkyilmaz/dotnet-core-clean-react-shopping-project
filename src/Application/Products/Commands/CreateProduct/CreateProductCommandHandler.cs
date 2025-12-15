@@ -6,16 +6,6 @@ using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Products.Commands.CreateProduct;
 
-[Authorize(Policy = Policies.CanManageProducts)]
-public record CreateProductCommand : IRequest<int>
-{
-    public string? Title { get; init; }
-    public decimal Price { get; init; }
-    public string? Description { get; init; }
-    public string? Category { get; init; }
-    public string? Image { get; init; }
-}
-
 public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, int>
 {
     private readonly IApplicationDbContext _context;
@@ -25,21 +15,31 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         _context = context;
     }
 
+    private static Product CreateProductFromRequest(CreateProductCommand request)
+    {
+        return new Product
+        {
+            Title = request.Title ?? string.Empty,
+            Price = request.Price,
+            Description = request.Description ?? string.Empty,
+            Category = request.Category ?? string.Empty,
+            Image = request.Image ?? string.Empty,
+            Rating = new Rating(0.0, 0),
+        };
+    }
+
+    private static void AddDomainEvents(Product entity)
+    {
+        entity.AddDomainEvent(new ProductCreatedEvent(entity));
+    }
+
     public async Task<int> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
-        var entity = new Product
-        {
-            Title = request.Title ?? "",
-            Price = request.Price,
-            Description = request.Description ?? "",
-            Category = request.Category ?? "",
-            Image = request.Image ?? "",
-            Rating = new Rating()
-        };
+        var entity = CreateProductFromRequest(request);
 
-        entity.AddDomainEvent(new ProductCreatedEvent(entity));
+        AddDomainEvents(entity);
 
-        _context.Add<Product>(entity);
+        _context.Add(entity);
 
         await _context.SaveChangesAsync(cancellationToken);
 

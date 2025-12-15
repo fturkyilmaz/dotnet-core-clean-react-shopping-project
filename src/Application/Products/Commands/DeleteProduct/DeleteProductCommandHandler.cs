@@ -1,13 +1,9 @@
-﻿using ShoppingProject.Application.Common.Interfaces;
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
+using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Constants;
 using ShoppingProject.Domain.Events;
-using ShoppingProject.Application.Common.Security;
 
 namespace ShoppingProject.Application.Products.Commands.DeleteProduct;
-
-[Authorize(Policy = Policies.CanManageProducts)]
-public record DeleteProductCommand(int Id) : IRequest;
 
 public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
 {
@@ -20,8 +16,7 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
 
     public async Task Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-        var entity = _context.Products
-            .FirstOrDefault(p => p.Id == request.Id);
+        var entity = _context.Products.FirstOrDefault(p => p.Id == request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 
@@ -31,5 +26,4 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
 
         await _context.SaveChangesAsync(cancellationToken);
     }
-
 }

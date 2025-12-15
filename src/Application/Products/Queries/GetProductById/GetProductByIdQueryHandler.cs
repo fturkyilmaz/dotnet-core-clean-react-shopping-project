@@ -4,8 +4,6 @@ using ShoppingProject.Application.DTOs;
 
 namespace ShoppingProject.Application.Products.Queries.GetProductById;
 
-public record GetProductByIdQuery(int Id) : IRequest<ProductDto>;
-
 public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, ProductDto>
 {
     private readonly IProductRepository _productRepository;
@@ -35,11 +33,7 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             async () =>
             {
                 var entity = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
-
-                if (entity == null)
-                    return null;
-
-                return _mapper.Map<ProductDto>(entity);
+                return entity is null ? null : _mapper.Map<ProductDto>(entity);
             },
             TimeSpan.FromMinutes(10),
             cancellationToken
@@ -47,6 +41,6 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
 
         Guard.Against.NotFound(request.Id, product);
 
-        return product;
+        return product!;
     }
 }

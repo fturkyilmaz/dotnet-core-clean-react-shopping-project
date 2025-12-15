@@ -1,19 +1,18 @@
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using ShoppingProject.Application.Common.Extensions;
 using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Application.DTOs;
 using ShoppingProject.Domain.Common;
-using ShoppingProject.Application.Common.Extensions;
-using ShoppingProject.Application.Common.Mappings;
-using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Domain.Entities;
-using MediatR;
-using AutoMapper.QueryableExtensions;
-using AutoMapper;
 
 namespace ShoppingProject.Application.Products.Queries.SearchProducts;
 
-public record SearchProductsQuery(DynamicQuery Query, int Index, int Size) : IRequest<IPaginate<ProductDto>>;
-
-public class SearchProductsQueryHandler : IRequestHandler<SearchProductsQuery, IPaginate<ProductDto>>
+public class SearchProductsQueryHandler
+    : IRequestHandler<SearchProductsQuery, IPaginate<ProductDto>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -24,31 +23,33 @@ public class SearchProductsQueryHandler : IRequestHandler<SearchProductsQuery, I
         _mapper = mapper;
     }
 
-    public async Task<IPaginate<ProductDto>> Handle(SearchProductsQuery request, CancellationToken cancellationToken)
+    public async Task<IPaginate<ProductDto>> Handle(
+        SearchProductsQuery request,
+        CancellationToken cancellationToken
+    )
     {
         var products = _context.Products.AsQueryable();
-        
-        // Apply dynamic query
-        if (request.Query != null)
+
+        if (request.Query is not null)
         {
             products = products.ToDynamic(request.Query);
         }
 
-        var paginatedProducts = products
+        var totalCount = await products.CountAsync(cancellationToken);
+
+        var paginatedProducts = await products
             .Skip(request.Index * request.Size)
             .Take(request.Size)
             .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
-            .ToList();
+            .ToListAsync(cancellationToken);
 
-        var totalCount = products.Count();
-
-        return await Task.FromResult(new Paginate<ProductDto>
+        return new Paginate<ProductDto>
         {
             Items = paginatedProducts,
             Index = request.Index,
             Size = request.Size,
             Count = totalCount,
-            Pages = (int)Math.Ceiling(totalCount / (double)request.Size)
-        });
+            Pages = (int)Math.Ceiling(totalCount / (double)request.Size),
+        };
     }
 }

@@ -4,16 +4,10 @@ public class UpdateProductCommandValidator : AbstractValidator<UpdateProductComm
 {
     public UpdateProductCommandValidator()
     {
-        RuleFor(v => v.Title)
-            .MaximumLength(200)
-            .NotEmpty();
-        RuleFor(v => v.Price)
-            .NotEmpty();
-        RuleFor(v => v.Description)
-            .NotEmpty();    
-        RuleFor(v => v.Image)
-            .NotEmpty();    
-        RuleFor(v => v.Category)
-            .NotEmpty();           
+        RuleFor(v => v.Title).MaximumLength(200).NotEmpty();
+        RuleFor(v => v.Price).NotEmpty();
+        RuleFor(v => v.Description).NotEmpty();
+        RuleFor(v => v.Image).NotEmpty();
+        RuleFor(v => v.Category).NotEmpty();
     }
 }

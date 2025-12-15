@@ -1,25 +1,10 @@
-﻿using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Application.Common.Security;
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
+using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Constants;
+using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Products.Commands.UpdateProduct;
-
-[Authorize(Policy = Policies.CanManageProducts)]
-public record UpdateProductCommand : IRequest
-{
-    public int Id { get; init; }
-
-    public string? Title { get; init; }
-
-    public decimal Price { get; init; }
-
-    public string? Description { get; init; }
-
-    public string? Image { get; init; }
-
-    public string? Category { get; init; }
-}
 
 public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand>
 {
@@ -32,17 +17,23 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand>
 
     public async Task Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        var entity = _context.Products
-            .FirstOrDefault(p => p.Id == request.Id);
+        var entity = FindProductById(request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 
+        UpdateEntity(entity!, request);
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    private Product? FindProductById(int id) => _context.Products.FirstOrDefault(p => p.Id == id);
+
+    private static void UpdateEntity(Product entity, UpdateProductCommand request)
+    {
         entity.Title = request.Title ?? entity.Title;
         entity.Price = request.Price;
         entity.Description = request.Description ?? entity.Description;
         entity.Image = request.Image ?? entity.Image;
         entity.Category = request.Category ?? entity.Category;
-
-        await _context.SaveChangesAsync(cancellationToken);
     }
 }
