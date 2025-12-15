@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ShoppingProject.Domain.Constants;
 using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.ValueObjects;
 using ShoppingProject.Infrastructure.Identity;
 
 namespace ShoppingProject.Infrastructure.Data;

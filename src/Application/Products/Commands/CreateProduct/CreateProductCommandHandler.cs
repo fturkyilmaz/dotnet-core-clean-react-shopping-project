@@ -3,6 +3,7 @@ using ShoppingProject.Application.Common.Security;
 using ShoppingProject.Domain.Constants;
 using ShoppingProject.Domain.Entities;
 using ShoppingProject.Domain.Events;
+using ShoppingProject.Domain.ValueObjects;
 
 namespace ShoppingProject.Application.Products.Commands.CreateProduct;
 

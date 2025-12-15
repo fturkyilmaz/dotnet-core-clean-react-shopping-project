@@ -2,6 +2,7 @@ using AutoMapper;
 using ShoppingProject.Application.DTOs;
 using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.ValueObjects;
 
 namespace ShoppingProject.Application.Mappings;
 
