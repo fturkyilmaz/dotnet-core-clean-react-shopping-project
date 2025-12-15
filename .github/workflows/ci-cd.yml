@@ -23,11 +23,17 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ./ShoppingProject.sln
 
-    - name: Build
-      run: dotnet build ./ShoppingProject.sln --configuration Release --no-restore
+    - name: Build with StyleCop enforcement
+      run: dotnet build ./ShoppingProject.sln --configuration Release --no-restore -warnaserror
 
-    - name: Run tests
-      run: dotnet test ./ShoppingProject.sln --no-build --verbosity normal
+    - name: Run tests with coverage
+      run: dotnet test ./ShoppingProject.sln --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: **/TestResults/**/*.xml
 
     # Frontend (React)
     - name: Setup Node.js
@@ -40,6 +46,12 @@ jobs:
 
     - name: Build React app
       run: npm run build --prefix ./shoppingproject-react
+
+    - name: Upload React build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: react-build
+        path: shoppingproject-react/build
 
   docker:
     runs-on: ubuntu-latest
@@ -61,28 +73,32 @@ jobs:
         context: .
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/shoppingproject:latest
-deploy:
-  runs-on: ubuntu-latest
-  needs: docker
 
-  steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+  deploy:
+    runs-on: ubuntu-latest
+    needs: docker
 
-  - name: Setup kubectl
-    uses: azure/setup-kubectl@v3
-    with:
-      version: 'latest'
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-  - name: Set up K8s context
-    uses: azure/k8s-set-context@v3
-    with:
-      method: kubeconfig
-      kubeconfig: ${{ secrets.KUBECONFIG }}
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
 
-  - name: Deploy to Kubernetes
-    run: |
-      kubectl apply -f k8s/deployment-backend.yml
-      kubectl apply -f k8s/service-backend.yml
-      kubectl apply -f k8s/ingress.yml
-      kubectl apply -f k8s/secrets.yml
+    - name: Set up K8s context
+      uses: azure/k8s-set-context@v3
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s/deployment-backend.yml
+        kubectl apply -f k8s/service-backend.yml
+        kubectl apply -f k8s/ingress.yml
+        kubectl apply -f k8s/secrets.yml
+
+    - name: Verify rollout status
+      run: kubectl rollout status deployment/shoppingproject-backend
