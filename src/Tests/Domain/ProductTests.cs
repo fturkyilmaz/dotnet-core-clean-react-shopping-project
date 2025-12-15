@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.ValueObjects;
 
 namespace ShoppingProject.UnitTests.Domain;
 
@@ -8,14 +9,12 @@ public class ProductTests
     [Fact]
     public void CreateProduct_WithValidData_ShouldSucceed()
     {
-        // Arrange
         string title = "Test Product";
         string description = "Test Description";
         decimal price = 19.99m;
         string category = "electronics";
         string image = "https://example.com/image.jpg";
 
-        // Act
         var product = new Product
         {
             Title = title,
@@ -25,7 +24,6 @@ public class ProductTests
             Image = image,
         };
 
-        // Assert
         product.Title.Should().Be(title);
         product.Description.Should().Be(description);
         product.Price.Should().Be(price);
@@ -36,10 +34,8 @@ public class ProductTests
     [Fact]
     public void CreateProduct_WithRating_ShouldSucceed()
     {
-        // Arrange
-        var rating = new Rating { Rate = 4.5, Count = 120 };
+        var rating = new Rating(4.5, 120);
 
-        // Act
         var product = new Product
         {
             Title = "Test Product",
@@ -48,7 +44,6 @@ public class ProductTests
             Rating = rating,
         };
 
-        // Assert
         product.Rating.Should().NotBeNull();
         product.Rating.Rate.Should().Be(4.5);
         product.Rating.Count.Should().Be(120);
@@ -57,7 +52,6 @@ public class ProductTests
     [Fact]
     public void CreateProduct_DefaultRating_ShouldBeInitialized()
     {
-        // Act
         var product = new Product
         {
             Title = "Test",
@@ -65,7 +59,6 @@ public class ProductTests
             Description = "Test",
         };
 
-        // Assert
         product.Rating.Should().NotBeNull();
         product.Rating.Rate.Should().Be(0.0);
         product.Rating.Count.Should().Be(0);
@@ -77,7 +70,6 @@ public class ProductTests
     [InlineData("books", 14.99)]
     public void CreateProduct_WithDifferentCategories_ShouldSucceed(string category, decimal price)
     {
-        // Act
         var product = new Product
         {
             Title = "Test Product",
@@ -87,7 +79,6 @@ public class ProductTests
             Image = "test.jpg",
         };
 
-        // Assert
         product.Category.Should().Be(category);
         product.Price.Should().Be(price);
     }
@@ -95,36 +86,30 @@ public class ProductTests
     [Fact]
     public void Product_ShouldInheritFromBaseAuditableEntity()
     {
-        // Arrange & Act
         var product = new Product();
 
-        // Assert
         product.Should().BeAssignableTo<ShoppingProject.Domain.Common.BaseAuditableEntity>();
     }
 
     [Fact]
     public void Product_ShouldHaveIdProperty()
     {
-        // Arrange & Act
         var product = new Product
         {
             Title = "Test",
-            Price = 10m,
-            Description = "Test",
+            Price = 100,
+            Rating = new Rating(4.5, 100),
         };
         product.Id = 42;
 
-        // Assert
         product.Id.Should().Be(42);
     }
 
     [Fact]
     public void Product_AllStringProperties_ShouldDefaultToEmpty()
     {
-        // Act
         var product = new Product();
 
-        // Assert
         product.Title.Should().BeEmpty();
         product.Description.Should().BeEmpty();
         product.Category.Should().BeEmpty();

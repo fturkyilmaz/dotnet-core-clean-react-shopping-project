@@ -1,5 +1,6 @@
 using FluentAssertions;
-using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.Events;
+using ShoppingProject.Domain.ValueObjects;
 
 namespace ShoppingProject.UnitTests.Domain;
 
@@ -13,7 +14,7 @@ public class RatingTests
         int count = 120;
 
         // Act
-        var rating = new Rating { Rate = rate, Count = count };
+        var rating = new Rating(rate, count);
 
         // Assert
         rating.Rate.Should().Be(rate);
@@ -28,7 +29,7 @@ public class RatingTests
     public void CreateRating_WithVariousValues_ShouldSucceed(double rate, int count)
     {
         // Act
-        var rating = new Rating { Rate = rate, Count = count };
+        var rating = new Rating(rate, count);
 
         // Assert
         rating.Rate.Should().Be(rate);
@@ -39,7 +40,7 @@ public class RatingTests
     public void CreateRating_DefaultValues_ShouldBeZero()
     {
         // Act
-        var rating = new Rating();
+        var rating = new Rating(0, 0);
 
         // Assert
         rating.Rate.Should().Be(0.0);
@@ -50,8 +51,8 @@ public class RatingTests
     public void Rating_ShouldBeValueObject()
     {
         // Arrange
-        var rating1 = new Rating { Rate = 4.5, Count = 100 };
-        var rating2 = new Rating { Rate = 4.5, Count = 100 };
+        var rating1 = new Rating(4.5, 100);
+        var rating2 = new Rating(4.5, 100);
 
         // Assert - Value objects should be compared by value, not reference
         rating1.Should().NotBeSameAs(rating2);
