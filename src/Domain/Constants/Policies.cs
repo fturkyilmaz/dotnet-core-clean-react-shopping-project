@@ -9,4 +9,4 @@ public abstract class Policies
     public const string CanManageClients = nameof(CanManageClients);
     public const string CanViewSystemConfig = nameof(CanViewSystemConfig);
     public const string CanManageOwnClients = nameof(CanManageOwnClients);
-};
+}

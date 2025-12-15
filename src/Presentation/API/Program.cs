@@ -14,8 +14,7 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 builder.Host.UseSerilog(
-    (context, configuration) => configuration.ReadFrom.Configuration(context.Configuration)
-);
+    (context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
 // DI extension
 builder.AddInfrastructureServices();
@@ -36,6 +35,7 @@ using (var scope = app.Services.CreateScope())
 // Middleware pipeline
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
 app.UseCors(AppConstants.CorsPolicies.AllowReactApp);
 app.UseAuthentication();
 app.UseAuthorization();

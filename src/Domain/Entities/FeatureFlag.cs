@@ -20,7 +20,7 @@ public class FeatureFlag : BaseEntity
     {
         if (!IsEnabled)
             return false;
-        
+
         if (StartDate.HasValue && utcNow.DateTime < StartDate.Value)
             return false;
 

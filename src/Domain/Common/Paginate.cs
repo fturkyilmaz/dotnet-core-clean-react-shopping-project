@@ -7,7 +7,9 @@ public class Paginate<T> : IPaginate<T>
         var enumerable = source as T[] ?? source.ToArray();
 
         if (from > index)
-            throw new ArgumentException($"indexFrom: {from} > pageIndex: {index}, must indexFrom <= pageIndex");
+            throw new ArgumentException(
+                $"indexFrom: {from} > pageIndex: {index}, must indexFrom <= pageIndex"
+            );
 
         if (source is IQueryable<T> querable)
         {
@@ -29,8 +31,6 @@ public class Paginate<T> : IPaginate<T>
         }
     }
 
-
-
     public Paginate()
     {
         Items = new List<T>();
@@ -48,7 +48,12 @@ public class Paginate<T> : IPaginate<T>
 
 public static class PaginateExtensions
 {
-    public static IPaginate<T> ToPaginate<T>(this IEnumerable<T> source, int index, int size, int from = 0)
+    public static IPaginate<T> ToPaginate<T>(
+        this IEnumerable<T> source,
+        int index,
+        int size,
+        int from = 0
+    )
     {
         return new Paginate<T>(source, index, size, from);
     }
