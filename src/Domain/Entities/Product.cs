@@ -1,5 +1,6 @@
 using System;
 using ShoppingProject.Domain.Common;
+using ShoppingProject.Domain.ValueObjects;
 
 namespace ShoppingProject.Domain.Entities
 {
@@ -12,6 +13,4 @@ namespace ShoppingProject.Domain.Entities
         public string Image { get; set; } = string.Empty;
         public Rating Rating { get; set; } = new(0, 0);
     }
-
-    public record Rating(double Rate, int Count);
 }
