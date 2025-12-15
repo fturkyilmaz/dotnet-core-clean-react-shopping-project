@@ -5,6 +5,8 @@ namespace ShoppingProject.Application.Common.Interfaces
 {
     public interface IIdentityService
     {
+        Task<List<string>> GetRolesAsync(string userId);
+
         Task<string?> GetUserNameAsync(string userId);
 
         Task<(Result Result, UserInfoResponse? Response)> GetUserByIdAsync(string userId);

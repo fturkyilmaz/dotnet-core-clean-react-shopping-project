@@ -3,10 +3,21 @@
     "settings": {
         "documentationRules": {
             "companyName": "ShoppingProject",
-            "copyrightText": "Copyright (c) ShoppingProject. All rights reserved."
+            "copyrightText": "Copyright (c) ShoppingProject. All rights reserved.",
+            "documentExposedElements": false,
+            "documentInternalElements": false,
+            "documentPrivateElements": false,
+            "documentInterfaces": false
         },
         "orderingRules": {
-            "usingDirectivesPlacement": "outsideNamespace"
+            "usingDirectivesPlacement": "outsideNamespace",
+            "systemUsingDirectivesFirst": false
+        },
+        "layoutRules": {
+            "newlineAtEndOfFile": "allow"
+        },
+        "readabilityRules": {
+            "allowBuiltInTypeAliases": true
         }
     }
 }

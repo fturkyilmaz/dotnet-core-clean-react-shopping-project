@@ -120,6 +120,8 @@ public class IdentityController : ControllerBase
                 ServiceResult<UserInfoResponse>.Fail("User not found", HttpStatusCode.NotFound)
             );
 
+        var roles = await _identityService.GetRolesAsync(userId);
+
         var response = new UserInfoResponse
         {
             Id = user.Response.Id,
@@ -128,33 +130,10 @@ public class IdentityController : ControllerBase
             LastName = user.Response.LastName,
             UserName = user.Response.UserName,
             Gender = user.Response.Gender,
+            Roles = roles,
         };
 
         return Ok(ServiceResult<UserInfoResponse>.Success(response));
-    }
-
-    [HttpPut("me")]
-    [Authorize]
-    [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServiceResult<string>>> UpdateUser(UpdateUserRequest request)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-            return Unauthorized(
-                ServiceResult<string>.Fail("User not authorized", HttpStatusCode.Unauthorized)
-            );
-
-        var result = await _identityService.UpdateUserAsync(
-            userId,
-            request.FirstName ?? string.Empty,
-            request.LastName ?? string.Empty,
-            request.Gender ?? string.Empty
-        );
-
-        if (!result.Succeeded)
-            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
-
-        return Ok(ServiceResult<string>.Success("User updated successfully"));
     }
 
     [HttpPost("forgot-password")]

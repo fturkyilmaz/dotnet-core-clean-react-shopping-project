@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using ShoppingProject.Application.Common.Exceptions;
 
 namespace ShoppingProject.Application.Common.Behaviours;
@@ -25,6 +26,23 @@ public class UnhandledExceptionBehaviour<TRequest, TResponse>
         try
         {
             return await next();
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Entity not found in {RequestName}", typeof(TRequest).Name);
+            throw new NotFoundException($"Entity not found in {typeof(TRequest).Name}", ex);
+        }
+        catch (BusinessRuleException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Business rule violated in {RequestName}",
+                typeof(TRequest).Name
+            );
+            throw new BusinessRuleException(
+                $"Business rule violated in {typeof(TRequest).Name}",
+                ex
+            );
         }
         catch (Exception ex)
         {

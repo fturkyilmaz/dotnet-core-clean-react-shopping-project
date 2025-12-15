@@ -376,6 +376,16 @@ public class IdentityService : IIdentityService
         return tokenHandler.WriteToken(token);
     }
 
+    public async Task<List<string>> GetRolesAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            return new List<string>();
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return roles.ToList();
+    }
+
     public async Task<Result> AddUserToRoleAsync(string userId, string role)
     {
         var user = await _userManager.FindByIdAsync(userId);

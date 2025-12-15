@@ -14,7 +14,8 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 builder.Host.UseSerilog(
-    (context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
+    (context, configuration) => configuration.ReadFrom.Configuration(context.Configuration)
+);
 
 // DI extension
 builder.AddInfrastructureServices();

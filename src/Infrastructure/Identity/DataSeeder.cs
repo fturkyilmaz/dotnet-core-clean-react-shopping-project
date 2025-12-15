@@ -26,7 +26,6 @@ public static class DataSeeder
                 var identityRole = new IdentityRole(role);
                 await roleManager.CreateAsync(identityRole);
 
-                // ✅ Role claims ekle
                 if (role == Roles.Administrator)
                 {
                     await roleManager.AddClaimAsync(

@@ -1,10 +1,11 @@
-using Ardalis.GuardClauses;
+using ShoppingProject.Application.Common.Exceptions;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.DTOs;
+using ShoppingProject.Domain.Entities;
 
 namespace ShoppingProject.Application.Products.Queries.GetProductById;
 
-public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, ProductDto>
+public sealed class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, ProductDto>
 {
     private readonly IProductRepository _productRepository;
     private readonly IMapper _mapper;
@@ -26,10 +27,10 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
         CancellationToken cancellationToken
     )
     {
-        var key = $"product-{request.Id}";
+        var cacheKey = $"product-{request.Id}";
 
         var product = await _cacheService.GetOrSetAsync(
-            key,
+            cacheKey,
             async () =>
             {
                 var entity = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
@@ -39,8 +40,11 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             cancellationToken
         );
 
-        Guard.Against.NotFound(request.Id, product);
+        if (product is null)
+        {
+            throw new NotFoundException(nameof(Product), request.Id);
+        }
 
-        return product!;
+        return product;
     }
 }

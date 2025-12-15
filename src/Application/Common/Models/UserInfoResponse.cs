@@ -8,4 +8,5 @@ public class UserInfoResponse
     public string? LastName { get; set; }
     public string? UserName { get; set; }
     public string? Gender { get; set; }
+    public List<string> Roles { get; set; } = new();
 }
