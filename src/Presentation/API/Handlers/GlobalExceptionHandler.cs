@@ -50,10 +50,17 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 break;
             case BadRequestException:
             case ValidationException:
-                _logger.LogWarning(exception, "Bad request: {Message}", exception.Message);
+                _logger.LogWarning(
+                    exception,
+                    "Bad request: {Message}, TraceId: {TraceId}, CorrelationId: {CorrelationId}",
+                    exception.Message,
+                    httpContext.TraceIdentifier,
+                    httpContext.Items[ConfigurationConstants.CorrelationId.ItemsKey]
+                );
                 break;
             case ForbiddenAccessException:
             case UnauthorizedAccessException:
+            case NotAccessException:
                 _logger.LogWarning(exception, "Access issue: {Message}", exception.Message);
                 break;
             default:
@@ -83,6 +90,15 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 StatusCodes.Status403Forbidden,
                 "Access Forbidden",
                 forbidden.Message,
+                ConfigurationConstants.RfcTypes.Forbidden,
+                ErrorType.Forbidden,
+                "FORBIDDEN"
+            ),
+            NotAccessException notAccess => CreateProblem(
+                httpContext,
+                StatusCodes.Status403Forbidden,
+                "Access Forbidden",
+                notAccess.Message,
                 ConfigurationConstants.RfcTypes.Forbidden,
                 ErrorType.Forbidden,
                 "FORBIDDEN"
@@ -126,7 +142,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         string detail,
         string type,
         ErrorType errorType,
-        string errorCode,
+        string errorCode = "",
         (string key, object value)? extension = null
     )
     {
@@ -137,12 +153,14 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
             Title = title,
             Detail = detail,
             Type = type,
+            Extensions =
+            {
+                ["errorType"] = errorType.ToString(),
+                ["errorCode"] = errorCode,
+                ["traceId"] = httpContext.TraceIdentifier,
+            },
         };
 
-        problem.Extensions["errorType"] = errorType.ToString();
-        problem.Extensions["errorCode"] = errorCode;
-
-        // Add correlation ID for request tracking
         if (
             httpContext.Items.TryGetValue(
                 ConfigurationConstants.CorrelationId.ItemsKey,
@@ -156,6 +174,11 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         if (extension.HasValue)
         {
             problem.Extensions[extension.Value.key] = extension.Value.value;
+        }
+
+        if (!_environment.IsProduction())
+        {
+            problem.Extensions["environment"] = _environment.EnvironmentName;
         }
 
         return problem;
