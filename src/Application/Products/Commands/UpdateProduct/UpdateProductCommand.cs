@@ -1,5 +1,3 @@
-using Ardalis.GuardClauses;
-using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Security;
 using ShoppingProject.Domain.Constants;
 

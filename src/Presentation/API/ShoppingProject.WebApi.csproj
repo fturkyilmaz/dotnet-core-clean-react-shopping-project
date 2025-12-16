@@ -56,4 +56,8 @@
     <ProjectReference Include="../../Application/ShoppingProject.Application.csproj" />
     <ProjectReference Include="../../Infrastructure/ShoppingProject.Infrastructure.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="logs/" />
+  </ItemGroup>
 </Project>

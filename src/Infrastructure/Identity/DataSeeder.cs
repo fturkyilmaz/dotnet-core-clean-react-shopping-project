@@ -1,8 +1,6 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using ShoppingProject.Domain.Constants;
-using ShoppingProject.Domain.Entities;
 
 namespace ShoppingProject.Infrastructure.Identity;
 
@@ -23,35 +21,7 @@ public static class DataSeeder
         {
             if (!await roleManager.RoleExistsAsync(role))
             {
-                var identityRole = new IdentityRole(role);
-                await roleManager.CreateAsync(identityRole);
-
-                if (role == Roles.Administrator)
-                {
-                    await roleManager.AddClaimAsync(
-                        identityRole,
-                        new Claim(Policies.CanPurge, "true")
-                    );
-                    await roleManager.AddClaimAsync(
-                        identityRole,
-                        new Claim(Policies.CanManageProducts, "true")
-                    );
-                    await roleManager.AddClaimAsync(
-                        identityRole,
-                        new Claim(Policies.CanManageClients, "true")
-                    );
-                    await roleManager.AddClaimAsync(
-                        identityRole,
-                        new Claim(Policies.CanViewSystemConfig, "true")
-                    );
-                }
-                else if (role == Roles.Client)
-                {
-                    await roleManager.AddClaimAsync(
-                        identityRole,
-                        new Claim(Policies.CanManageOwnClients, "true")
-                    );
-                }
+                await roleManager.CreateAsync(new IdentityRole(role));
             }
         }
 
@@ -74,11 +44,6 @@ public static class DataSeeder
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, Roles.Administrator);
-
-                await userManager.AddClaimAsync(
-                    user,
-                    new Claim(Policies.RequireAdministratorRole, "true")
-                );
             }
         }
 
@@ -101,11 +66,6 @@ public static class DataSeeder
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, Roles.Client);
-
-                await userManager.AddClaimAsync(
-                    user,
-                    new Claim(Policies.RequireClientRole, "true")
-                );
             }
         }
     }
