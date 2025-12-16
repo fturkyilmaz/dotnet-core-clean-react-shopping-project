@@ -5,16 +5,13 @@ using ShoppingProject.Application.Common.Security;
 
 namespace ShoppingProject.Application.Common.Behaviours;
 
-public class AuthorizationBehaviour<TRequest, TResponse>
-    : IPipelineBehavior<TRequest, TResponse>
+public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
     private readonly IUser _user;
     private readonly IIdentityService _identityService;
 
-    public AuthorizationBehaviour(
-        IUser user,
-        IIdentityService identityService)
+    public AuthorizationBehaviour(IUser user, IIdentityService identityService)
     {
         _user = user;
         _identityService = identityService;
@@ -23,7 +20,8 @@ public class AuthorizationBehaviour<TRequest, TResponse>
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var authorizeAttributes = request
             .GetType()
@@ -41,24 +39,22 @@ public class AuthorizationBehaviour<TRequest, TResponse>
         var userRoles = _user.GetRoles();
 
         // Role-based authorization
-        var roleAttributes = authorizeAttributes
-            .Where(a => !string.IsNullOrWhiteSpace(a.Roles));
+        var roleAttributes = authorizeAttributes.Where(a => !string.IsNullOrWhiteSpace(a.Roles));
 
         if (roleAttributes.Any())
         {
             var isAuthorized = roleAttributes.Any(attr =>
-                attr.Roles!
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                attr.Roles!.Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(r => r.Trim())
-                    .Any(role => userRoles.Contains(role)));
+                    .Any(role => userRoles.Contains(role))
+            );
 
             if (!isAuthorized)
                 throw new ForbiddenAccessException();
         }
 
         // Policy-based authorization
-        var policyAttributes = authorizeAttributes
-            .Where(a => !string.IsNullOrWhiteSpace(a.Policy));
+        var policyAttributes = authorizeAttributes.Where(a => !string.IsNullOrWhiteSpace(a.Policy));
 
         foreach (var policy in policyAttributes.Select(a => a.Policy!))
         {

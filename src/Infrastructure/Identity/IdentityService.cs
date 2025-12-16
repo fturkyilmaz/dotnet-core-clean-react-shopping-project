@@ -380,6 +380,9 @@ public class IdentityService : IIdentityService
         string? lastName,
         string? gender)
     {
+        if (string.IsNullOrWhiteSpace(userId))
+            return ServiceResult<UserInfoResponse>.Fail("User not authenticated.");
+
         var user = await _userManager.FindByIdAsync(userId);
 
         if (user == null)
