@@ -1,15 +1,17 @@
-﻿using ShoppingProject.Application.Common.Interfaces;
+﻿using MediatR;
 using ShoppingProject.Application.Common.Security;
 using ShoppingProject.Domain.Constants;
 
 namespace ShoppingProject.Application.Products.Commands.CreateProduct;
 
+/// <summary>
+/// Command for creating a new product.
+/// </summary>
 [Authorize(Policy = Policies.CanManageProducts)]
-public record CreateProductCommand : IRequest<int>
-{
-    public string? Title { get; init; }
-    public decimal Price { get; init; }
-    public string? Description { get; init; }
-    public string? Category { get; init; }
-    public string? Image { get; init; }
-}
+public record CreateProductCommand(
+    string? Title,
+    decimal Price,
+    string? Description,
+    string? Category,
+    string? Image
+) : IRequest<int>;

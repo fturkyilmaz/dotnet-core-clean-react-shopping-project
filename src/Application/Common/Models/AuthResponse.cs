@@ -1,8 +1,3 @@
 namespace ShoppingProject.Application.Common.Models;
 
-public class AuthResponse
-{
-    public string AccessToken { get; set; } = string.Empty;
-    public string RefreshToken { get; set; } = string.Empty;
-    public DateTimeOffset RefreshTokenExpiryTime { get; set; }
-}
+public record AuthResponse(string AccessToken, string RefreshToken, DateTime Expires);

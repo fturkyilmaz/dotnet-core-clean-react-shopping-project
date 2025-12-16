@@ -1,4 +1,4 @@
-﻿using ShoppingProject.Application.Common.Interfaces;
+﻿using MediatR;
 using ShoppingProject.Application.Common.Security;
 using ShoppingProject.Domain.Constants;
 
