@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace ShoppingProject.Application.Identity.Commands.Login;
+namespace ShoppingProject.Application.Identity.Commands.Register;
 
-public class LoginCommandValidator : AbstractValidator<LoginCommand>
+public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
-    public LoginCommandValidator()
+    public RegisterCommandValidator()
     {
         RuleFor(v => v.Email)
             .NotEmpty()
@@ -17,5 +17,9 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
             .WithMessage("Şifre boş olamaz.")
             .MinimumLength(6)
             .WithMessage("Şifre en az 6 karakter olmalıdır.");
+
+        RuleFor(v => v.FirstName).NotEmpty().WithMessage("Ad alanı boş olamaz.");
+
+        RuleFor(v => v.LastName).NotEmpty().WithMessage("Soyad alanı boş olamaz.");
     }
 }

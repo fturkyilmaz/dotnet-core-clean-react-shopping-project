@@ -1,50 +1,128 @@
-﻿using ShoppingProject.Application.Common.Models;
+using ShoppingProject.Application.Common.Models;
+using ShoppingProject.Application.DTOs.Identity;
 using ShoppingProject.Domain.Constants;
 
-namespace ShoppingProject.Application.Common.Interfaces
+namespace ShoppingProject.Application.Common.Interfaces;
+
+/// <summary>
+/// Provides identity and access management operations such as
+/// authentication, authorization, user, role and password management.
+/// </summary>
+public interface IIdentityService
 {
-    public interface IIdentityService
-    {
-        Task<List<string>> GetRolesAsync(string userId);
+    // =========================
+    // Authentication
+    // =========================
 
-        Task<string?> GetUserNameAsync(string userId);
+    /// <summary>
+    /// Authenticates a user using email and password.
+    /// </summary>
+    Task<ServiceResult<AuthResponse>> LoginAsync(
+        string email,
+        string password
+    );
 
-        Task<(Result Result, UserInfoResponse? Response)> GetUserByIdAsync(string userId);
+    /// <summary>
+    /// Refreshes access and refresh tokens.
+    /// </summary>
+    Task<ServiceResult<AuthResponse>> RefreshTokenAsync(
+        string accessToken,
+        string refreshToken
+    );
 
-        Task<bool> IsInRoleAsync(string userId, string role);
+    // =========================
+    // User Management
+    // =========================
 
-        Task<bool> AuthorizeAsync(string userId, string policyName);
+    /// <summary>
+    /// Registers a new user.
+    /// </summary>
+    Task<ServiceResult<string>> RegisterUserAsync(
+        string email,
+        string password,
+        string firstName,
+        string lastName,
+        string gender,
+        string role = Roles.Client
+    );
 
-        Task<(Result Result, string UserId)> CreateUserAsync(
-            string userName,
-            string password,
-            string? firstName = null,
-            string? lastName = null,
-            string? gender = null,
-            string role = Roles.Client
-        );
+    /// <summary>
+    /// Retrieves detailed information of the current user.
+    /// </summary>
+    Task<ServiceResult<UserInfoResponse>> GetUserInfoAsync(string userId);
 
-        Task<Result> DeleteUserAsync(string userId);
+    /// <summary>
+    /// Returns the username of the specified user.
+    /// Used by logging and performance behaviors.
+    /// </summary>
+    Task<string?> GetUserNameAsync(string userId);
 
-        Task<(Result Result, AuthResponse? Response)> LoginAsync(string email, string password);
+    /// <summary>
+    /// Updates user profile information.
+    /// </summary>
+    Task<ServiceResult<string>> UpdateUserAsync(
+        string userId,
+        string firstName,
+        string lastName,
+        string gender
+    );
 
-        Task<(Result Result, AuthResponse? Response)> RefreshTokenAsync(
-            string token,
-            string refreshToken
-        );
+    /// <summary>
+    /// Deletes a user by user id.
+    /// </summary>
+    Task<ServiceResult<string>> DeleteUserAsync(string userId);
 
-        Task<Result> AddUserToRoleAsync(string userId, string role);
+    // =========================
+    // Role Management
+    // =========================
 
-        Task<Result> CreateRoleAsync(string roleName);
+    /// <summary>
+    /// Assigns a role to a user.
+    /// </summary>
+    Task<ServiceResult<string>> AssignUserToRoleAsync(
+        string userId,
+        string role
+    );
 
-        Task<Result> UpdateUserAsync(
-            string userId,
-            string firstName,
-            string lastName,
-            string gender
-        );
+    /// <summary>
+    /// Creates a new role.
+    /// </summary>
+    Task<ServiceResult<string>> CreateRoleAsync(string roleName);
 
-        Task<Result> RequestPasswordResetAsync(string email);
-        Task<Result> ResetPasswordAsync(string email, string token, string newPassword);
-    }
+    /// <summary>
+    /// Retrieves roles of a user.
+    /// </summary>
+    Task<List<string>> GetRolesAsync(string userId);
+
+    /// <summary>
+    /// Checks if the user belongs to a specific role.
+    /// </summary>
+    Task<bool> IsInRoleAsync(string userId, string role);
+
+    // =========================
+    // Authorization
+    // =========================
+
+    /// <summary>
+    /// Authorizes a user against a given policy.
+    /// </summary>
+    Task<bool> AuthorizeAsync(string userId, string policyName);
+
+    // =========================
+    // Password Management
+    // =========================
+
+    /// <summary>
+    /// Sends a password reset link to the user's email.
+    /// </summary>
+    Task<ServiceResult<string>> SendPasswordResetLinkAsync(string email);
+
+    /// <summary>
+    /// Resets the user's password using a reset token.
+    /// </summary>
+    Task<ServiceResult<string>> ResetPasswordAsync(
+        string email,
+        string token,
+        string newPassword
+    );
 }

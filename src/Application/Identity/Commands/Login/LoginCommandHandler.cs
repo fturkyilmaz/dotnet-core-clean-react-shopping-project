@@ -1,10 +1,10 @@
-using MediatR;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
+using ShoppingProject.Application.DTOs.Identity;
 
 namespace ShoppingProject.Application.Identity.Commands.Login;
 
-public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponse>
+public class LoginCommandHandler : IRequestHandler<LoginCommand, ServiceResult<AuthResponse>>
 {
     private readonly IIdentityService _identityService;
 
@@ -13,18 +13,11 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponse>
         _identityService = identityService;
     }
 
-    public async Task<AuthResponse> Handle(
+    public async Task<ServiceResult<AuthResponse>> Handle(
         LoginCommand request,
         CancellationToken cancellationToken
     )
     {
-        var (result, response) = await _identityService.LoginAsync(request.Email, request.Password);
-
-        if (!result.Succeeded || response == null)
-        {
-            throw new Exception($"Authentication Failed: {string.Join(", ", result.Errors)}");
-        }
-
-        return response;
+        return await _identityService.LoginAsync(request.Email, request.Password);
     }
 }

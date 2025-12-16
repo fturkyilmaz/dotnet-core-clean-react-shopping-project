@@ -18,4 +18,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="System.Linq.Dynamic.Core" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Identity/Commands/RefreshToken/" />
+  </ItemGroup>
 </Project>

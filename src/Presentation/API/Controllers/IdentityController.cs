@@ -63,7 +63,7 @@ public class IdentityController : ControllerBase
             request.Password,
             request.FirstName,
             request.LastName,
-            request.Gender ?? "Unknown", // default gender
+            request.Gender ?? "Unknown",
             Roles.Client
         );
 
@@ -122,16 +122,15 @@ public class IdentityController : ControllerBase
 
         var roles = await _identityService.GetRolesAsync(userId);
 
-        var response = new UserInfoResponse
-        {
-            Id = user.Response.Id,
-            Email = user.Response.Email ?? string.Empty,
-            FirstName = user.Response.FirstName,
-            LastName = user.Response.LastName,
-            UserName = user.Response.UserName,
-            Gender = user.Response.Gender,
-            Roles = roles,
-        };
+        var response = new UserInfoResponse(
+            user.Response.Id,
+            user.Response.Email ?? string.Empty,
+            user.Response.FirstName ?? string.Empty,
+            user.Response.LastName ?? string.Empty,
+            user.Response.UserName ?? string.Empty,
+            user.Response.Gender ?? string.Empty,
+            roles
+        );
 
         return Ok(ServiceResult<UserInfoResponse>.Success(response));
     }

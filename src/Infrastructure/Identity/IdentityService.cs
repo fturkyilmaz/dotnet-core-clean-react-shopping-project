@@ -63,15 +63,15 @@ public class IdentityService : IIdentityService
         if (user == null)
             return (Result.Failure(new[] { "User not found." }), null);
 
-        var response = new UserInfoResponse
-        {
-            Id = user.Id,
-            UserName = user.UserName,
-            Email = user.Email ?? string.Empty,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Gender = user.Gender,
-        };
+        var response = new UserInfoResponse(
+            user.Id,
+            user.Email ?? string.Empty,
+            user.FirstName ?? string.Empty,
+            user.LastName ?? string.Empty,
+            user.UserName ?? string.Empty,
+            user.Gender ?? string.Empty,
+            new List<string>() // Roles will be empty here, as this is just getting basic user info
+        );
 
         return (Result.Success(), response);
     }
@@ -154,12 +154,11 @@ public class IdentityService : IIdentityService
 
         return (
             Result.Success(),
-            new AuthResponse
-            {
-                AccessToken = token,
-                RefreshToken = refreshToken,
-                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime ?? _clock.UtcNow.UtcDateTime,
-            }
+            new AuthResponse(
+                token,
+                refreshToken,
+                _clock.UtcNow.UtcDateTime.AddMinutes(_jwtOptions.ExpiryMinutes)
+            )
         );
     }
 
@@ -226,12 +225,11 @@ public class IdentityService : IIdentityService
 
         return (
             Result.Success(),
-            new AuthResponse
-            {
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken,
-                RefreshTokenExpiryTime = user.RefreshTokenExpiryTime ?? _clock.UtcNow.DateTime,
-            }
+            new AuthResponse(
+                newAccessToken,
+                newRefreshToken,
+                _clock.UtcNow.UtcDateTime.AddMinutes(_jwtOptions.ExpiryMinutes)
+            )
         );
     }
 
