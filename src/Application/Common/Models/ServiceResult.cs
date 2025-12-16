@@ -27,5 +27,8 @@ namespace ShoppingProject.Application.Common.Models
 
         public static ServiceResult<T> Fail(string message, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
             => new(false, default, message, statusCode);
+
+        public static ServiceResult<T> Fail(IEnumerable<string> errors)
+        => new(false, default,  string.Join(", ", errors ?? Enumerable.Empty<string>()), HttpStatusCode.BadRequest);
     }
 }

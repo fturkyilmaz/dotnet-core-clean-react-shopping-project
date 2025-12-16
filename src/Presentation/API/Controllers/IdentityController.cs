@@ -1,11 +1,21 @@
 using System.Net;
 using System.Security.Claims;
 using Asp.Versioning;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Application.DTOs.Identity;
+using ShoppingProject.Application.Identity.Commands.AssignAdminRole;
+using ShoppingProject.Application.Identity.Commands.CreateRole;
+using ShoppingProject.Application.Identity.Commands.ForgotPassword;
+using ShoppingProject.Application.Identity.Commands.Login;
+using ShoppingProject.Application.Identity.Commands.RefreshToken;
+using ShoppingProject.Application.Identity.Commands.Register;
+using ShoppingProject.Application.Identity.Commands.ResetPassword;
+using ShoppingProject.Application.Identity.Commands.UpdateMe;
+using ShoppingProject.Application.Identity.Queries.GetCurrentUserInfo;
 using ShoppingProject.Domain.Constants;
 
 namespace ShoppingProject.WebApi.Controllers;
@@ -15,11 +25,11 @@ namespace ShoppingProject.WebApi.Controllers;
 [ApiController]
 public class IdentityController : ControllerBase
 {
-    private readonly IIdentityService _identityService;
+    private readonly ISender _sender;
 
-    public IdentityController(IIdentityService identityService)
+    public IdentityController(ISender sender)
     {
-        _identityService = identityService;
+        _sender = sender;
     }
 
     [HttpPost("login")]
@@ -27,12 +37,9 @@ public class IdentityController : ControllerBase
     [ProducesResponseType(typeof(ServiceResult<AuthResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ServiceResult<AuthResponse>>> Login(LoginRequest request)
     {
-        var (result, response) = await _identityService.LoginAsync(request.Email, request.Password);
+        var result = await _sender.Send(new LoginCommand(request.Email, request.Password));
 
-        if (!result.Succeeded)
-            return BadRequest(ServiceResult<AuthResponse>.Fail(string.Join(", ", result.Errors)));
-
-        return Ok(ServiceResult<AuthResponse>.Success(response!));
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("refresh-token")]
@@ -42,15 +49,9 @@ public class IdentityController : ControllerBase
         RefreshTokenRequest request
     )
     {
-        var (result, response) = await _identityService.RefreshTokenAsync(
-            request.AccessToken,
-            request.RefreshToken
-        );
+        var result = await _sender.Send(new RefreshTokenCommand(request.AccessToken, request.RefreshToken));
 
-        if (!result.Succeeded)
-            return BadRequest(ServiceResult<AuthResponse>.Fail(string.Join(", ", result.Errors)));
-
-        return Ok(ServiceResult<AuthResponse>.Success(response!));
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("register")]
@@ -58,19 +59,16 @@ public class IdentityController : ControllerBase
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ServiceResult<string>>> Register(RegisterRequest request)
     {
-        var (result, _) = await _identityService.CreateUserAsync(
-            request.Email,
-            request.Password,
-            request.FirstName,
-            request.LastName,
-            request.Gender ?? "Unknown",
-            Roles.Client
-        );
+        var result = await _sender.Send(
+           new RegisterCommand(
+               request.Email,
+               request.Password,
+               request.FirstName,
+               request.LastName,
+               request.Gender ?? "Unknown",
+               Roles.Client));
 
-        if (!result.Succeeded)
-            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
-
-        return Ok(ServiceResult<string>.Success("User registered successfully"));
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("{userId}/assign-admin-role")]
@@ -78,12 +76,9 @@ public class IdentityController : ControllerBase
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ServiceResult<string>>> AssignAdminRole(string userId)
     {
-        var result = await _identityService.AddUserToRoleAsync(userId, "Administrator");
+        var result = await _sender.Send(new AssignAdminRoleCommand(userId, Roles.Administrator));
 
-        if (!result.Succeeded)
-            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
-
-        return Ok(ServiceResult<string>.Success("Administrator role assigned successfully"));
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("roles/{roleName}")]
@@ -91,12 +86,9 @@ public class IdentityController : ControllerBase
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ServiceResult<string>>> CreateRole(string roleName)
     {
-        var result = await _identityService.CreateRoleAsync(roleName);
+        var result = await _sender.Send(new CreateRoleCommand(roleName));
 
-        if (!result.Succeeded)
-            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
-
-        return Ok(ServiceResult<string>.Success($"Role '{roleName}' created successfully"));
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("me")]
@@ -106,34 +98,39 @@ public class IdentityController : ControllerBase
     public async Task<ActionResult<ServiceResult<UserInfoResponse>>> GetCurrentUserInfo()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-            return Unauthorized(
-                ServiceResult<UserInfoResponse>.Fail(
-                    "User not authorized",
-                    HttpStatusCode.Unauthorized
-                )
-            );
 
-        var user = await _identityService.GetUserByIdAsync(userId);
-        if (!user.Result.Succeeded || user.Response == null)
-            return NotFound(
-                ServiceResult<UserInfoResponse>.Fail("User not found", HttpStatusCode.NotFound)
-            );
+        if (string.IsNullOrWhiteSpace(userId))
+            return Unauthorized(ServiceResult<UserInfoResponse>.Fail("Unauthorized"));
 
-        var roles = await _identityService.GetRolesAsync(userId);
+        var result = await _sender.Send(new GetCurrentUserInfoQuery(userId));
 
-        var response = new UserInfoResponse(
-            user.Response.Id,
-            user.Response.Email ?? string.Empty,
-            user.Response.FirstName ?? string.Empty,
-            user.Response.LastName ?? string.Empty,
-            user.Response.UserName ?? string.Empty,
-            user.Response.Gender ?? string.Empty,
-            roles
-        );
-
-        return Ok(ServiceResult<UserInfoResponse>.Success(response));
+        return result.IsSuccess ? Ok(result) : NotFound(result);
     }
+
+    [HttpPut("me")]
+[Authorize]
+[ProducesResponseType(typeof(ServiceResult<UserInfoResponse>), StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+public async Task<ActionResult<ServiceResult<UserInfoResponse>>> UpdateMe(
+    UpdateUserRequest request)
+{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    if (string.IsNullOrWhiteSpace(userId))
+        return Unauthorized(ServiceResult<UserInfoResponse>.Fail("Unauthorized"));
+
+    var result = await _sender.Send(
+        new UpdateMeCommand(
+            userId,
+            request.FirstName ?? string.Empty,
+            request.LastName ?? string.Empty,
+            request.Gender ?? string.Empty
+        )
+    );
+
+    return result.IsSuccess ? Ok(result) : BadRequest(result);
+}
+
 
     [HttpPost("forgot-password")]
     [AllowAnonymous]
@@ -142,11 +139,9 @@ public class IdentityController : ControllerBase
         ForgotPasswordRequest request
     )
     {
-        var result = await _identityService.RequestPasswordResetAsync(request.Email);
-        if (!result.Succeeded)
-            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
+        var result = await _sender.Send(new ForgotPasswordCommand(request.Email));
 
-        return Ok(ServiceResult<string>.Success("Reset maili gönderildi."));
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("reset-password")]
@@ -156,15 +151,12 @@ public class IdentityController : ControllerBase
         ResetPasswordRequest request
     )
     {
-        var result = await _identityService.ResetPasswordAsync(
-            request.Email,
-            request.Token,
-            request.NewPassword
-        );
+        var result = await _sender.Send(
+            new ResetPasswordCommand(
+                request.Email,
+                request.Token,
+                request.NewPassword));
 
-        if (!result.Succeeded)
-            return BadRequest(ServiceResult<string>.Fail(string.Join(", ", result.Errors)));
-
-        return Ok(ServiceResult<string>.Success("Şifre güncellendi."));
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 }

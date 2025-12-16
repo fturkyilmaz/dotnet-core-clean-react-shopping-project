@@ -18,7 +18,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ServiceRe
         CancellationToken cancellationToken
     )
     {
-        return await _identityService.RegisterUserAsync(
+        return await _identityService.RegisterAsync(
             request.Email,
             request.Password,
             request.FirstName,

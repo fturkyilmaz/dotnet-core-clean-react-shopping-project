@@ -21,5 +21,6 @@
 
   <ItemGroup>
     <Folder Include="Identity/Commands/RefreshToken/" />
+    <Folder Include="Identity/Commands/UpdateMe/" />
   </ItemGroup>
 </Project>
