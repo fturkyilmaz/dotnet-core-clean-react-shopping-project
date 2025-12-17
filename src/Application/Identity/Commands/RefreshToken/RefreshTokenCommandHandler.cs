@@ -1,7 +1,5 @@
-using MediatR;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
-using ShoppingProject.Application.DTOs.Identity;
 
 namespace ShoppingProject.Application.Identity.Commands.RefreshToken;
 
