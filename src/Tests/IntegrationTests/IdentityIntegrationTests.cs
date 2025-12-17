@@ -1,32 +1,35 @@
 ﻿using System.Net.Http.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using ShoppingProject.Application.Common.Models;
-using Xunit;
+using Bogus;
 
 namespace ShoppingProject.UnitTests.IntegrationTests
 {
     public class IdentityIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
     {
         private readonly HttpClient _client;
+        private readonly Faker _faker;
 
         public IdentityIntegrationTests(WebApplicationFactory<Program> factory)
         {
             _client = factory.CreateClient();
+            _faker = new Faker();
         }
 
         [Fact]
         public async Task Register_Then_Login_Should_Return_Token()
         {
+            var email = _faker.Internet.Email();
+
             var registerResponse = await _client.PostAsJsonAsync(
                 "/api/v1/identity/register",
-                new { Email = "testuser@example.com", Password = "Test123!" }
+                new { Email = email, Password = "Test123!" }
             );
             registerResponse.EnsureSuccessStatusCode();
 
             var loginResponse = await _client.PostAsJsonAsync(
                 "/api/v1/identity/login",
-                new { Email = "testuser@example.com", Password = "Test123!" }
+                new { Email = email, Password = "Test123!" }
             );
             loginResponse.EnsureSuccessStatusCode();
 
@@ -43,7 +46,7 @@ namespace ShoppingProject.UnitTests.IntegrationTests
         {
             var loginResponse = await _client.PostAsJsonAsync(
                 "/api/v1/identity/login",
-                new { Email = "testuser@example.com", Password = "Test123!" }
+                new { Email = "admin@test.com", Password = "Admin123!" }
             );
             loginResponse.EnsureSuccessStatusCode();
 
@@ -74,9 +77,13 @@ namespace ShoppingProject.UnitTests.IntegrationTests
         {
             var response = await _client.PostAsJsonAsync(
                 "/api/v1/identity/forgot-password",
-                new { Email = "testuser@example.com" }
+                new { Email = "admin@test.com" }
             );
             response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadFromJsonAsync<ServiceResult<string>>();
+            Assert.NotNull(result);
+            Assert.True(result!.IsSuccess);
         }
 
         [Fact]
@@ -86,7 +93,7 @@ namespace ShoppingProject.UnitTests.IntegrationTests
                 "/api/v1/identity/reset-password",
                 new
                 {
-                    Email = "testuser@example.com",
+                    Email = "admin@test.com",
                     Token = "FAKE_RESET_TOKEN",
                     NewPassword = "NewPass123!",
                 }

@@ -17,7 +17,6 @@ public class GetProductByIdQueryTests
     private readonly Mock<IMapper> _mockMapper;
     private readonly Mock<ICacheService> _mockCacheService;
     private readonly GetProductByIdQueryHandler _handler;
-    private readonly Faker _faker;
 
     public GetProductByIdQueryTests()
     {
@@ -29,7 +28,6 @@ public class GetProductByIdQueryTests
             _mockMapper.Object,
             _mockCacheService.Object
         );
-        _faker = new Faker();
     }
 
     [Fact]

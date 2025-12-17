@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json.Serialization;
 
 namespace ShoppingProject.Application.Common.Models
 {
@@ -6,11 +7,14 @@ namespace ShoppingProject.Application.Common.Models
     {
         public bool IsSuccess { get; }
         public T? Data { get; }
-        public string Message { get; }
+        public string Message { get; } = string.Empty;
         public HttpStatusCode StatusCode { get; }
-        public string Location { get; }
+        public string Location { get; } = string.Empty;
 
-        private ServiceResult(bool isSuccess, T? data, string message, HttpStatusCode statusCode, string location = "")
+        public ServiceResult() {}
+
+        [JsonConstructor]
+        public ServiceResult(bool isSuccess, T? data, string message, HttpStatusCode statusCode, string location = "")
         {
             IsSuccess = isSuccess;
             Data = data;
@@ -29,6 +33,6 @@ namespace ShoppingProject.Application.Common.Models
             => new(false, default, message, statusCode);
 
         public static ServiceResult<T> Fail(IEnumerable<string> errors)
-        => new(false, default,  string.Join(", ", errors ?? Enumerable.Empty<string>()), HttpStatusCode.BadRequest);
+            => new(false, default, string.Join(", ", errors ?? Enumerable.Empty<string>()), HttpStatusCode.BadRequest);
     }
 }

@@ -13,27 +13,9 @@ public class QueryableExtensionsTests
         // Arrange
         var products = new List<Product>
         {
-            new Product
-            {
-                Id = 1,
-                Category = "women's clothing",
-                Title = "Dress",
-                Price = 50,
-            },
-            new Product
-            {
-                Id = 2,
-                Category = "men's clothing",
-                Title = "Shirt",
-                Price = 40,
-            },
-            new Product
-            {
-                Id = 3,
-                Category = "women's clothing",
-                Title = "Skirt",
-                Price = 30,
-            },
+            Product.Create("Dress", 50, "Nice dress", "women's clothing", "dress.jpg"),
+            Product.Create("Shirt", 40, "Cool shirt", "men's clothing", "shirt.jpg"),
+            Product.Create("Skirt", 30, "Skirt desc", "women's clothing", "skirt.jpg"),
         }.AsQueryable();
 
         var query = new DynamicQuery
@@ -60,13 +42,7 @@ public class QueryableExtensionsTests
         // Arrange
         var products = new List<Product>
         {
-            new Product
-            {
-                Id = 1,
-                Category = "Women's Clothing",
-                Title = "Dress",
-                Price = 50,
-            },
+            Product.Create("Dress", 50, "Desc", "Women's Clothing", "dress.jpg"),
         }.AsQueryable();
 
         var query = new DynamicQuery
@@ -93,9 +69,9 @@ public class QueryableExtensionsTests
         // Arrange
         var products = new List<Product>
         {
-            new Product { Id = 1, Price = 50 },
-            new Product { Id = 2, Price = 30 },
-            new Product { Id = 3, Price = 40 },
+            Product.Create("A", 50, "Desc", "Cat", "a.jpg"),
+            Product.Create("B", 30, "Desc", "Cat", "b.jpg"),
+            Product.Create("C", 40, "Desc", "Cat", "c.jpg"),
         }.AsQueryable();
 
         var query = new DynamicQuery
@@ -122,9 +98,9 @@ public class QueryableExtensionsTests
         // Arrange
         var products = new List<Product>
         {
-            new Product { Id = 1, Price = 30 },
-            new Product { Id = 2, Price = 50 },
-            new Product { Id = 3, Price = 40 },
+            Product.Create("A", 30, "Desc", "Cat", "a.jpg"),
+            Product.Create("B", 50, "Desc", "Cat", "b.jpg"),
+            Product.Create("C", 40, "Desc", "Cat", "c.jpg"),
         }.AsQueryable();
 
         var query = new DynamicQuery
@@ -151,30 +127,10 @@ public class QueryableExtensionsTests
         // Arrange
         var products = new List<Product>
         {
-            new Product
-            {
-                Id = 1,
-                Category = "electronics",
-                Price = 100,
-            },
-            new Product
-            {
-                Id = 2,
-                Category = "electronics",
-                Price = 50,
-            },
-            new Product
-            {
-                Id = 3,
-                Category = "clothing",
-                Price = 75,
-            },
-            new Product
-            {
-                Id = 4,
-                Category = "electronics",
-                Price = 200,
-            },
+            Product.Create("A", 100, "Desc", "electronics", "a.jpg"),
+            Product.Create("B", 50, "Desc", "electronics", "b.jpg"),
+            Product.Create("C", 75, "Desc", "clothing", "c.jpg"),
+            Product.Create("D", 200, "Desc", "electronics", "d.jpg"),
         }.AsQueryable();
 
         var query = new DynamicQuery

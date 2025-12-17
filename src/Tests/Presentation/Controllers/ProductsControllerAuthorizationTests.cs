@@ -1,37 +1,33 @@
-using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OutputCaching; 
+using Microsoft.AspNetCore.OutputCaching;
 using Moq;
-using ShoppingProject.Application.Products.Commands.CreateProduct;
-using ShoppingProject.Application.Products.Commands.DeleteProduct;
-using ShoppingProject.Application.Products.Commands.UpdateProduct;
 using ShoppingProject.Domain.Constants;
 using ShoppingProject.WebApi.Controllers;
-using Xunit;
 
 namespace ShoppingProject.UnitTests.Presentation.Controllers;
 
 public class ProductsControllerAuthorizationTests
 {
     private readonly Mock<ISender> _senderMock;
-    private readonly Mock<IOutputCacheStore> _outputCacheStoreMock; 
+    private readonly Mock<IOutputCacheStore> _outputCacheStoreMock;
     private readonly ProductsController _controller;
 
+/// <summary>
+/// Unit tests for the <see cref="ProductsController"/> class.
+/// </summary>
     public ProductsControllerAuthorizationTests()
     {
         _senderMock = new Mock<ISender>();
-        _outputCacheStoreMock = new Mock<IOutputCacheStore>(); 
+        _outputCacheStoreMock = new Mock<IOutputCacheStore>();
 
-        _controller = new ProductsController(_senderMock.Object, _outputCacheStoreMock.Object); // <-- düzeltildi
+        _controller = new ProductsController(_senderMock.Object, _outputCacheStoreMock.Object);
     }
 
     [Fact]
     public void GetAll_HasAllowAnonymousAttribute()
     {
-        var method = typeof(ProductsController).GetMethod(nameof(ProductsController.GetAll));
+        var method = _controller.GetType().GetMethod(nameof(ProductsController.GetAll));
         var attributes = method?.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
@@ -40,7 +36,7 @@ public class ProductsControllerAuthorizationTests
     [Fact]
     public void GetById_HasAllowAnonymousAttribute()
     {
-        var method = typeof(ProductsController).GetMethod(nameof(ProductsController.GetById));
+        var method = _controller.GetType().GetMethod(nameof(ProductsController.GetById));
         var attributes = method?.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
@@ -49,7 +45,7 @@ public class ProductsControllerAuthorizationTests
     [Fact]
     public void Search_HasAllowAnonymousAttribute()
     {
-        var method = typeof(ProductsController).GetMethod(nameof(ProductsController.Search));
+        var method = _controller.GetType().GetMethod(nameof(ProductsController.Search));
         var attributes = method?.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
@@ -58,7 +54,7 @@ public class ProductsControllerAuthorizationTests
     [Fact]
     public void Create_HasAuthorizeAttributeWithCanManageProductsPolicy()
     {
-        var method = typeof(ProductsController).GetMethod(nameof(ProductsController.Create));
+        var method = _controller.GetType().GetMethod(nameof(ProductsController.Create));
         var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
             .Cast<AuthorizeAttribute>()
             .ToArray();
@@ -70,7 +66,7 @@ public class ProductsControllerAuthorizationTests
     [Fact]
     public void Update_HasAuthorizeAttributeWithCanManageProductsPolicy()
     {
-        var method = typeof(ProductsController).GetMethod(nameof(ProductsController.Update));
+        var method = _controller.GetType().GetMethod(nameof(ProductsController.Update));
         var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
             .Cast<AuthorizeAttribute>()
             .ToArray();
@@ -82,7 +78,7 @@ public class ProductsControllerAuthorizationTests
     [Fact]
     public void Delete_HasAuthorizeAttributeWithCanManageProductsPolicy()
     {
-        var method = typeof(ProductsController).GetMethod(nameof(ProductsController.Delete));
+        var method = _controller.GetType().GetMethod(nameof(ProductsController.Delete));
         var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
             .Cast<AuthorizeAttribute>()
             .ToArray();

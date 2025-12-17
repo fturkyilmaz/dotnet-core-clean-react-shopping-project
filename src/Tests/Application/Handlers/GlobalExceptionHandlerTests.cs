@@ -1,16 +1,14 @@
-using System.IO;
 using System.Text.Json;
 using FluentAssertions;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ShoppingProject.Application.Common.Exceptions;
 using ShoppingProject.WebApi.Handlers;
-using Xunit;
 
+namespace ShoppingProject.UnitTests.Application.Handlers;
 public class GlobalExceptionHandlerTests
 {
     private readonly Mock<ILogger<GlobalExceptionHandler>> _loggerMock;
