@@ -124,8 +124,11 @@ public class ArchitectureTests
             .BeAbstract()
             .GetResult();
 
-        // Note: This test might fail if you have non-sealed entities
-        // You can adjust based on your design preferences
+       // Assert
+        Assert.True(
+            result.IsSuccessful,
+            "All domain entities should be sealed or abstract to prevent unintended inheritance"
+        );
     }
 
     [Fact]

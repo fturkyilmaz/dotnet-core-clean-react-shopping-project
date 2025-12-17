@@ -25,14 +25,13 @@ public class CreateProductCommandTests
     public async Task Handle_ValidCommand_ShouldCreateProduct()
     {
         // Arrange
-        var command = new CreateProductCommand
-        {
-            Title = _faker.Commerce.ProductName(),
-            Description = _faker.Commerce.ProductDescription(),
-            Price = _faker.Random.Decimal(1, 1000),
-            Category = _faker.Commerce.Categories(1)[0],
-            Image = _faker.Image.PicsumUrl(),
-        };
+        var command = new CreateProductCommand(
+            _faker.Commerce.ProductName(),
+            _faker.Random.Decimal(1, 1000),
+            _faker.Commerce.ProductDescription(),
+            _faker.Commerce.Categories(1)[0],
+            _faker.Image.PicsumUrl() // geçerli URL
+        );
 
         Product? capturedProduct = null;
         _mockContext
@@ -52,19 +51,20 @@ public class CreateProductCommandTests
 
         _mockContext.Verify(x => x.Add(It.IsAny<Product>()), Times.Once);
         _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+
+        Assert.Equal(capturedProduct.Id, result);
     }
 
     [Fact]
     public async Task Handle_ValidCommand_ShouldRaiseDomainEvent()
     {
-        var command = new CreateProductCommand
-        {
-            Title = "Test Product",
-            Description = "Test Description",
-            Price = 29.99m,
-            Category = "electronics",
-            Image = "test.jpg",
-        };
+        var command = new CreateProductCommand(
+            "Test Product",
+            29.99m,
+            "Test Description",
+            "electronics",
+            _faker.Image.PicsumUrl() // geçerli URL
+        );
 
         Product? capturedProduct = null;
         _mockContext
@@ -86,14 +86,13 @@ public class CreateProductCommandTests
     [Fact]
     public async Task Handle_NullValues_ShouldUseEmptyStrings()
     {
-        var command = new CreateProductCommand
-        {
-            Title = null,
-            Description = null,
-            Price = 10m,
-            Category = null,
-            Image = null,
-        };
+        var command = new CreateProductCommand(
+            null,
+            10m,
+            null,
+            null,
+            null
+        );
 
         Product? capturedProduct = null;
         _mockContext
@@ -114,14 +113,13 @@ public class CreateProductCommandTests
     [Fact]
     public async Task Handle_ValidCommand_ShouldInitializeRating()
     {
-        var command = new CreateProductCommand
-        {
-            Title = "Test",
-            Description = "Test",
-            Price = 10m,
-            Category = "test",
-            Image = "test.jpg",
-        };
+        var command = new CreateProductCommand(
+            "Test",
+            10m,
+            "Test",
+            "test",
+            _faker.Image.PicsumUrl() // geçerli URL
+        );
 
         Product? capturedProduct = null;
         _mockContext
