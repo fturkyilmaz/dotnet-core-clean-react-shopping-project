@@ -1,7 +1,5 @@
-using Ardalis.GuardClauses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using MediatR;
+using Microsoft.EntityFrameworkCore;
+using ShoppingProject.Application.Common.Exceptions;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.DTOs;
 
@@ -20,13 +18,15 @@ public class GetCartByIdQueryHandler : IRequestHandler<GetCartByIdQuery, CartDto
 
     public async Task<CartDto> Handle(GetCartByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await Task.FromResult(
-            _context
-                .Carts.ProjectTo<CartDto>(_mapper.ConfigurationProvider)
-                .FirstOrDefault(x => x.Id == request.Id)
-        );
+        var entity = await _context
+            .Carts.Where(c => c.Id == request.Id)
+            .ProjectTo<CartDto>(_mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        Guard.Against.NotFound(request.Id, entity);
+        if (entity == null)
+        {
+            throw new NotFoundException($"Cart with Id {request.Id} was not found.");
+        }
 
         return entity;
     }
