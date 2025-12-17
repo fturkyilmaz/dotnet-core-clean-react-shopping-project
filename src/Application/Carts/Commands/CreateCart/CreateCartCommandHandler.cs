@@ -20,7 +20,7 @@ public class CreateCartCommandHandler : IRequestHandler<CreateCartCommand, int>
         {
             Title = request.Title,
             Price = request.Price,
-            Image = request.Image,
+            Image = request.Image ?? string.Empty,
             Quantity = request.Quantity,
         };
 
