@@ -44,9 +44,6 @@ namespace ShoppingProject.WebApi.Controllers
         public async Task<ActionResult<ServiceResult<CartDto>>> GetById(int id)
         {
             var cart = await _sender.Send(new GetCartByIdQuery(id));
-            if (cart == null)
-                return ServiceResult<CartDto>.Fail("Cart not found", HttpStatusCode.NotFound);
-
             return ServiceResult<CartDto>.Success(cart);
         }
 
@@ -68,9 +65,6 @@ namespace ShoppingProject.WebApi.Controllers
             UpdateCartCommand command
         )
         {
-            if (id != command.Id)
-                return ServiceResult<bool>.Fail("Id mismatch", HttpStatusCode.BadRequest);
-
             await _sender.Send(command);
 
             return ServiceResult<bool>.Success(true, HttpStatusCode.NoContent);
