@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using ShoppingProject.Domain.Constants;
 using ShoppingProject.WebApi.Controllers;
-using Xunit;
-
 namespace ShoppingProject.UnitTests.Presentation.Controllers;
 
 public class CartsControllerAuthorizationTests
@@ -21,13 +19,8 @@ public class CartsControllerAuthorizationTests
     [Fact]
     public void GetAll_HasAuthorizeAttribute()
     {
-        // Arrange
-        var method = typeof(CartsController).GetMethod(nameof(CartsController.GetAll));
-
-        // Act
+        var method = _controller.GetType().GetMethod(nameof(CartsController.GetAll));
         var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -35,13 +28,8 @@ public class CartsControllerAuthorizationTests
     [Fact]
     public void GetById_HasAuthorizeAttribute()
     {
-        // Arrange
-        var method = typeof(CartsController).GetMethod(nameof(CartsController.GetById));
-
-        // Act
+        var method = _controller.GetType().GetMethod(nameof(CartsController.GetById));
         var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -49,13 +37,8 @@ public class CartsControllerAuthorizationTests
     [Fact]
     public void Create_HasAuthorizeAttribute()
     {
-        // Arrange
-        var method = typeof(CartsController).GetMethod(nameof(CartsController.Create));
-
-        // Act
+        var method = _controller.GetType().GetMethod(nameof(CartsController.Create));
         var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -63,13 +46,8 @@ public class CartsControllerAuthorizationTests
     [Fact]
     public void Update_HasAuthorizeAttribute()
     {
-        // Arrange
-        var method = typeof(CartsController).GetMethod(nameof(CartsController.Update));
-
-        // Act
+        var method = _controller.GetType().GetMethod(nameof(CartsController.Update));
         var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -77,13 +55,8 @@ public class CartsControllerAuthorizationTests
     [Fact]
     public void Delete_HasAuthorizeAttribute()
     {
-        // Arrange
-        var method = typeof(CartsController).GetMethod(nameof(CartsController.Delete));
-
-        // Act
+        var method = _controller.GetType().GetMethod(nameof(CartsController.Delete));
         var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -91,16 +64,12 @@ public class CartsControllerAuthorizationTests
     [Fact]
     public void DeleteAll_HasAuthorizeAttributeWithCanPurgePolicy()
     {
-        // Arrange
-        var method = typeof(CartsController).GetMethod(nameof(CartsController.DeleteAll));
-
-        // Act
+        var method = _controller.GetType().GetMethod(nameof(CartsController.DeleteAll));
         var attributes = method
             ?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
             .Cast<AuthorizeAttribute>()
             .ToArray();
 
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
         Assert.Contains(attributes, a => a.Policy == Policies.CanPurge);

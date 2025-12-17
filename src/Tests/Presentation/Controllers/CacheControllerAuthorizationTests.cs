@@ -22,7 +22,7 @@ public class CacheControllerAuthorizationTests
     public void Controller_HasAuthorizeAttributeWithRequireAdministratorRolePolicy()
     {
         // Arrange
-        var controllerType = typeof(CacheController);
+        var controllerType = _controller.GetType();
 
         // Act
         var attributes = controllerType
@@ -40,14 +40,12 @@ public class CacheControllerAuthorizationTests
     public void Get_InheritsControllerAuthorization()
     {
         // Arrange
-        var method = typeof(CacheController).GetMethod(nameof(CacheController.Get));
-        var controllerType = typeof(CacheController);
+        var method = _controller.GetType().GetMethod(nameof(CacheController.Get));
 
         // Act
-        var controllerAttributes = controllerType.GetCustomAttributes(
-            typeof(AuthorizeAttribute),
-            false
-        );
+        var controllerAttributes = _controller
+            .GetType()
+            .GetCustomAttributes(typeof(AuthorizeAttribute), false);
 
         // Assert
         Assert.NotNull(method);
@@ -58,14 +56,12 @@ public class CacheControllerAuthorizationTests
     public void Set_InheritsControllerAuthorization()
     {
         // Arrange
-        var method = typeof(CacheController).GetMethod(nameof(CacheController.Set));
-        var controllerType = typeof(CacheController);
+        var method = _controller.GetType().GetMethod(nameof(CacheController.Set));
 
         // Act
-        var controllerAttributes = controllerType.GetCustomAttributes(
-            typeof(AuthorizeAttribute),
-            false
-        );
+        var controllerAttributes = _controller
+            .GetType()
+            .GetCustomAttributes(typeof(AuthorizeAttribute), false);
 
         // Assert
         Assert.NotNull(method);
@@ -76,14 +72,12 @@ public class CacheControllerAuthorizationTests
     public void Delete_InheritsControllerAuthorization()
     {
         // Arrange
-        var method = typeof(CacheController).GetMethod(nameof(CacheController.Delete));
-        var controllerType = typeof(CacheController);
+        var method = _controller.GetType().GetMethod(nameof(CacheController.Delete));
 
         // Act
-        var controllerAttributes = controllerType.GetCustomAttributes(
-            typeof(AuthorizeAttribute),
-            false
-        );
+        var controllerAttributes = _controller
+            .GetType()
+            .GetCustomAttributes(typeof(AuthorizeAttribute), false);
 
         // Assert
         Assert.NotNull(method);

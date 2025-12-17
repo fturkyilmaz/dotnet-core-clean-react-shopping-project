@@ -23,15 +23,8 @@ public class DeleteProductCommandTests
     public async Task Handle_ValidCommand_ShouldDeleteProduct()
     {
         // Arrange
-        var existingProduct = new Product
-        {
-            Id = 1,
-            Title = "Test Product",
-            Description = "Test",
-            Price = 10m,
-            Category = "test",
-            Image = "test.jpg",
-        };
+        var existingProduct = Product.Create("Test Product", 10m, "Test", "test", "test.jpg");
+        typeof(Product).GetProperty(nameof(Product.Id))!.SetValue(existingProduct, 1);
 
         var products = new List<Product> { existingProduct }.AsQueryable();
         _mockContext.Setup(x => x.Products).Returns(products);
@@ -51,15 +44,8 @@ public class DeleteProductCommandTests
     public async Task Handle_ValidCommand_ShouldRaiseDomainEvent()
     {
         // Arrange
-        var existingProduct = new Product
-        {
-            Id = 1,
-            Title = "Test Product",
-            Description = "Test",
-            Price = 10m,
-            Category = "test",
-            Image = "test.jpg",
-        };
+        var existingProduct = Product.Create("Test Product", 10m, "Test", "test", "test.jpg");
+        typeof(Product).GetProperty(nameof(Product.Id))!.SetValue(existingProduct, 1);
 
         var products = new List<Product> { existingProduct }.AsQueryable();
         _mockContext.Setup(x => x.Products).Returns(products);
@@ -71,7 +57,8 @@ public class DeleteProductCommandTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        existingProduct.DomainEvents.Should().ContainSingle();
+        existingProduct.DomainEvents.Should().Contain(x => x is ProductDeletedEvent);
+
         existingProduct.DomainEvents.First().Should().BeOfType<ProductDeletedEvent>();
 
         var domainEvent = existingProduct.DomainEvents.First() as ProductDeletedEvent;

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Bogus;
 using FluentValidation.TestHelper;
 using ShoppingProject.Application.Products.Commands.CreateProduct;
 
@@ -7,24 +7,20 @@ namespace ShoppingProject.UnitTests.Application.Validators;
 public class CreateProductCommandValidatorTests
 {
     private readonly CreateProductCommandValidator _validator;
+    private readonly Faker _faker;
 
     public CreateProductCommandValidatorTests()
     {
         _validator = new CreateProductCommandValidator();
+        _faker = new Faker();
     }
 
     [Fact]
     public void Validate_ValidCommand_ShouldNotHaveValidationErrors()
     {
-        // Arrange
-        var command = new CreateProductCommand
-        {
-            Title = "Test Product",
-            Description = "Test Description",
-            Price = 29.99m,
-            Category = "electronics",
-            Image = "https://example.com/image.jpg",
-        };
+        // Arrange → Faker ile geçerli image URL üret
+        var fakeImageUrl = _faker.Image.PicsumUrl(); // örn: https://picsum.photos/200/300
+        var command = new CreateProductCommand("Title", 99.99m, "Desc", "Category", fakeImageUrl);
 
         // Act
         var result = _validator.TestValidate(command);
@@ -36,100 +32,54 @@ public class CreateProductCommandValidatorTests
     [Fact]
     public void Validate_EmptyTitle_ShouldHaveValidationError()
     {
-        // Arrange
-        var command = new CreateProductCommand
-        {
-            Title = "",
-            Description = "Test",
-            Price = 10m,
-            Category = "test",
-            Image = "test.jpg",
-        };
+        var fakeImageUrl = _faker.Image.PicsumUrl();
+        var command = new CreateProductCommand("", 99.99m, "Desc", "Category", fakeImageUrl);
 
-        // Act
         var result = _validator.TestValidate(command);
 
-        // Assert
         result.ShouldHaveValidationErrorFor(x => x.Title);
     }
 
     [Fact]
     public void Validate_TitleTooLong_ShouldHaveValidationError()
     {
-        // Arrange
-        var command = new CreateProductCommand
-        {
-            Title = new string('a', 201), // 201 characters
-            Description = "Test",
-            Price = 10m,
-            Category = "test",
-            Image = "test.jpg",
-        };
+        var fakeImageUrl = _faker.Image.PicsumUrl();
+        var command = new CreateProductCommand(new string('a', 201), 99.99m, "Desc", "Category", fakeImageUrl);
 
-        // Act
         var result = _validator.TestValidate(command);
 
-        // Assert
         result.ShouldHaveValidationErrorFor(x => x.Title);
     }
 
     [Fact]
     public void Validate_EmptyDescription_ShouldHaveValidationError()
     {
-        // Arrange
-        var command = new CreateProductCommand
-        {
-            Title = "Test",
-            Description = "",
-            Price = 10m,
-            Category = "test",
-            Image = "test.jpg",
-        };
+        var fakeImageUrl = _faker.Image.PicsumUrl();
+        var command = new CreateProductCommand("Test", 10m, "", "test", fakeImageUrl);
 
-        // Act
         var result = _validator.TestValidate(command);
 
-        // Assert
         result.ShouldHaveValidationErrorFor(x => x.Description);
     }
 
     [Fact]
     public void Validate_EmptyCategory_ShouldHaveValidationError()
     {
-        // Arrange
-        var command = new CreateProductCommand
-        {
-            Title = "Test",
-            Description = "Test",
-            Price = 10m,
-            Category = "",
-            Image = "test.jpg",
-        };
+        var fakeImageUrl = _faker.Image.PicsumUrl();
+        var command = new CreateProductCommand("Test", 10m, "Test", "", fakeImageUrl);
 
-        // Act
         var result = _validator.TestValidate(command);
 
-        // Assert
         result.ShouldHaveValidationErrorFor(x => x.Category);
     }
 
     [Fact]
     public void Validate_EmptyImage_ShouldHaveValidationError()
     {
-        // Arrange
-        var command = new CreateProductCommand
-        {
-            Title = "Test",
-            Description = "Test",
-            Price = 10m,
-            Category = "test",
-            Image = "",
-        };
+        var command = new CreateProductCommand("Test", 10m, "Test", "test", "");
 
-        // Act
         var result = _validator.TestValidate(command);
 
-        // Assert
         result.ShouldHaveValidationErrorFor(x => x.Image);
     }
 }
