@@ -6,4 +6,4 @@ namespace ShoppingProject.Application.Identity.Queries.GetCurrentUserInfo;
 /// <summary>
 /// Query to fetch detailed information for a specific user ID.
 /// </summary>
-public record GetCurrentUserInfoQuery(string UserId) : IRequest<ServiceResult<UserInfoResponse>>;
+public record GetCurrentUserInfoQuery() : IRequest<ServiceResult<UserInfoResponse>>;
