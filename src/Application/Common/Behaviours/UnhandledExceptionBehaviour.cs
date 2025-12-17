@@ -44,13 +44,27 @@ namespace ShoppingProject.Application.Common.Behaviours
                     ex
                 );
             }
+            catch (PersistenceException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Database update failed in {RequestName}: {Message}",
+                    typeof(TRequest).Name,
+                    ex.Message
+                );
+                throw new PersistenceException(
+                    $"Database update failed in {typeof(TRequest).Name}. See inner exception for details.",
+                    ex
+                );
+            }
             catch (Exception ex)
             {
                 var requestName = typeof(TRequest).Name;
 
                 _logger.LogError(
                     ex,
-                    "Unhandled exception in {Behaviour} for request {RequestName} {@Request}",
+                    "Unhandled exception ({ExceptionType}) in {Behaviour} for request {RequestName} {@Request}",
+                    ex.GetType().Name,
                     nameof(UnhandledExceptionBehaviour<TRequest, TResponse>),
                     requestName,
                     request
