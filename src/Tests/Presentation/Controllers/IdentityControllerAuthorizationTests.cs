@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Moq;
-using ShoppingProject.Application.Common.Interfaces;
+using MediatR;
 using ShoppingProject.Domain.Constants;
 using ShoppingProject.WebApi.Controllers;
 using Xunit;
@@ -9,25 +9,20 @@ namespace ShoppingProject.UnitTests.Presentation.Controllers;
 
 public class IdentityControllerAuthorizationTests
 {
-    private readonly Mock<IIdentityService> _identityServiceMock;
+    private readonly Mock<ISender> _senderMock;
     private readonly IdentityController _controller;
 
     public IdentityControllerAuthorizationTests()
     {
-        _identityServiceMock = new Mock<IIdentityService>();
-        _controller = new IdentityController(_identityServiceMock.Object);
+        _senderMock = new Mock<ISender>();
+        _controller = new IdentityController(_senderMock.Object);
     }
 
     [Fact]
     public void Login_HasAllowAnonymousAttribute()
     {
-        // Arrange
-        var method = typeof(IdentityController).GetMethod(nameof(IdentityController.Login));
-
-        // Act
+        var method = _controller.GetType().GetMethod(nameof(IdentityController.Login));
         var attributes = method?.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -35,13 +30,8 @@ public class IdentityControllerAuthorizationTests
     [Fact]
     public void RefreshToken_HasAllowAnonymousAttribute()
     {
-        // Arrange
-        var method = typeof(IdentityController).GetMethod(nameof(IdentityController.RefreshToken));
-
-        // Act
+        var method = _controller.GetType().GetMethod(nameof(IdentityController.RefreshToken));
         var attributes = method?.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -49,13 +39,8 @@ public class IdentityControllerAuthorizationTests
     [Fact]
     public void Register_HasAllowAnonymousAttribute()
     {
-        // Arrange
-        var method = typeof(IdentityController).GetMethod(nameof(IdentityController.Register));
-
-        // Act
+        var method = _controller.GetType().GetMethod(nameof(IdentityController.Register));
         var attributes = method?.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
@@ -63,18 +48,9 @@ public class IdentityControllerAuthorizationTests
     [Fact]
     public void AssignAdminRole_HasAuthorizeAttributeWithRequireAdministratorRolePolicy()
     {
-        // Arrange
-        var method = typeof(IdentityController).GetMethod(
-            nameof(IdentityController.AssignAdminRole)
-        );
-
-        // Act
-        var attributes = method
-            ?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
-            .Cast<AuthorizeAttribute>()
-            .ToArray();
-
-        // Assert
+        var method = _controller.GetType().GetMethod(nameof(IdentityController.AssignAdminRole));
+        var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
+            .Cast<AuthorizeAttribute>().ToArray();
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
         Assert.Contains(attributes, a => a.Policy == Policies.RequireAdministratorRole);
@@ -83,47 +59,28 @@ public class IdentityControllerAuthorizationTests
     [Fact]
     public void CreateRole_HasAuthorizeAttributeWithRequireAdministratorRolePolicy()
     {
-        // Arrange
-        var method = typeof(IdentityController).GetMethod(nameof(IdentityController.CreateRole));
-
-        // Act
-        var attributes = method
-            ?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
-            .Cast<AuthorizeAttribute>()
-            .ToArray();
-
-        // Assert
+        var method = _controller.GetType().GetMethod(nameof(IdentityController.CreateRole));
+        var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false)
+            .Cast<AuthorizeAttribute>().ToArray();
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
         Assert.Contains(attributes, a => a.Policy == Policies.RequireAdministratorRole);
     }
 
     [Fact]
-    public void GetCurrentUserInfo_HasAllowAnonymousAttribute()
+    public void GetCurrentUserInfo_HasAuthorizeAttribute()
     {
-        // Arrange
-        var method = typeof(IdentityController).GetMethod(
-            nameof(IdentityController.GetCurrentUserInfo)
-        );
-
-        // Act
-        var attributes = method?.GetCustomAttributes(typeof(AllowAnonymousAttribute), false);
-
-        // Assert
+        var method = _controller.GetType().GetMethod(nameof(IdentityController.GetCurrentUserInfo));
+        var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false);
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
 
     [Fact]
-    public void UpdateUser_HasAuthorizeAttribute()
+    public void UpdateMe_HasAuthorizeAttribute()
     {
-        // Arrange
-        var method = typeof(IdentityController).GetMethod(nameof(IdentityController.UpdateUser));
-
-        // Act
+        var method = _controller.GetType().GetMethod(nameof(IdentityController.UpdateMe));
         var attributes = method?.GetCustomAttributes(typeof(AuthorizeAttribute), false);
-
-        // Assert
         Assert.NotNull(attributes);
         Assert.NotEmpty(attributes);
     }
