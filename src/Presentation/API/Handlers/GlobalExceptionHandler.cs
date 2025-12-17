@@ -50,13 +50,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 break;
             case BadRequestException:
             case ValidationException:
-                _logger.LogWarning(
-                    exception,
-                    "Bad request: {Message}, TraceId: {TraceId}, CorrelationId: {CorrelationId}",
-                    exception.Message,
-                    httpContext.TraceIdentifier,
-                    httpContext.Items[ConfigurationConstants.CorrelationId.ItemsKey]
-                );
+                _logger.LogWarning(exception, "Bad request: {Message}", exception.Message);
                 break;
             case ForbiddenAccessException:
             case UnauthorizedAccessException:
