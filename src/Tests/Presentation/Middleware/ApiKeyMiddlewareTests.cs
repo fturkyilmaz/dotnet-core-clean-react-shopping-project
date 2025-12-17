@@ -11,8 +11,8 @@ using Moq;
 using ShoppingProject.Domain.Enums;
 using ShoppingProject.Infrastructure.Constants;
 using ShoppingProject.WebApi.Middleware;
-using Xunit;
 
+namespace ShoppingProject.UnitTests.Presentation.Middleware;
 public class ApiKeyMiddlewareTests
 {
     private readonly Mock<ILogger<ApiKeyMiddleware>> _loggerMock;
