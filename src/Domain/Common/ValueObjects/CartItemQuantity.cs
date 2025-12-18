@@ -43,7 +43,7 @@ public sealed class CartItemQuantity : ValueObject
         return new CartItemQuantity(Value - 1);
     }
 
-    public CartItemQuantity Update(int newQuantity)
+    public static CartItemQuantity Update(int newQuantity)
     {
         if (newQuantity < MinValue || newQuantity > MaxValue)
             throw new ArgumentException($"Quantity must be between {MinValue} and {MaxValue}");
