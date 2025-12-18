@@ -51,7 +51,7 @@ public class DispatchDomainEventsInterceptor : SaveChangesInterceptor
         }
     }
 
-    private INotification GetNotificationCorrespondingToDomainEvent(BaseEvent domainEvent)
+    private static INotification GetNotificationCorrespondingToDomainEvent(BaseEvent domainEvent)
     {
         return (INotification)Activator.CreateInstance(
             typeof(DomainEventNotification<>).MakeGenericType(domainEvent.GetType()), domainEvent)!;

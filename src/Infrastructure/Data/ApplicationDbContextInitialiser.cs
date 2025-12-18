@@ -17,8 +17,7 @@ public static class InitialiserExtensions
     {
         using var scope = app.Services.CreateScope();
 
-        var initialiser =
-            scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
+        var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
 
         await initialiser.InitialiseAsync();
         await initialiser.SeedAsync();
@@ -36,8 +35,7 @@ public class ApplicationDbContextInitialiser
         ILogger<ApplicationDbContextInitialiser> logger,
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager
-    )
+        RoleManager<IdentityRole> roleManager)
     {
         _logger = logger;
         _context = context;
@@ -76,7 +74,7 @@ public class ApplicationDbContextInitialiser
         // Default roles
         var administratorRole = new IdentityRole(Roles.Administrator);
 
-        if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
+        if (await _roleManager.Roles.AllAsync(r => r.Name != administratorRole.Name))
         {
             await _roleManager.CreateAsync(administratorRole);
         }
@@ -88,7 +86,7 @@ public class ApplicationDbContextInitialiser
             Email = "administrator@localhost",
         };
 
-        if (_userManager.Users.All(u => u.UserName != administrator.UserName))
+        if (await _userManager.Users.AllAsync(u => u.UserName != administrator.UserName))
         {
             await _userManager.CreateAsync(administrator, "Administrator1!");
             if (!string.IsNullOrWhiteSpace(administratorRole.Name))
@@ -97,7 +95,7 @@ public class ApplicationDbContextInitialiser
             }
         }
 
-        if (!_context.Products.Any())
+        if (!await _context.Products.AnyAsync())
         {
             var products = new List<Product>();
 

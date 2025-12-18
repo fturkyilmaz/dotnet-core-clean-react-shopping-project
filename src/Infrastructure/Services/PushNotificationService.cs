@@ -176,14 +176,14 @@ public class PushNotificationService : IPushNotificationService
             ?? new List<string>();
     }
 
-    private async Task<List<string>> GetAllPushTokensAsync()
+    private static async Task<List<string>> GetAllPushTokensAsync()
     {
         // In production, this should query database
         // For now, return empty list
         return await Task.FromResult(new List<string>());
     }
 
-    private async Task<List<string>> GetRolePushTokensAsync(string role)
+    private static async Task<List<string>> GetRolePushTokensAsync(string role)
     {
         // In production, this should query database for users in role
         // For now, return empty list
