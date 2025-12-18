@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ShoppingProject.Infrastructure.BackgroundJobs;
 
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
 public class LogHangfireJobActivityAttribute : JobFilterAttribute, IServerFilter, IApplyStateFilter
 {
     private readonly ILogger<LogHangfireJobActivityAttribute> _logger;

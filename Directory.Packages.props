@@ -86,6 +86,7 @@
         <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.6.0.2" />
         <PackageVersion Include="StackExchange.Redis" Version="2.9.33" />
         <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
+        <PackageVersion Include="Microsoft.OpenApi" Version="2.3.0" />
 
         <!-- Test ve diğer paketler -->
         <PackageVersion Include="xunit" Version="2.6.6" />

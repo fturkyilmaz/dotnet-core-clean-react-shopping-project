@@ -1,6 +1,7 @@
 using AspNetCoreRateLimit;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using RabbitMQ.Client;
 using Serilog;
 using ShoppingProject.Application;
 using ShoppingProject.Infrastructure;
@@ -50,13 +51,24 @@ builder.Services.AddHealthChecks()
         name: "redis",
         tags: new[] { "ready" }
     )
-    .AddRabbitMQ(
-        builder.Configuration.GetConnectionString(
-            ConfigurationConstants.ConnectionStrings.RabbitMqConnection
-        )!,
-        name: "rabbitmq",
-        tags: new[] { "ready" }
-    );
+    .AddRabbitMQ(sp =>
+    {
+        var connStr = builder.Configuration.GetConnectionString(
+            ShoppingProject.Infrastructure.Constants.ConfigurationConstants.ConnectionStrings.RabbitMqConnection
+        )!;
+
+        var factory = new ConnectionFactory
+        {
+            Uri = new Uri(connStr),
+            AutomaticRecoveryEnabled = true,
+            TopologyRecoveryEnabled = true
+        };
+
+        // v7+ için: sadece async bağlantı mevcut
+        return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+    },
+    name: "rabbitmq",
+    tags: new[] { "ready" });
 
 builder.Services.AddHealthChecksUI()
     .AddInMemoryStorage();
@@ -68,15 +80,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-     app.DescribeApiVersions()
-        .Select(d => d.GroupName)
-        .ToList()
-        .ForEach(groupName =>
-            options.SwaggerEndpoint(
-                $"/swagger/{groupName}/swagger.json",
-                groupName.ToUpperInvariant()
-            )
-        );
+        app.DescribeApiVersions()
+           .Select(d => d.GroupName)
+           .ToList()
+           .ForEach(groupName =>
+               options.SwaggerEndpoint(
+                   $"/swagger/{groupName}/swagger.json",
+                   groupName.ToUpperInvariant()
+               )
+           );
     });
 }
 
@@ -116,4 +128,4 @@ app.UseWebSockets();
 app.UseMiddleware<WebSocketEchoMiddleware>();
 
 app.MapHub<ShoppingProject.Infrastructure.Hubs.NotificationHub>("/hubs/notifications");
-app.Run();
+await app.RunAsync();

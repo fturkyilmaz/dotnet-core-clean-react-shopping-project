@@ -68,7 +68,7 @@ public class CachingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest,
         return response!;
     }
 
-    private string GenerateCacheKey(TRequest request, string prefix)
+    private static string GenerateCacheKey(TRequest request, string prefix)
     {
         var requestType = typeof(TRequest).Name;
         var requestJson = System.Text.Json.JsonSerializer.Serialize(request);
