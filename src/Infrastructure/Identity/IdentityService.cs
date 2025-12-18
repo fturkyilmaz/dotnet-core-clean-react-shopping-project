@@ -319,13 +319,13 @@ public class IdentityService : IIdentityService
     // HELPERS
     // =====================================================
 
-    private string GenerateRefreshToken()
+    private static string GenerateRefreshToken()
     {
         var bytes = RandomNumberGenerator.GetBytes(32);
         return Convert.ToBase64String(bytes);
     }
 
-    private string HashRefreshToken(string token)
+    private static string HashRefreshToken(string token)
     {
         using var sha = SHA256.Create();
         return Convert.ToBase64String(sha.ComputeHash(Encoding.UTF8.GetBytes(token)));

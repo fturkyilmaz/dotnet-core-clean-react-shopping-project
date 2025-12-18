@@ -7,7 +7,7 @@ on:
     branches: [ main, develop ]
 
 env:
-  DOTNET_VERSION: '10.0.x'
+  DOTNET_VERSION: '10.0.101'
   SOLUTION_PATH: 'ShoppingProject.sln'
   TEST_PROJECT_PATH: 'src/UnitTests/ShoppingProject.UnitTests.csproj'
 
@@ -15,18 +15,18 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Shallow clones should be disabled for better SonarQube analysis
-    
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-    
+
     - name: Cache NuGet packages
       uses: actions/cache@v4
       with:
@@ -34,30 +34,30 @@ jobs:
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
         restore-keys: |
           ${{ runner.os }}-nuget-
-    
+
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_PATH }}
-    
+
     - name: Build solution
       run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
-    
+
     - name: Run tests
       run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-build --verbosity normal --logger trx --collect:"XPlat Code Coverage" --results-directory ./coverage
-    
+
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results
         path: coverage/**/*.trx
-    
+
     - name: Upload coverage reports
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: coverage-reports
         path: coverage/**/coverage.cobertura.xml
-    
+
     - name: Code Coverage Summary
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
@@ -70,7 +70,7 @@ jobs:
         indicators: true
         output: both
         thresholds: '60 80'
-    
+
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
       if: github.event_name == 'pull_request'
@@ -81,25 +81,25 @@ jobs:
   sonarcloud:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Shallow clones should be disabled for better SonarQube analysis
-    
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-    
+
     - name: Cache SonarCloud packages
       uses: actions/cache@v4
       with:
         path: ~/sonar/cache
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
-    
+
     - name: Cache SonarCloud scanner
       id: cache-sonar-scanner
       uses: actions/cache@v4
@@ -107,13 +107,13 @@ jobs:
         path: ./.sonar/scanner
         key: ${{ runner.os }}-sonar-scanner
         restore-keys: ${{ runner.os }}-sonar-scanner
-    
+
     - name: Install SonarCloud scanner
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
       run: |
         mkdir -p ./.sonar/scanner
         dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-    
+
     - name: Build and analyze
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

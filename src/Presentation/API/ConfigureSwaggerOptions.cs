@@ -1,8 +1,7 @@
 using Asp.Versioning.ApiExplorer;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.OpenApi;
 
 namespace ShoppingProject.WebApi;
 
@@ -22,10 +21,11 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 
     private static OpenApiInfo CreateInfoForApiVersion(ApiVersionDescription description)
     {
-        var info = new OpenApiInfo()
+        var info = new OpenApiInfo
         {
             Title = "Shopping Project API",
             Version = description.ApiVersion.ToString(),
+            Description = "Shopping Project API documentation"
         };
 
         if (description.IsDeprecated)

@@ -32,7 +32,7 @@ public class WebSocketEchoMiddleware
         }
     }
 
-    private async Task Echo(WebSocket webSocket)
+    private static async Task Echo(WebSocket webSocket)
     {
         var buffer = new byte[1024 * 4];
         var receiveResult = await webSocket.ReceiveAsync(
