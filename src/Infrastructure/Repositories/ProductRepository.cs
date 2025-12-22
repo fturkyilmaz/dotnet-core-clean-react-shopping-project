@@ -16,7 +16,8 @@ public class ProductRepository : Repository<Product>, IProductRepository
     )
     {
         return await _context
-            .Products.Where(p => p.Category == category)
+            .Products.AsNoTracking()
+            .Where(p => p.Category.ToLower() == category.ToLower())
             .ToListAsync(cancellationToken);
     }
 }
