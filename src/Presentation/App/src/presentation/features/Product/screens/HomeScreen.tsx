@@ -4,25 +4,17 @@ import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeaturedProducts } from '@/presentation/features/Product/hooks/useProducts';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { toCamelCase } from '@/application/utils/toCamelCase';
 
-const toCamelCase = (str: string): string => {
-    return str
-        .split(/['s\s]+/)
-        .map((word, index) => {
-            if (index === 0) {
-                return word.toLowerCase();
-            }
-            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-        })
-        .join('');
-};
-
-export default function HomeScreen({ navigation }: any) {
+export default function HomeScreen() {
     const { theme } = useTheme();
+    const navigation = useNavigation();
     const { t } = useTranslation();
     const { data: featuredProducts, isLoading: isFeaturedLoading } = useFeaturedProducts();
 
-    console.log("X", featuredProducts);
+    const primaryColor = theme === 'dark' ? '#60a5fa' : '#2563eb';
+
     return (
         <ScrollView className="flex-1 bg-slate-50 dark:bg-background-dark">
             {/* Hero Section */}
@@ -64,27 +56,30 @@ export default function HomeScreen({ navigation }: any) {
                     </AccessibleTouchable>
                 </View>
 
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
-                    {['electronics', 'jewelery', 'men\'s clothing', 'women\'s clothing'].map((cat, index) => (
+                <FlatList
+                    data={['electronics', 'jewelery', "men's clothing", "women's clothing"]}
+                    horizontal
+                    keyExtractor={(item) => item}
+                    showsHorizontalScrollIndicator={false}
+                    renderItem={({ item, index }) => (
                         <AccessibleTouchable
-                            accessibilityLabel={t(`home.${toCamelCase(cat)}`) || cat}
-                            key={index}
+                            accessibilityLabel={t(`home.${toCamelCase(item)}`) || item}
                             className="mr-4 items-center"
-                            onPress={() => navigation.navigate('Products', { category: cat })}
+                            onPress={() => navigation.navigate('Products', { category: item })}
                         >
                             <View className="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl items-center justify-center shadow-sm border border-slate-100 dark:border-slate-700 mb-2">
                                 <Ionicons
-                                    name={index === 0 ? "hardware-chip-outline" : index === 1 ? "diamond-outline" : "shirt-outline"}
+                                    name={index === 0 ? "hardware-chip-outline" : index === 1 ? "diamond-outline" : index === 2 ? "shirt-outline" : "woman-outline"}
                                     size={24}
-                                    color={theme === 'dark' ? '#60a5fa' : '#2563eb'}
+                                    color={primaryColor}
                                 />
                             </View>
                             <Text className="text-xs font-medium text-slate-600 dark:text-slate-400 capitalize">
-                                {t(`home.${toCamelCase(cat)}`) || cat}
+                                {t(`home.${toCamelCase(item)}`) || item}
                             </Text>
                         </AccessibleTouchable>
-                    ))}
-                </ScrollView>
+                    )}
+                />
             </View>
 
             {/* Featured Products */}
@@ -93,19 +88,25 @@ export default function HomeScreen({ navigation }: any) {
 
                 {isFeaturedLoading ? (
                     <View className="items-center justify-center py-8">
-                        <ActivityIndicator size="large" color={theme === 'dark' ? '#60a5fa' : '#2563eb'} />
+                        <ActivityIndicator size="large" color={primaryColor} />
                     </View>
-                ) : (
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingBottom: 32 }}>
-                        {featuredProducts?.map((item) => (
+                ) :
+                    <FlatList
+                        data={featuredProducts}
+                        ListEmptyComponent={<Text className="text-slate-500 dark:text-slate-400">{t('home.noProducts')}</Text>}
+                        horizontal
+                        keyExtractor={(item) => item.id.toString()}
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 32 }}
+                        renderItem={({ item }) => (
                             <AccessibleTouchable
                                 accessibilityLabel={item.title}
-                                key={item.id}
                                 className="bg-white dark:bg-slate-800 w-48 p-4 rounded-2xl mr-4 shadow-sm border border-slate-100 dark:border-slate-700"
-                                onPress={() => { navigation.navigate('ProductDetails', { productId: item.id }) }}
+                                onPress={() => navigation.navigate('ProductDetails', { productId: item.id })}
                             >
                                 <Image
                                     source={{ uri: item.image }}
+                                    accessibilityLabel={`${item.title} image`}
                                     className="w-full h-32 mb-3"
                                     resizeMode="contain"
                                 />
@@ -116,9 +117,9 @@ export default function HomeScreen({ navigation }: any) {
                                     ${item.price}
                                 </Text>
                             </AccessibleTouchable>
-                        ))}
-                    </ScrollView>
-                )}
+                        )}
+                    />
+                }
             </View>
         </ScrollView>
     );

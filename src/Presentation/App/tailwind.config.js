@@ -6,12 +6,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        
         primary: {
-          DEFAULT: '#2563eb', // light mode primary (blue-600)
-          400: '#60a5fa', // blue-400
-          700: '#1e40af', // dark mode primary (blue-700)
+          DEFAULT: '#2563eb',
+          400: '#60a5fa',
+          700: '#1e40af', 
         },
-        secondary: '#6b7280',
+        secondary: {
+          DEFAULT: '#6b7280',
+          400: '#6b7280',
+          700: '#6b7280', 
+        },
+
         background: '#ffffff',
         'background-dark': '#0f172a',
       },
