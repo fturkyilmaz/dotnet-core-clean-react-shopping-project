@@ -16,7 +16,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "codegen": "orval --config orval.config.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
@@ -44,6 +45,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "orval": "^7.17.2",
     "@playwright/test": "^1.57.0",
     "@storybook/addon-a11y": "^8.5.0",
     "@storybook/addon-essentials": "^8.5.0",

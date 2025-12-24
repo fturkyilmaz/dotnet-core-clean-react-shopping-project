@@ -1,7 +1,6 @@
 import { View, Text, FlatList, Image, ActivityIndicator } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useProducts } from '@/presentation/features/Product/hooks/useProducts';
 import { Product, NavigationProp } from '@/types';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
