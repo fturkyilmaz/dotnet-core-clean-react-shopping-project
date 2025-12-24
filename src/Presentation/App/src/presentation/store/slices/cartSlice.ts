@@ -33,8 +33,8 @@ export const addToCart = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
-          error.message ||
-          "Failed to add item to cart"
+        error.message ||
+        "Failed to add item to cart"
       );
     }
   }
@@ -46,19 +46,20 @@ export const updateCartItem = createAsyncThunk(
   async (
     {
       cartId,
-      productId,
       quantity,
-    }: { cartId: number; productId: number; quantity: number },
+      ...item
+    }: { cartId: number; quantity: number; },
     { rejectWithValue }
   ) => {
     try {
-      await api.put<ApiResponse<boolean>>(`/carts/${cartId}`, { quantity });
+      await api.put<ApiResponse<boolean>>(`/carts/${cartId}`, { ...item, quantity, });
+
       return { cartId, quantity };
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
-          error.message ||
-          "Failed to update cart item"
+        error.message ||
+        "Failed to update cart item"
       );
     }
   }
@@ -79,8 +80,8 @@ export const removeCartItem = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
-          error.message ||
-          "Failed to remove from cart"
+        error.message ||
+        "Failed to remove from cart"
       );
     }
   }
@@ -95,8 +96,8 @@ export const removeAllCartItems = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
-          error.message ||
-          'Failed to remove all cart items'
+        error.message ||
+        'Failed to remove all cart items'
       );
     }
   }
@@ -139,9 +140,9 @@ const cartSlice = createSlice({
       .addCase(addToCart.fulfilled, (state, action) => {
         state.loading = false;
         if (state.cart) {
-            state.cart.push(action.payload);
+          state.cart.push(action.payload);
         } else {
-            state.cart = [action.payload];
+          state.cart = [action.payload];
         }
       })
       .addCase(addToCart.rejected, (state, action) => {
@@ -158,10 +159,10 @@ const cartSlice = createSlice({
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
         if (state.cart) {
-            const itemIndex = state.cart.findIndex(item => item.id === action.payload.cartId);
-            if (itemIndex !== -1) {
-                state.cart[itemIndex].quantity = action.payload.quantity;
-            }
+          const itemIndex = state.cart.findIndex(item => item.id === action.payload.cartId);
+          if (itemIndex !== -1) {
+            state.cart[itemIndex].quantity = action.payload.quantity;
+          }
         }
       })
       .addCase(updateCartItem.rejected, (state, action) => {
@@ -177,7 +178,7 @@ const cartSlice = createSlice({
       })
       .addCase(removeCartItem.fulfilled, (state, action) => {
         if (state.cart) {
-            state.cart = state.cart.filter(item => item.id !== action.payload.id);
+          state.cart = state.cart.filter(item => item.id !== action.payload.id);
         }
       })
       .addCase(removeCartItem.rejected, (state, action) => {
