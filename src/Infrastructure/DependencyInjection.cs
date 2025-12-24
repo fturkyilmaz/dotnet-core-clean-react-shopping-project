@@ -79,6 +79,9 @@ public static class DependencyInjection
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
         builder.Services.AddScoped<IPushTokenRepository, PushTokenRepository>();
 
+        // Outbox & Event Publishing
+        builder.Services.AddScoped<IOutboxMessageStore, OutboxMessageStore>();
+
         // Services
         builder.Services.AddSingleton<ICacheService, RedisCacheService>();
         builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
