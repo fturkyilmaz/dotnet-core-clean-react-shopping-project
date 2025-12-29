@@ -1,36 +1,153 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js 16 Starter (shadcn) [[LIVE DEMO](https://nextjs-16-starter-shadcn.vercel.app/)]
 
-## Getting Started
+![MIT License](https://img.shields.io/badge/license-MIT-blue) [![TypeScript](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://typescriptlang.org) ![ESLint](https://img.shields.io/badge/code%20style-eslint-brightgreen) ![GitHub stars](https://img.shields.io/github/stars/siddharthamaity/nextjs-16-starter-shadcn?style=social) ![GitHub forks](https://img.shields.io/github/forks/siddharthamaity/nextjs-16-starter-shadcn?style=social) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/siddharthamaity)
 
-First, run the development server:
+*This is the Tailwind version for Next.js 16 Starter, you may be interested in other templates too -*
+- [**Next.js 16 Starter Core**](https://github.com/SiddharthaMaity/nextjs-16-starter-core)
+- [**Next.js 16 Starter with Tailwind CSS**](https://github.com/SiddharthaMaity/nextjs-16-starter-tailwind)
+
+Welcome to the **Next.js 16 Starter** repository! This starter template is built with Next.js 16, React 19, TypeScript 5, Tailwind CSS 3, Shadcn UI and comes packed with several powerful tools and configurations to accelerate your project setup and streamline development workflows using VS Code.
+
+![Next.js 16 Starter Shadcn](public/images/screenshot1.png)
+
+![Next.js 16 Starter Shadcn](public/images/screenshot2.png)
+
+## 🚀 What's Included
+
+- **Next.js 16**
+- **React 19**
+- **TypeScript 5**
+- **ESLint 9**
+- **Prettier 3**
+- **Tailwind CSS 4**
+- **Shadcn UI**
+- **App Directory**
+- **System, Light & Dark Mode**
+- **Next.js Bundle Analyzer**
+- **Dockerfile** with Node.js 24.11.1 (Alpine)
+- **Dockerfile.bun** with Bun 1.3.3 (Alpine)
+
+### 🛠️ ESLint Plugins
+
+- [**@eslint/js**](https://www.npmjs.com/package/@eslint/js)
+- [**typescript-eslint**](https://github.com/typescript-eslint/typescript-eslint)
+- [**eslint-plugin-react**](https://github.com/jsx-eslint/eslint-plugin-react)
+- [**@next/eslint-plugin-next**](https://github.com/vercel/next.js)
+- [**eslint-config-prettier**](eslint-config-prettier)
+- [**eslint-plugin-tailwindcss**](https://github.com/francoismassart/eslint-plugin-tailwindcss)
+- [**eslint-plugin-import**](https://github.com/import-js/eslint-plugin-import)
+- [**eslint-plugin-promise**](https://github.com/eslint-community/eslint-plugin-promise)
+
+### ✨ Prettier Plugins
+
+- [**@trivago/prettier-plugin-sort-imports**](https://github.com/trivago/prettier-plugin-sort-imports)
+- [**prettier-plugin-tailwindcss**](https://github.com/tailwindlabs/prettier-plugin-tailwindcss)
+
+### 💻 VS Code Extensions (Recommended)
+
+To enhance development experience, install the following VS Code extensions:
+
+- [**Auto Close Tag**](https://marketplace.visualstudio.com/items?itemName=formulahendry.auto-close-tag)
+- [**Better Comments**](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments)
+- [**DotENV**](https://marketplace.visualstudio.com/items?itemName=mikestead.dotenv)
+- [**EditorConfig for VS Code**](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
+- [**ESLint**](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+- [**formate: CSS/LESS/SCSS formatter**](https://marketplace.visualstudio.com/items?itemName=MikeBovenlander.formate)
+- [**Git History**](https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory)
+- [**Import Cost**](https://marketplace.visualstudio.com/items?itemName=wix.vscode-import-cost)
+- [**JavaScript Booster**](https://marketplace.visualstudio.com/items?itemName=sburg.vscode-javascript-booster)
+- [**npm Intellisense**](https://marketplace.visualstudio.com/items?itemName=christian-kohler.npm-intellisense)
+- [**Prettier - Code formatter**](https://marketplace.visualstudio.com/items?itemName=esbenp)
+- [**Todo Tree**](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.todo-tree)
+- [**Turbo Console Log**](https://marketplace.visualstudio.com/items?itemName=ChakrounAnas.turbo-console-log)
+- [**Package Json Upgrade**](https://marketplace.visualstudio.com/items?itemName=codeandstuff.package-json-upgrade)
+- [**Visual Studio Code Commitizen Support**](https://marketplace.visualstudio.com/items?itemName=KnisterPeter.vscode-commitizen)
+- [**Markdown All in One**](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one)
+
+
+## 🏁 Getting Started
+
+### Prerequisites
+
+- **Bun**: Version 1.3.3 or higher OR
+- **Node.js**: Version 20.18.0 or higher
+- **Docker**: For containerized deployment (optional but recommended)
+
+### Installation
+
+1. **Clone the Repository**:
+    ```bash
+    git clone https://github.com/siddharthamaity/nextjs-16-starter-shadcn.git
+    cd nextjs-16-starter-shadcn
+    ```
+
+2. **Install Dependencies**:
+    ```bash
+    npm install
+    # or with Yarn
+    yarn install
+    # or with pnpm
+    pnpm install
+    # or with Bun
+    bun install
+    ```
+
+3. **Run Development Server**:
+    ```bash
+    npm run dev
+    # or with Yarn
+    yarn dev
+    # or with pnpm
+    pnpm dev
+    # or with Bun
+    bun dev
+    ```
+
+4. **Build for Production**:
+    ```bash
+    npm run build
+    # or with Yarn
+    yarn build
+    # or with pnpm
+    pnpm build
+    # or with Bun
+    bun run build
+    ```
+
+### 🐳 Docker Setup
+
+To use Docker, make sure Docker is installed on your machine. Then, build and run the Docker container:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker build . -t nextjs-starter-shadcn
+# or if using Bun
+docker build . -t nextjs-starter-shadcn -f Dockerfile.bun
+
+docker run -p 3000:3000 nextjs-starter-shadcn
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### ☁ Try it in the Cloud
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+[![Open in VS Code](https://img.shields.io/badge/Open%20in-VS%20Code-blue?logo=visualstudiocode)](https://vscode.dev/github/SiddharthaMaity/nextjs-16-starter-shadcn)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Open%20in-GitHub%20Codespaces-blue?logo=github)](https://codespaces.new/SiddharthaMaity/nextjs-16-starter-shadcn)
 
-## Learn More
+[![Open in CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/SiddharthaMaity/nextjs-16-starter-shadcn)
 
-To learn more about Next.js, take a look at the following resources:
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/SiddharthaMaity/nextjs-16-starter-shadcn)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz_small.svg)](https://stackblitz.com/github/SiddharthaMaity/nextjs-16-starter-shadcn)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+[![Open in Repl.it](https://replit.com/badge/github/SiddharthaMaity/nextjs-16-starter-shadcn)](https://replit.com/github/SiddharthaMaity/nextjs-16-starter-shadcn)
 
-## Deploy on Vercel
+[![Open in Glitch](https://img.shields.io/badge/Open%20in-Glitch-blue?logo=glitch)](https://glitch.com/edit/#!/import/github/SiddharthaMaity/nextjs-16-starter-shadcn)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+[![Open in Codeanywhere](https://codeanywhere.com/img/open-in-codeanywhere-btn.svg)](https://app.codeanywhere.com/#https://github.com/SiddharthaMaity/nextjs-16-starter-shadcn)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+<p style="text-align: center;"> With ❤️ from 🇮🇳 </p>
