@@ -36,7 +36,11 @@ public interface IIdentityService
     // PASSWORD
     Task<ServiceResult<string>> SendPasswordResetLinkAsync(string email);
     Task<ServiceResult<string>> ResetPasswordAsync(string email, string token, string newPassword);
+
     // OTHER
     Task<bool> AuthorizeAsync(string userId, string policyName);
     Task<string?> GetUserNameAsync(string userId);
+
+    /// <summary> /// Get all users in the system. /// </summary>
+    Task<ServiceResult<List<UserInfoResponse>>> GetAllUsersAsync();
 }
