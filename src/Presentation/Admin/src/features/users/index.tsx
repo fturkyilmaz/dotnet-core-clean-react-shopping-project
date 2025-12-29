@@ -1,4 +1,7 @@
 import { getRouteApi } from '@tanstack/react-router'
+import { RefreshCw } from 'lucide-react'
+import { useUsers } from '@/hooks/useUsers'
+import { Button } from '@/components/ui/button'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -9,13 +12,28 @@ import { UsersDialogs } from './components/users-dialogs'
 import { UsersPrimaryButtons } from './components/users-primary-buttons'
 import { UsersProvider } from './components/users-provider'
 import { UsersTable } from './components/users-table'
-import { users } from './data/users'
+import type { User } from './data/schema'
 
 const route = getRouteApi('/_authenticated/users/')
 
 export function Users() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
+  const { data: apiUsers, isLoading, refetch, isRefetching } = useUsers()
+
+  // Transform API response to User type
+  const users: User[] = (apiUsers || []).map((user) => ({
+    id: user.id || '',
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+    userName: user.userName || '',
+    email: user.email || '',
+    gender: user.gender || '',
+    roles: user.roles || [],
+    status: 'active' as const,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }))
 
   return (
     <UsersProvider>
@@ -36,9 +54,20 @@ export function Users() {
               Manage your users and their roles here.
             </p>
           </div>
-          <UsersPrimaryButtons />
+          <div className='flex gap-2'>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => refetch()}
+              disabled={isRefetching}
+            >
+              <RefreshCw className={isRefetching ? 'animate-spin' : ''} />
+              Refresh
+            </Button>
+            <UsersPrimaryButtons />
+          </div>
         </div>
-        <UsersTable data={users} search={search} navigate={navigate} />
+        <UsersTable data={users} search={search} navigate={navigate} isLoading={isLoading} />
       </Main>
 
       <UsersDialogs />
