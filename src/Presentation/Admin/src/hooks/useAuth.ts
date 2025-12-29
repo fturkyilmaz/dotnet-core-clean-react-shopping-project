@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { authApi } from '@/lib/api/auth'
-import type { LoginCommand, UserInfoResponse } from '@/lib/api/types'
+import type { LoginCommand } from '@/lib/api/types'
 import { useAuthStore } from '@/stores/auth-store'
 
 export const authKeys = {
@@ -15,7 +15,6 @@ export const authKeys = {
 }
 
 export function useLogin() {
-    const navigate = useNavigate()
     const { auth } = useAuthStore()
     const queryClient = useQueryClient()
 
@@ -64,6 +63,27 @@ export function useLogout() {
         navigate({ to: '/sign-in', replace: true })
         toast.success('Logged out successfully')
     }
+}
+
+export function useRegister() {
+    const navigate = useNavigate()
+
+    return useMutation({
+        mutationFn: async (command: { email: string; password: string; firstName?: string; lastName?: string }) => {
+            const result = await authApi.register(command)
+            if (!result.isSuccess) {
+                throw new Error(result.message || 'Registration failed')
+            }
+            return result.data
+        },
+        onSuccess: () => {
+            toast.success('Account created successfully! Please sign in.')
+            navigate({ to: '/sign-in', replace: true })
+        },
+        onError: (error: Error) => {
+            toast.error(error.message || 'Registration failed. Please try again.')
+        },
+    })
 }
 
 export function useCurrentUser(enabled = true) {
