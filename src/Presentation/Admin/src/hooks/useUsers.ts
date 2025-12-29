@@ -9,17 +9,19 @@ import { usersApi } from '@/lib/api/users'
 export const userKeys = {
     all: ['users'] as const,
     lists: () => [...userKeys.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) =>
+        [...userKeys.lists(), filters] as const,
 }
 
-export function useUsers() {
+export function useUsers(pageNumber = 1, pageSize = 10) {
     return useQuery({
-        queryKey: userKeys.lists(),
+        queryKey: userKeys.list({ pageNumber, pageSize }),
         queryFn: async () => {
-            const result = await usersApi.getAll()
+            const result = await usersApi.getAll(pageNumber, pageSize)
             if (!result.isSuccess) {
                 throw new Error(result.message || 'Failed to fetch users')
             }
-            return result.data || []
+            return result.data
         },
     })
 }

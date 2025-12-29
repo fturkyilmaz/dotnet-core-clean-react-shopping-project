@@ -5,7 +5,7 @@ using ShoppingProject.Application.Common.Models;
 namespace ShoppingProject.Application.Identity.Queries.GetAllUsers;
 
 public class GetAllUsersQueryHandler
-    : IRequestHandler<GetAllUsersQuery, ServiceResult<List<UserInfoResponse>>>
+    : IRequestHandler<GetAllUsersQuery, ServiceResult<PaginatedList<UserInfoResponse>>>
 {
     private readonly IIdentityService _identityService;
 
@@ -14,11 +14,11 @@ public class GetAllUsersQueryHandler
         _identityService = identityService;
     }
 
-    public async Task<ServiceResult<List<UserInfoResponse>>> Handle(
+    public async Task<ServiceResult<PaginatedList<UserInfoResponse>>> Handle(
         GetAllUsersQuery request,
         CancellationToken cancellationToken
     )
     {
-        return await _identityService.GetAllUsersAsync();
+        return await _identityService.GetAllUsersAsync(request.PageNumber, request.PageSize);
     }
 }

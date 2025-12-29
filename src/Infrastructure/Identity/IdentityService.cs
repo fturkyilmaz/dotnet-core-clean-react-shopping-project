@@ -465,9 +465,13 @@ public class IdentityService : IIdentityService
         throw new NotImplementedException();
     }
 
-    public async Task<ServiceResult<List<UserInfoResponse>>> GetAllUsersAsync()
+    public async Task<ServiceResult<PaginatedList<UserInfoResponse>>> GetAllUsersAsync(int pageNumber = 1, int pageSize = 10)
     {
-        var users = _userManager.Users.ToList();
+        var totalCount = _userManager.Users.Count();
+        var users = _userManager.Users
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
 
         var mapped = new List<UserInfoResponse>();
 
@@ -489,6 +493,7 @@ public class IdentityService : IIdentityService
             );
         }
 
-        return ServiceResult<List<UserInfoResponse>>.Success(mapped);
+        var paginatedList = new PaginatedList<UserInfoResponse>(mapped, totalCount, pageNumber, pageSize);
+        return ServiceResult<PaginatedList<UserInfoResponse>>.Success(paginatedList);
     }
 }

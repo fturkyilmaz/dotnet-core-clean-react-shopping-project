@@ -42,5 +42,5 @@ public interface IIdentityService
     Task<string?> GetUserNameAsync(string userId);
 
     /// <summary> /// Get all users in the system. /// </summary>
-    Task<ServiceResult<List<UserInfoResponse>>> GetAllUsersAsync();
+    Task<ServiceResult<PaginatedList<UserInfoResponse>>> GetAllUsersAsync(int pageNumber = 1, int pageSize = 10);
 }

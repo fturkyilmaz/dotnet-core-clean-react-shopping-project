@@ -3,11 +3,16 @@
  */
 
 import { httpClient } from '../httpClient'
-import type { UserInfoResponse, ServiceResult } from './types'
+import type { UserInfoResponse, ServiceResult, PaginatedList } from './types'
 
 export const usersApi = {
-    getAll: async (): Promise<ServiceResult<UserInfoResponse[]>> => {
-        const response = await httpClient.get<ServiceResult<UserInfoResponse[]>>('/identity/users')
+    getAll: async (
+        pageNumber = 1,
+        pageSize = 10
+    ): Promise<ServiceResult<PaginatedList<UserInfoResponse>>> => {
+        const response = await httpClient.get<ServiceResult<PaginatedList<UserInfoResponse>>>('/identity/users', {
+            params: { pageNumber, pageSize }
+        })
         return response.data
     },
 
