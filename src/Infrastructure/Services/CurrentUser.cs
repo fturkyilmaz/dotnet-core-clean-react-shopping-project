@@ -16,6 +16,9 @@ public class CurrentUser : IUser
     public string? Id =>
         _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
+    public string? Email =>
+        _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+
     public IReadOnlyCollection<string> GetRoles()
     {
         return _httpContextAccessor

@@ -8,6 +8,7 @@ public interface IApplicationDbContext
     IQueryable<Cart> Carts { get; }
     IQueryable<FeatureFlag> FeatureFlags { get; }
     IQueryable<OutboxMessage> OutboxMessages { get; }
+    IQueryable<AuditLog> AuditLogs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 

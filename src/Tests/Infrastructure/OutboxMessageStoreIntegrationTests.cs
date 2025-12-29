@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Entities;
@@ -60,7 +61,7 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
         var product = Product.Create("Test", 10m, "Desc", "Cat", "https://img.jpg");
 
         // Act
-        var message = await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+        var message = await _outboxStore.AddEventAsync(product.DomainEvents.First());
 
         // Assert
         message.Should().NotBeNull();
@@ -80,8 +81,9 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
 
         // Act
         var message = await _outboxStore.AddEventAsync(
-            product.DomainEvents[0],
-            correlationId: correlationId);
+            product.DomainEvents.First(),
+            correlationId: correlationId
+        );
 
         // Assert
         message.CorrelationId.Should().Be(correlationId);
@@ -94,8 +96,8 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
         var product1 = Product.Create("Product1", 10m, "Desc1", "Cat1", "https://img1.jpg");
         var product2 = Product.Create("Product2", 20m, "Desc2", "Cat2", "https://img2.jpg");
 
-        await _outboxStore.AddEventAsync(product1.DomainEvents[0]);
-        await _outboxStore.AddEventAsync(product2.DomainEvents[0]);
+        await _outboxStore.AddEventAsync(product1.DomainEvents.First());
+        await _outboxStore.AddEventAsync(product2.DomainEvents.First());
 
         // Act
         var messages = await _outboxStore.GetUnprocessedMessagesAsync(batchSize: 10);
@@ -111,8 +113,14 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
         // Arrange
         for (int i = 0; i < 5; i++)
         {
-            var product = Product.Create($"Product{i}", 10m * (i + 1), $"Desc{i}", "Cat", "https://img.jpg");
-            await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+            var product = Product.Create(
+                $"Product{i}",
+                10m * (i + 1),
+                $"Desc{i}",
+                "Cat",
+                "https://img.jpg"
+            );
+            await _outboxStore.AddEventAsync(product.DomainEvents.First());
         }
 
         // Act
@@ -127,7 +135,7 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
     {
         // Arrange
         var product = Product.Create("Test", 10m, "Desc", "Cat", "https://img.jpg");
-        var message = await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+        var message = await _outboxStore.AddEventAsync(product.DomainEvents.First());
 
         // Act
         await _outboxStore.MarkAsProcessedAsync(message.Id, DateTimeOffset.UtcNow);
@@ -144,7 +152,7 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
     {
         // Arrange
         var product = Product.Create("Test", 10m, "Desc", "Cat", "https://img.jpg");
-        var message = await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+        var message = await _outboxStore.AddEventAsync(product.DomainEvents.First());
 
         // Act
         await _outboxStore.MarkAsFailedAsync(message.Id, "First error", DateTimeOffset.UtcNow);
@@ -162,7 +170,7 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
     {
         // Arrange
         var product = Product.Create("Test", 10m, "Desc", "Cat", "https://img.jpg");
-        var message = await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+        var message = await _outboxStore.AddEventAsync(product.DomainEvents.First());
         var utcNow = DateTimeOffset.UtcNow;
 
         // Act - first failure
@@ -186,13 +194,14 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
     {
         // Arrange
         var product = Product.Create("Test", 10m, "Desc", "Cat", "https://img.jpg");
-        var message = await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+        var message = await _outboxStore.AddEventAsync(product.DomainEvents.First());
 
         // Mark as failed (sets future retry time)
         await _outboxStore.MarkAsFailedAsync(
             message.Id,
             "Error",
-            DateTimeOffset.UtcNow.AddHours(-1)); // Failed 1 hour ago
+            DateTimeOffset.UtcNow.AddHours(-1)
+        ); // Failed 1 hour ago
 
         // Act
         var unprocessed = await _outboxStore.GetUnprocessedMessagesAsync();
@@ -206,13 +215,14 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
     {
         // Arrange
         var product = Product.Create("Test", 10m, "Desc", "Cat", "https://img.jpg");
-        var message = await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+        var message = await _outboxStore.AddEventAsync(product.DomainEvents.First());
 
         // Act
         await _outboxStore.MarkAsDeadLetterAsync(
             message.Id,
             "Max retries exceeded",
-            DateTimeOffset.UtcNow);
+            DateTimeOffset.UtcNow
+        );
 
         // Assert
         var retrieved = await _outboxStore.GetByIdAsync(message.Id);
@@ -229,8 +239,8 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
         var product1 = Product.Create("Product1", 10m, "Desc1", "Cat1", "https://img1.jpg");
         var product2 = Product.Create("Product2", 20m, "Desc2", "Cat2", "https://img2.jpg");
 
-        var msg1 = await _outboxStore.AddEventAsync(product1.DomainEvents[0]);
-        var msg2 = await _outboxStore.AddEventAsync(product2.DomainEvents[0]);
+        var msg1 = await _outboxStore.AddEventAsync(product1.DomainEvents.First());
+        var msg2 = await _outboxStore.AddEventAsync(product2.DomainEvents.First());
 
         // Dead-letter first message
         await _outboxStore.MarkAsDeadLetterAsync(msg1.Id, "Failed", DateTimeOffset.UtcNow);
@@ -249,11 +259,12 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
         // Arrange
         var oldDate = DateTime.UtcNow.AddDays(-10);
         var product = Product.Create("Test", 10m, "Desc", "Cat", "https://img.jpg");
-        var message = await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+        var message = await _outboxStore.AddEventAsync(product.DomainEvents.First());
 
         // Manually mark as processed with old date
-        _context.OutboxMessages.Where(m => m.Id == message.Id).ExecuteUpdate(s =>
-            s.SetProperty(m => m.ProcessedOnUtc, oldDate));
+        await _context
+            .OutboxMessages.Where(m => m.Id == message.Id)
+            .ExecuteUpdateAsync(s => s.SetProperty(m => m.ProcessedOnUtc, oldDate));
 
         // Act
         var deleted = await _outboxStore.CleanupProcessedMessagesAsync(TimeSpan.FromDays(5));
@@ -269,7 +280,7 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
     {
         // Arrange
         var product = Product.Create("Test", 10m, "Desc", "Cat", "https://img.jpg");
-        var message = await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+        var message = await _outboxStore.AddEventAsync(product.DomainEvents.First());
 
         // Mark as processed just now
         await _outboxStore.MarkAsProcessedAsync(message.Id, DateTimeOffset.UtcNow);
@@ -288,7 +299,7 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
     {
         // Arrange
         var product = Product.Create("Test", 10m, "Desc", "Cat", "https://img.jpg");
-        var message = await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+        var message = await _outboxStore.AddEventAsync(product.DomainEvents.First());
 
         // Act
         var retrieved = await _outboxStore.GetByIdAsync(message.Id);
@@ -314,7 +325,7 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
     {
         // Arrange
         var product = Product.Create("Test", 10m, "Desc", "Cat", "https://img.jpg");
-        var message = await _outboxStore.AddEventAsync(product.DomainEvents[0]);
+        var message = await _outboxStore.AddEventAsync(product.DomainEvents.First());
         var utcNow = DateTimeOffset.UtcNow;
 
         // Act - fail multiple times
@@ -336,7 +347,16 @@ public class OutboxMessageStoreIntegrationTests : IAsyncLifetime
 /// </summary>
 file class TestLogger : ILogger<OutboxMessageStore>
 {
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+    public IDisposable? BeginScope<TState>(TState state)
+        where TState : notnull => null;
+
     public bool IsEnabled(LogLevel logLevel) => false;
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) { }
+
+    public void Log<TState>(
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
+        Exception? exception,
+        Func<TState, Exception?, string> formatter
+    ) { }
 }

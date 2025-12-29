@@ -1,7 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using FluentValidation;
 using MassTransit;
-using RabbitMQ.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RabbitMQ.Client;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Services;
 using ShoppingProject.Application.Contracts.ServiceBus;
@@ -42,12 +42,24 @@ public static class DependencyInjection
         builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        {
-            options.UseNpgsql(connectionString);
-            options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
-        });
+        builder.Services.AddDbContext<ApplicationDbContext>(
+            (sp, options) =>
+            {
+                options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
+                options.UseNpgsql(connectionString);
+                options.ConfigureWarnings(w =>
+                    w.Ignore(RelationalEventId.PendingModelChangesWarning)
+                );
+            }
+        );
         builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+
+        var auditConnectionString = builder.Configuration.GetConnectionString("AuditConnection");
+        builder.Services.AddDbContext<AuditDbContext>(options =>
+            options.UseNpgsql(auditConnectionString)
+        );
+        builder.Services.AddScoped<IAuditDbContext, AuditDbContext>();
+        builder.Services.AddHostedService<AuditCleanupWorker>();
 
         var readOnlyConnectionString =
             builder.Configuration.GetConnectionString(
@@ -205,6 +217,7 @@ public static class DependencyInjection
         // Authorization Handlers
         builder.Services.AddScoped<IAuthorizationHandler, ResourceOwnerRequirementHandler>();
         builder.Services.AddScoped<IUser, CurrentUser>();
+        builder.Services.AddScoped<IRequestContext, RequestContext>();
 
         // Observability
         const string serviceName = "ShoppingProject.API";

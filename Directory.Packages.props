@@ -1,105 +1,105 @@
 <Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <AspireVersion>10.0.1</AspireVersion>
-        <AspnetVersion>10.0.1</AspnetVersion>
-        <EfcoreVersion>10.0.1</EfcoreVersion>
-        <MicrosoftExtensionsVersion>10.0.1</MicrosoftExtensionsVersion>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <PackageVersion Include="Ardalis.GuardClauses" Version="5.0.0" />
-        <PackageVersion Include="Asp.Versioning.Mvc" Version="8.1.0" />
-        <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
-        <PackageVersion Include="AspNetCoreRateLimit" Version="5.0.0" />
-        <PackageVersion Include="AspNetCore.HealthChecks.UI" Version="9.0.0" />
-        <PackageVersion Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
-        <PackageVersion Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0" />
-        <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
-        <PackageVersion Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
-        <PackageVersion Include="AspNetCore.HealthChecks.Uris" Version="9.0.0" />
-        <PackageVersion Include="AutoMapper" Version="16.0.0" />
-        <PackageVersion Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.5.0" />
-        <PackageVersion Include="Azure.Identity" Version="1.18.0" />
-        <PackageVersion Include="Bogus" Version="36.0.0" />
-        <PackageVersion Include="Consul" Version="1.7.14.9" />
-        <PackageVersion Include="coverlet.collector" Version="6.0.5" />
-        <PackageVersion Include="FluentAssertions" Version="7.1.0" />
-        <PackageVersion Include="FluentValidation" Version="12.1.1" />
-        <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.1" />
-        <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-        <PackageVersion Include="Hangfire.Core" Version="1.8.22" />
-        <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.22" />
-        <PackageVersion Include="Hangfire.PostgreSql" Version="1.20.13" />
-        <PackageVersion Include="MediatR" Version="14.0.0" />
-        <PackageVersion Include="MediatR.Contracts" Version="2.0.1" />
-
-        <!-- OpenTelemetry -->
-        <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
-        <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
-        <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
-        <PackageVersion Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.14.0-beta.1" />
-        <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
-        <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.14.0" />
-
-        <!-- ASP.NET Core -->
-        <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(AspnetVersion)" />
-        <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspnetVersion)" />
-        <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspnetVersion)" />
-        <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspnetVersion)" />
-        <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
-        <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspnetVersion)" />
-        <PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="$(AspnetVersion)" />
-        <PackageVersion Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="$(AspnetVersion)" />
-
-        <!-- EF Core -->
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EfcoreVersion)" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EfcoreVersion)" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EfcoreVersion)" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfcoreVersion)" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfcoreVersion)" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EfcoreVersion)" />
-        <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-
-        <!-- Extensions -->
-        <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="$(MicrosoftExtensionsVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.1" />
-        <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
-        <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="10.0.1" />
-        <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
-
-        <!-- MassTransit -->
-        <PackageVersion Include="MassTransit" Version="8.5.7" />
-        <PackageVersion Include="MassTransit.RabbitMQ" Version="8.5.7" />
-
-        <!-- Diğer paketler -->
-        <PackageVersion Include="RabbitMQ.Client" Version="7.2.0" />
-        <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-        <PackageVersion Include="Polly" Version="8.4.0" />
-        <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
-        <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
-        <PackageVersion Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
-        <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
-        <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.0.1" />
-        <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
-        <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.6.0.2" />
-        <PackageVersion Include="StackExchange.Redis" Version="2.9.33" />
-        <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
-        <PackageVersion Include="Microsoft.OpenApi" Version="2.3.0" />
-
-        <!-- Test ve diğer paketler -->
-        <PackageVersion Include="xunit" Version="2.6.6" />
-        <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" />
-        <PackageVersion Include="nunit" Version="4.5.0" />
-        <PackageVersion Include="NUnit3TestAdapter" Version="5.3.0" />
-        <PackageVersion Include="Moq" Version="4.20.72" />
-        <PackageVersion Include="NSubstitute" Version="5.4.0" />
-        <PackageVersion Include="Shouldly" Version="4.3.1" />
-        <PackageVersion Include="AspNetCore.HealthChecks.RabbitMQ" Version="9.0.0" />
-        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-        <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
-        <PackageVersion Include="Testcontainers.PostgreSql" Version="3.9.0" />
-        <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.17.0.131074" />
-    </ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <AspireVersion>10.0.1</AspireVersion>
+    <AspnetVersion>10.0.1</AspnetVersion>
+    <EfcoreVersion>10.0.1</EfcoreVersion>
+    <MicrosoftExtensionsVersion>10.0.1</MicrosoftExtensionsVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Ardalis.GuardClauses" Version="5.0.0" />
+    <PackageVersion Include="Asp.Versioning.Mvc" Version="8.1.0" />
+    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageVersion Include="AspNetCoreRateLimit" Version="5.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI" Version="9.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.Uris" Version="9.0.0" />
+    <PackageVersion Include="AutoMapper" Version="16.0.0" />
+    <PackageVersion Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.5.0" />
+    <PackageVersion Include="Azure.Identity" Version="1.18.0" />
+    <PackageVersion Include="Bogus" Version="35.6.1" />
+    <PackageVersion Include="Consul" Version="1.7.14.9" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="FluentAssertions" Version="7.1.0" />
+    <PackageVersion Include="FluentValidation" Version="12.1.1" />
+    <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.1" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageVersion Include="Hangfire.Core" Version="1.8.22" />
+    <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.22" />
+    <PackageVersion Include="Hangfire.PostgreSql" Version="1.20.13" />
+    <PackageVersion Include="MediatR" Version="14.0.0" />
+    <PackageVersion Include="MediatR.Contracts" Version="2.0.1" />
+    <!-- OpenTelemetry -->
+    <PackageVersion Include="Npgsql.OpenTelemetry" Version="10.0.1" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.14.0-beta.1" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.14.0" />
+    <!-- ASP.NET Core -->
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer"
+      Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore"
+      Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore"
+      Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="$(AspnetVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis"
+      Version="$(AspnetVersion)" />
+    <!-- EF Core -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <!-- Extensions -->
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis"
+      Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables"
+      Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json"
+      Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
+    <!-- MassTransit -->
+    <PackageVersion Include="MassTransit" Version="8.5.7" />
+    <PackageVersion Include="MassTransit.RabbitMQ" Version="8.5.7" />
+    <!-- Diğer paketler -->
+    <PackageVersion Include="RabbitMQ.Client" Version="7.2.0" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageVersion Include="Polly" Version="8.4.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageVersion Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.0.1" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
+    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.6.0.2" />
+    <PackageVersion Include="StackExchange.Redis" Version="2.9.33" />
+    <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.3.0" />
+    <!-- Test ve diğer paketler -->
+    <PackageVersion Include="xunit" Version="2.6.6" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" />
+    <PackageVersion Include="nunit" Version="4.5.0" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="5.3.0" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="NSubstitute" Version="5.4.0" />
+    <PackageVersion Include="Shouldly" Version="4.3.1" />
+    <PackageVersion Include="AspNetCore.HealthChecks.RabbitMQ" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="3.9.0" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.17.0.131074" />
+  </ItemGroup>
 </Project>

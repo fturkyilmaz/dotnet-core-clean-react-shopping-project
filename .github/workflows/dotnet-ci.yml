@@ -9,7 +9,7 @@ on:
 env:
   DOTNET_VERSION: '10.0.101'
   SOLUTION_PATH: 'ShoppingProject.sln'
-  TEST_PROJECT_PATH: 'src/UnitTests/ShoppingProject.UnitTests.csproj'
+  TEST_PROJECT_PATH: ${{ env.SOLUTION_PATH }}
 
 jobs:
   build:

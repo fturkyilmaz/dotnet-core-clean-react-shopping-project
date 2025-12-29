@@ -20,6 +20,8 @@ namespace ShoppingProject.Infrastructure.Extensions
                     tracing
                         .AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation()
+                        .AddSource("MassTransit")
+                        .AddSource("Npgsql")
                         .AddConsoleExporter()
                 )
                 .WithMetrics(metrics =>

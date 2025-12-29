@@ -1,95 +1,152 @@
-﻿using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Domain.Common;
+﻿using System.Text.Json;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using System.Text.Json;
+using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Domain.Common;
+using ShoppingProject.Domain.Entities;
+using ShoppingProject.Infrastructure.Bus.Events;
+using ShoppingProject.Infrastructure.Identity;
 
 namespace ShoppingProject.Infrastructure.Data.Interceptors;
 
 public class AuditableEntityInterceptor : SaveChangesInterceptor
 {
     private readonly IUser _user;
+    private readonly IRequestContext _requestContext;
     private readonly TimeProvider _dateTime;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public AuditableEntityInterceptor(IUser user, TimeProvider dateTime)
+    public AuditableEntityInterceptor(
+        IUser user,
+        IRequestContext requestContext,
+        TimeProvider dateTime,
+        IPublishEndpoint publishEndpoint
+    )
     {
         _user = user;
+        _requestContext = requestContext;
         _dateTime = dateTime;
+        _publishEndpoint = publishEndpoint;
     }
 
-    public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
+    public override InterceptionResult<int> SavingChanges(
+        DbContextEventData eventData,
+        InterceptionResult<int> result
+    )
     {
-        UpdateEntities(eventData.Context);
+        UpdateEntitiesAsync(eventData.Context).GetAwaiter().GetResult();
         return base.SavingChanges(eventData, result);
     }
 
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+    public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        UpdateEntities(eventData.Context);
-        return base.SavingChangesAsync(eventData, result, cancellationToken);
+        await UpdateEntitiesAsync(eventData.Context);
+        return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private void UpdateEntities(DbContext? context)
+    private async Task UpdateEntitiesAsync(DbContext? context)
     {
-        if (context == null) return;
+        if (context == null)
+            return;
 
-        var utcNow = _dateTime.GetUtcNow().UtcDateTime;
+        var utcNow = _dateTime.GetUtcNow();
         var userId = _user?.Id ?? "system";
         var userEmail = _user?.Email ?? "system@local";
 
-        var auditableEntries = context.ChangeTracker
-            .Entries<BaseAuditableEntity>()
+        var auditableEntries = context
+            .ChangeTracker.Entries<BaseAuditableEntity>()
             .Where(entry =>
-                entry.State is EntityState.Added or EntityState.Modified or EntityState.Deleted ||
-                entry.HasChangedOwnedEntities());
+                entry.State is EntityState.Added or EntityState.Modified or EntityState.Deleted
+                || entry.HasChangedOwnedEntities()
+            );
 
         foreach (var entry in auditableEntries)
         {
             var entity = entry.Entity;
-            entity.EntityName = entry.Entity.GetType().Name;
-            entity.EntityId = GetPrimaryKeyValue(entry);
-            entity.UserId = userId;
-            entity.UserEmail = userEmail;
 
             if (entry.State == EntityState.Added)
             {
-                entity.Action = "Added";
                 entity.CreatedBy = userId;
                 entity.Created = utcNow;
-                entity.NewValues = SerializeValues(entry.CurrentValues);
+            }
+            else if (entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
+            {
+                entity.LastModifiedBy = userId;
+                entity.LastModified = utcNow;
+            }
+
+            var auditEvent = new AuditEvent
+            {
+                UserId = userId,
+                UserEmail = userEmail,
+                EntityName = entity.GetType().Name,
+                EntityId = GetPrimaryKeyValue(entry),
+                Timestamp = utcNow,
+                Action = entry.State.ToString(),
+                CorrelationId = _requestContext.CorrelationId,
+                RemoteIp = _requestContext.RemoteIp,
+                UserAgent = _requestContext.UserAgent,
+            };
+
+            if (entry.State == EntityState.Added)
+            {
+                auditEvent = auditEvent with
+                {
+                    NewValues = SerializeValues(entry.CurrentValues, entry),
+                };
             }
             else if (entry.State == EntityState.Modified)
             {
-                entity.Action = "Modified";
-                entity.LastModifiedBy = userId;
-                entity.LastModified = utcNow;
-                entity.OldValues = SerializeValues(entry.OriginalValues);
-                entity.NewValues = SerializeValues(entry.CurrentValues);
+                auditEvent = auditEvent with
+                {
+                    OldValues = SerializeValues(entry.OriginalValues, entry),
+                    NewValues = SerializeValues(entry.CurrentValues, entry),
+                };
             }
             else if (entry.State == EntityState.Deleted)
             {
-                entity.Action = "Deleted";
-                entity.LastModifiedBy = userId;
-                entity.LastModified = utcNow;
-                entity.OldValues = SerializeValues(entry.OriginalValues);
+                auditEvent = auditEvent with
+                {
+                    OldValues = SerializeValues(entry.OriginalValues, entry),
+                };
             }
+
+            await _publishEndpoint.Publish(auditEvent);
         }
     }
 
     private static string GetPrimaryKeyValue(EntityEntry entry)
     {
         var key = entry.Metadata.FindPrimaryKey();
-        var vals = key?.Properties.Select(p => entry.Property(p.Name).CurrentValue)?.ToArray() ?? Array.Empty<object>();
+        var vals =
+            key?.Properties.Select(p => entry.Property(p.Name).CurrentValue)?.ToArray()
+            ?? Array.Empty<object>();
         return string.Join("|", vals.Select(v => v?.ToString()));
     }
 
-    private static string SerializeValues(PropertyValues values)
+    private static string SerializeValues(PropertyValues values, EntityEntry entry)
     {
-        var dict = values.Properties.ToDictionary(p => p.Name, p => values[p.Name]);
+        var dict = values.Properties.ToDictionary(
+            property => property.Name,
+            property =>
+            {
+                var propertyInfo = entry.Entity.GetType().GetProperty(property.Name);
+                if (
+                    propertyInfo != null
+                    && Attribute.IsDefined(propertyInfo, typeof(AuditIgnoreAttribute))
+                )
+                {
+                    return (object?)"[MASKED]";
+                }
+                return values[property.Name];
+            }
+        );
         return JsonSerializer.Serialize(dict);
     }
 }
@@ -98,7 +155,12 @@ public static class Extensions
 {
     public static bool HasChangedOwnedEntities(this EntityEntry entry) =>
         entry.References.Any(r =>
-            r.TargetEntry != null &&
-            r.TargetEntry.Metadata.IsOwned() &&
-            (r.TargetEntry.State == EntityState.Added || r.TargetEntry.State == EntityState.Modified || r.TargetEntry.State == EntityState.Deleted));
+            r.TargetEntry != null
+            && r.TargetEntry.Metadata.IsOwned()
+            && (
+                r.TargetEntry.State == EntityState.Added
+                || r.TargetEntry.State == EntityState.Modified
+                || r.TargetEntry.State == EntityState.Deleted
+            )
+        );
 }

@@ -53,12 +53,48 @@ public class SpecificationPatternIntegrationTests : IAsyncLifetime
     {
         var products = new[]
         {
-            Product.Create("Laptop", 999.99m, "High performance laptop", "Electronics", "https://example.com/laptop.jpg"),
-            Product.Create("Mouse", 29.99m, "Wireless mouse", "Electronics", "https://example.com/mouse.jpg"),
-            Product.Create("Keyboard", 79.99m, "Mechanical keyboard", "Electronics", "https://example.com/keyboard.jpg"),
-            Product.Create("Monitor", 299.99m, "4K Monitor", "Electronics", "https://example.com/monitor.jpg"),
-            Product.Create("Desk", 399.99m, "Standing desk", "Furniture", "https://example.com/desk.jpg"),
-            Product.Create("Chair", 199.99m, "Ergonomic chair", "Furniture", "https://example.com/chair.jpg"),
+            Product.Create(
+                "Laptop",
+                999.99m,
+                "High performance laptop",
+                "Electronics",
+                "https://example.com/laptop.jpg"
+            ),
+            Product.Create(
+                "Mouse",
+                29.99m,
+                "Wireless mouse",
+                "Electronics",
+                "https://example.com/mouse.jpg"
+            ),
+            Product.Create(
+                "Keyboard",
+                79.99m,
+                "Mechanical keyboard",
+                "Electronics",
+                "https://example.com/keyboard.jpg"
+            ),
+            Product.Create(
+                "Monitor",
+                299.99m,
+                "4K Monitor",
+                "Electronics",
+                "https://example.com/monitor.jpg"
+            ),
+            Product.Create(
+                "Desk",
+                399.99m,
+                "Standing desk",
+                "Furniture",
+                "https://example.com/desk.jpg"
+            ),
+            Product.Create(
+                "Chair",
+                199.99m,
+                "Ergonomic chair",
+                "Furniture",
+                "https://example.com/chair.jpg"
+            ),
         };
 
         _context.Products.AddRange(products);
@@ -173,11 +209,13 @@ public class SpecificationPatternIntegrationTests : IAsyncLifetime
 
         // Assert
         results.Should().NotBeEmpty();
-        results.Should().AllSatisfy(p =>
-        {
-            p.Price.Should().BeGreaterThanOrEqualTo(minPrice);
-            p.Price.Should().BeLessThanOrEqualTo(maxPrice);
-        });
+        results
+            .Should()
+            .AllSatisfy(p =>
+            {
+                p.Price.Should().BeGreaterThanOrEqualTo(minPrice);
+                p.Price.Should().BeLessThanOrEqualTo(maxPrice);
+            });
     }
 
     [Fact]
@@ -229,7 +267,7 @@ public class SpecificationPatternIntegrationTests : IAsyncLifetime
     public async Task SearchSpecification_WithEmptySearchTerm_ReturnsAllProducts()
     {
         // Arrange
-        var spec = new SearchProductsSpecification(null, 1, 10);
+        var spec = new SearchProductsSpecification("", 1, 10);
 
         // Act
         var query = SpecificationEvaluator<Product>.GetQuery(_context.Products, spec);
@@ -260,7 +298,10 @@ public class SpecificationPatternIntegrationTests : IAsyncLifetime
         var spec = new ActiveProductsSpecification();
 
         // Act
-        var query = SpecificationEvaluator<Product>.GetQuery(_context.Products.AsNoTracking(), spec);
+        var query = SpecificationEvaluator<Product>.GetQuery(
+            _context.Products.AsNoTracking(),
+            spec
+        );
         var results = await query.ToListAsync();
 
         // Assert
@@ -280,10 +321,12 @@ public class SpecificationPatternIntegrationTests : IAsyncLifetime
         var results = await query.ToListAsync();
 
         // Assert
-        results.Should().AllSatisfy(p =>
-        {
-            p.Category.Should().Be("Electronics");
-            p.Price.Should().BeGreaterThan(0);
-        });
+        results
+            .Should()
+            .AllSatisfy(p =>
+            {
+                p.Category.Should().Be("Electronics");
+                p.Price.Should().BeGreaterThan(0);
+            });
     }
 }

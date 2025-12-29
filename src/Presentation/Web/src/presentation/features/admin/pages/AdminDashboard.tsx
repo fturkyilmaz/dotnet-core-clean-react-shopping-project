@@ -209,6 +209,10 @@ const AdminDashboard: FC = () => {
                                         <i className="bi bi-people me-2"></i>
                                         Manage Users
                                     </button>
+                                    <button className="btn btn-outline-primary" onClick={() => navigate('/admin/audit-logs')}>
+                                        <i className="bi bi-clock-history me-2"></i>
+                                        View Audit Logs
+                                    </button>
                                     <button className="btn btn-outline-primary">
                                         <i className="bi bi-gear me-2"></i>
                                         Settings
