@@ -25,6 +25,7 @@ const userSchema = z.object({
   email: z.string().nullable().optional(),
   gender: z.string().nullable().optional(),
   roles: z.array(z.string()).nullable().optional(),
+  phoneNumber: z.string().nullable().optional(),
   // Computed fields for UI
   status: userStatusSchema.optional().default('active'),
   createdAt: z.coerce.date().optional(),

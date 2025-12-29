@@ -291,7 +291,8 @@ public class IdentityService : IIdentityService
                 user.LastName!,
                 user.UserName!,
                 user.Gender!,
-                new List<string>()
+                new List<string>(),
+                user.PhoneNumber!
             )
         );
     }
@@ -450,7 +451,8 @@ public class IdentityService : IIdentityService
             user.LastName ?? string.Empty,
             user.UserName ?? string.Empty,
             user.Gender ?? string.Empty,
-            roles.ToList()
+            roles.ToList(),
+            user.PhoneNumber ?? string.Empty
         );
 
         _logger.LogInformation("User {UserId} updated successfully", userId);
@@ -481,7 +483,8 @@ public class IdentityService : IIdentityService
                     user.LastName ?? string.Empty,
                     user.UserName ?? string.Empty,
                     user.Gender ?? string.Empty,
-                    roles.ToList()
+                    roles.ToList(),
+                    user.PhoneNumber ?? string.Empty
                 )
             );
         }

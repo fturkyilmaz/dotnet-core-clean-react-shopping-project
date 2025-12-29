@@ -10,5 +10,6 @@ public record UserInfoResponse(
     string? LastName,
     string? UserName,
     string? Gender,
-    IReadOnlyList<string> Roles
+    IReadOnlyList<string> Roles,
+    string? PhoneNumber
 );

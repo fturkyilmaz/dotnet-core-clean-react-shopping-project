@@ -1,3 +1,4 @@
+using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using ShoppingProject.Domain.Constants;
@@ -32,12 +33,14 @@ public static class DataSeeder
         {
             var user = new ApplicationUser
             {
-                UserName = adminEmail,
+                UserName = adminEmail.Split('@')[0],
                 Email = adminEmail,
                 EmailConfirmed = true,
                 FirstName = "System",
                 LastName = "Admin",
                 Gender = "Male",
+                PhoneNumber = new Faker("tr").Phone.PhoneNumber("+90##########"),
+                PhoneNumberConfirmed = true,
             };
 
             var result = await userManager.CreateAsync(user, "Admin123!");
@@ -54,12 +57,42 @@ public static class DataSeeder
         {
             var user = new ApplicationUser
             {
-                UserName = clientEmail,
+                UserName = clientEmail.Split('@')[0],
                 Email = clientEmail,
                 EmailConfirmed = true,
                 FirstName = "Furkan",
                 LastName = "Türkyılmaz",
                 Gender = "Male",
+                PhoneNumber = new Faker("tr").Phone.PhoneNumber("+90##########"),
+                PhoneNumberConfirmed = true,
+            };
+
+            var result = await userManager.CreateAsync(user, "User123!");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, Roles.Client);
+            }
+        }
+
+        // --- Seed 50 Random Users ---
+        var faker = new Faker("tr");
+        for (int i = 0; i < 50; i++)
+        {
+            var email = faker.Internet.Email();
+            var existingUser = await userManager.FindByEmailAsync(email);
+            if (existingUser != null)
+                continue;
+
+            var user = new ApplicationUser
+            {
+                UserName = email.Split('@')[0],
+                Email = email,
+                EmailConfirmed = true,
+                FirstName = faker.Name.FirstName(),
+                LastName = faker.Name.LastName(),
+                Gender = faker.PickRandom("Male", "Female", "Unknown"),
+                PhoneNumber = faker.Phone.PhoneNumber("+90##########"),
+                PhoneNumberConfirmed = true,
             };
 
             var result = await userManager.CreateAsync(user, "User123!");

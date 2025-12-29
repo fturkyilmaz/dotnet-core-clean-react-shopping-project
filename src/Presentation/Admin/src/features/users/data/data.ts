@@ -18,8 +18,8 @@ export const roles = [
     icon: Shield,
   },
   {
-    label: 'User',
-    value: 'User',
+    label: 'Client',
+    value: 'Client',
     icon: UserCheck,
   },
   {

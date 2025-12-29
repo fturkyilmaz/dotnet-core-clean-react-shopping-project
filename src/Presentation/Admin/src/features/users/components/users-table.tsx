@@ -57,8 +57,8 @@ export function UsersTable({ data, search, navigate, isLoading }: DataTableProps
     pagination: { defaultPage: 1, defaultPageSize: 10 },
     globalFilter: { enabled: false },
     columnFilters: [
-      // username per-column text filter
-      { columnId: 'username', searchKey: 'username', type: 'string' },
+      // userName per-column text filter
+      { columnId: 'userName', searchKey: 'userName', type: 'string' },
       { columnId: 'status', searchKey: 'status', type: 'array' },
       { columnId: 'role', searchKey: 'role', type: 'array' },
     ],

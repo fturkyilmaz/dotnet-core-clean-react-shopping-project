@@ -37,12 +37,12 @@ export const usersColumns: ColumnDef<User>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'username',
+    accessorKey: 'userName',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Username' />
     ),
     cell: ({ row }) => (
-      <LongText className='max-w-36 ps-3'>{row.getValue('username')}</LongText>
+      <LongText className='max-w-36 ps-3'>{row.getValue('userName')}</LongText>
     ),
     meta: {
       className: cn(
@@ -78,7 +78,7 @@ export const usersColumns: ColumnDef<User>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Phone Number' />
     ),
-    cell: ({ row }) => <div>{row.getValue('phoneNumber')}</div>,
+    cell: ({ row }) => console.log(row.original) || <div>{row.getValue('phoneNumber')}</div>,
     enableSorting: false,
   },
   {
@@ -104,29 +104,34 @@ export const usersColumns: ColumnDef<User>[] = [
     enableSorting: false,
   },
   {
-    accessorKey: 'role',
+    accessorKey: 'roles',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Role' />
     ),
     cell: ({ row }) => {
-      const { role } = row.original
-      const userType = roles.find(({ value }) => value === role)
-
-      if (!userType) {
-        return null
-      }
+      const tableRoles: string[] = row.original.roles ?? []
 
       return (
-        <div className='flex items-center gap-x-2'>
-          {userType.icon && (
-            <userType.icon size={16} className='text-muted-foreground' />
-          )}
-          <span className='text-sm capitalize'>{row.getValue('role')}</span>
+        <div className='flex flex-wrap items-center gap-x-2'>
+          {tableRoles.map((role) => {
+            const roleDef = roles.find((r) => r.value === role)
+            if (!roleDef) return null
+
+            return (
+              <div key={role} className='flex items-center gap-x-1'>
+                {roleDef.icon && (
+                  <roleDef.icon size={16} className='text-muted-foreground' />
+                )}
+                <span className='text-sm capitalize'>{roleDef.label}</span>
+              </div>
+            )
+          })}
         </div>
       )
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      const rowRoles: string[] = row.getValue(id) ?? []
+      return rowRoles.some((r) => value.includes(r))
     },
     enableSorting: false,
     enableHiding: false,
