@@ -21,21 +21,23 @@ import {
   AudioWaveform,
   Command,
   GalleryVerticalEnd,
+  ShoppingCart,
+  Database,
+  ScrollText,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
   user: {
-    name: 'satnaing',
-    email: 'satnaingdev@gmail.com',
+    name: 'Admin',
+    email: 'admin@example.com',
     avatar: '/avatars/shadcn.jpg',
   },
   teams: [
     {
-      name: 'Shadcn Admin',
+      name: 'Admin Panel',
       logo: Command,
-      plan: 'Vite + ShadcnUI',
+      plan: 'Shopping Project',
     },
     {
       name: 'Acme Inc',
@@ -58,20 +60,14 @@ export const sidebarData: SidebarData = {
           icon: LayoutDashboard,
         },
         {
-          title: 'Tasks',
-          url: '/tasks',
-          icon: ListTodo,
-        },
-        {
-          title: 'Apps',
-          url: '/apps',
+          title: 'Products',
+          url: '/products',
           icon: Package,
         },
         {
-          title: 'Chats',
-          url: '/chats',
-          badge: '3',
-          icon: MessagesSquare,
+          title: 'Carts',
+          url: '/carts',
+          icon: ShoppingCart,
         },
         {
           title: 'Users',
@@ -79,22 +75,30 @@ export const sidebarData: SidebarData = {
           icon: Users,
         },
         {
-          title: 'Secured by Clerk',
-          icon: ClerkLogo,
-          items: [
-            {
-              title: 'Sign In',
-              url: '/clerk/sign-in',
-            },
-            {
-              title: 'Sign Up',
-              url: '/clerk/sign-up',
-            },
-            {
-              title: 'User Management',
-              url: '/clerk/user-management',
-            },
-          ],
+          title: 'Tasks',
+          url: '/tasks',
+          icon: ListTodo,
+        },
+        {
+          title: 'Chats',
+          url: '/chats',
+          badge: '3',
+          icon: MessagesSquare,
+        },
+      ],
+    },
+    {
+      title: 'Admin',
+      items: [
+        {
+          title: 'Audit Logs',
+          url: '/audit-logs',
+          icon: ScrollText,
+        },
+        {
+          title: 'Cache Management',
+          url: '/cache',
+          icon: Database,
         },
       ],
     },
