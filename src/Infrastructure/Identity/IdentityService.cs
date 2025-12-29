@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
-
 using ShoppingProject.Infrastructure.Configuration;
 
 namespace ShoppingProject.Infrastructure.Identity;
@@ -33,7 +32,8 @@ public class IdentityService : IIdentityService
         RoleManager<IdentityRole> roleManager,
         ILogger<IdentityService> logger,
         IEmailService emailService,
-        IClock clock)
+        IClock clock
+    )
     {
         _userManager = userManager;
         _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
@@ -61,7 +61,8 @@ public class IdentityService : IIdentityService
 
     public async Task<ServiceResult<AuthResponse>> RefreshTokenAsync(
         string token,
-        string refreshToken)
+        string refreshToken
+    )
     {
         var (result, response) = await RefreshTokenInternalAsync(token, refreshToken);
 
@@ -76,9 +77,17 @@ public class IdentityService : IIdentityService
         string firstName,
         string lastName,
         string gender,
-        string role)
+        string role
+    )
     {
-        var result = await RegisterInternalAsync(email, password, firstName, lastName, gender, role);
+        var result = await RegisterInternalAsync(
+            email,
+            password,
+            firstName,
+            lastName,
+            gender,
+            role
+        );
 
         return result.Succeeded
             ? ServiceResult<string>.Success("User registered successfully.")
@@ -100,8 +109,7 @@ public class IdentityService : IIdentityService
 
         if (result.Succeeded)
         {
-            _logger.LogInformation(
-                "User {UserId} assigned to role {Role}", userId, role);
+            _logger.LogInformation("User {UserId} assigned to role {Role}", userId, role);
         }
 
         return result.Succeeded
@@ -130,7 +138,8 @@ public class IdentityService : IIdentityService
     public async Task<ServiceResult<string>> ResetPasswordAsync(
         string email,
         string token,
-        string newPassword)
+        string newPassword
+    )
     {
         var result = await ResetPasswordInternalAsync(email, token, newPassword);
 
@@ -154,7 +163,8 @@ public class IdentityService : IIdentityService
     public async Task<bool> AuthorizeAsync(string userId, string policyName)
     {
         var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return false;
+        if (user == null)
+            return false;
 
         var principal = await _userClaimsPrincipalFactory.CreateAsync(user);
         var result = await _authorizationService.AuthorizeAsync(principal, policyName);
@@ -166,14 +176,15 @@ public class IdentityService : IIdentityService
     // =====================================================
 
     private async Task<(Result Result, AuthResponse? Response)> LoginInternalAsync(
-        string email, string password)
+        string email,
+        string password
+    )
     {
         var user = await _userManager.FindByEmailAsync(email);
 
         if (user == null || !await _userManager.CheckPasswordAsync(user, password))
         {
-            _logger.LogWarning(
-               "Failed login attempt for email {Email}", email);
+            _logger.LogWarning("Failed login attempt for email {Email}", email);
 
             return (Result.Failure(new[] { "Invalid email or password." }), null);
         }
@@ -182,8 +193,9 @@ public class IdentityService : IIdentityService
         var refreshToken = GenerateRefreshToken();
 
         user.RefreshToken = HashRefreshToken(refreshToken);
-        user.RefreshTokenExpiryTime =
-            _clock.UtcNow.UtcDateTime.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        user.RefreshTokenExpiryTime = _clock.UtcNow.UtcDateTime.AddDays(
+            _jwtOptions.RefreshTokenExpiryDays
+        );
         user.UpdateAt = _clock.UtcNow.UtcDateTime;
 
         await _userManager.UpdateAsync(user);
@@ -193,12 +205,15 @@ public class IdentityService : IIdentityService
             new AuthResponse(
                 token,
                 refreshToken,
-                _clock.UtcNow.UtcDateTime.AddMinutes(_jwtOptions.ExpiryMinutes))
+                _clock.UtcNow.UtcDateTime.AddMinutes(_jwtOptions.ExpiryMinutes)
+            )
         );
     }
 
     private async Task<(Result Result, AuthResponse? Response)> RefreshTokenInternalAsync(
-        string token, string refreshToken)
+        string token,
+        string refreshToken
+    )
     {
         var principal = GetPrincipalFromExpiredToken(token);
         if (principal == null)
@@ -217,8 +232,9 @@ public class IdentityService : IIdentityService
         var newRefresh = GenerateRefreshToken();
 
         user.RefreshToken = HashRefreshToken(newRefresh);
-        user.RefreshTokenExpiryTime =
-            _clock.UtcNow.UtcDateTime.AddDays(_jwtOptions.RefreshTokenExpiryDays);
+        user.RefreshTokenExpiryTime = _clock.UtcNow.UtcDateTime.AddDays(
+            _jwtOptions.RefreshTokenExpiryDays
+        );
 
         await _userManager.UpdateAsync(user);
 
@@ -227,7 +243,8 @@ public class IdentityService : IIdentityService
             new AuthResponse(
                 newToken,
                 newRefresh,
-                _clock.UtcNow.UtcDateTime.AddMinutes(_jwtOptions.ExpiryMinutes))
+                _clock.UtcNow.UtcDateTime.AddMinutes(_jwtOptions.ExpiryMinutes)
+            )
         );
     }
 
@@ -237,7 +254,8 @@ public class IdentityService : IIdentityService
         string firstName,
         string lastName,
         string gender,
-        string role)
+        string role
+    )
     {
         var user = new ApplicationUser
         {
@@ -245,7 +263,7 @@ public class IdentityService : IIdentityService
             Email = email,
             FirstName = firstName,
             LastName = lastName,
-            Gender = gender
+            Gender = gender,
         };
 
         var result = await _userManager.CreateAsync(user, password);
@@ -256,8 +274,9 @@ public class IdentityService : IIdentityService
         return Result.Success();
     }
 
-    private async Task<(Result Result, UserInfoResponse? Response)>
-        GetUserByIdInternalAsync(string userId)
+    private async Task<(Result Result, UserInfoResponse? Response)> GetUserByIdInternalAsync(
+        string userId
+    )
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
@@ -272,7 +291,8 @@ public class IdentityService : IIdentityService
                 user.LastName!,
                 user.UserName!,
                 user.Gender!,
-                new List<string>())
+                new List<string>()
+            )
         );
     }
 
@@ -305,7 +325,10 @@ public class IdentityService : IIdentityService
     }
 
     private async Task<Result> ResetPasswordInternalAsync(
-        string email, string token, string newPassword)
+        string email,
+        string token,
+        string newPassword
+    )
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
@@ -341,7 +364,7 @@ public class IdentityService : IIdentityService
             ValidateAudience = false,
             ValidateLifetime = false,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key)
+            IssuerSigningKey = new SymmetricSecurityKey(key),
         };
 
         var handler = new JwtSecurityTokenHandler();
@@ -355,7 +378,7 @@ public class IdentityService : IIdentityService
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id),
-            new(ClaimTypes.Email, user.Email!)
+            new(ClaimTypes.Email, user.Email!),
         };
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -368,7 +391,8 @@ public class IdentityService : IIdentityService
             expires: _clock.UtcNow.UtcDateTime.AddMinutes(_jwtOptions.ExpiryMinutes),
             signingCredentials: new SigningCredentials(
                 new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256)
+                SecurityAlgorithms.HmacSha256
+            )
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -378,7 +402,8 @@ public class IdentityService : IIdentityService
         string userId,
         string? firstName,
         string? lastName,
-        string? gender)
+        string? gender
+    )
     {
         if (string.IsNullOrWhiteSpace(userId))
             return ServiceResult<UserInfoResponse>.Fail("User not authenticated.");
@@ -412,7 +437,8 @@ public class IdentityService : IIdentityService
             );
 
             return ServiceResult<UserInfoResponse>.Fail(
-                updateResult.Errors.Select(e => e.Description));
+                updateResult.Errors.Select(e => e.Description)
+            );
         }
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -435,5 +461,31 @@ public class IdentityService : IIdentityService
     public Task<ServiceResult<string>> DeleteUserAsync(string userId)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<ServiceResult<List<UserInfoResponse>>> GetAllUsersAsync()
+    {
+        var users = _userManager.Users.ToList();
+
+        var mapped = new List<UserInfoResponse>();
+
+        foreach (var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+
+            mapped.Add(
+                new UserInfoResponse(
+                    user.Id,
+                    user.Email ?? string.Empty,
+                    user.FirstName ?? string.Empty,
+                    user.LastName ?? string.Empty,
+                    user.UserName ?? string.Empty,
+                    user.Gender ?? string.Empty,
+                    roles.ToList()
+                )
+            );
+        }
+
+        return ServiceResult<List<UserInfoResponse>>.Success(mapped);
     }
 }

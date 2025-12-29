@@ -11,6 +11,7 @@ using ShoppingProject.Application.Identity.Commands.RefreshToken;
 using ShoppingProject.Application.Identity.Commands.Register;
 using ShoppingProject.Application.Identity.Commands.ResetPassword;
 using ShoppingProject.Application.Identity.Commands.UpdateMe;
+using ShoppingProject.Application.Identity.Queries.GetAllUsers;
 using ShoppingProject.Application.Identity.Queries.GetCurrentUserInfo;
 using ShoppingProject.Domain.Constants;
 
@@ -28,6 +29,14 @@ public class IdentityController : ControllerBase
         _sender = sender;
     }
 
+    [HttpGet("users")]
+    [Authorize(Policy = Policies.RequireAdministratorRole)]
+    [ProducesResponseType(typeof(ServiceResult<List<UserInfoResponse>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ServiceResult<List<UserInfoResponse>>>> GetAllUsers()
+    {
+        return Ok(await _sender.Send(new GetAllUsersQuery()));
+    }
+
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ServiceResult<AuthResponse>), StatusCodes.Status200OK)]
@@ -39,7 +48,9 @@ public class IdentityController : ControllerBase
     [HttpPost("refresh-token")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ServiceResult<AuthResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServiceResult<AuthResponse>>> RefreshToken(RefreshTokenCommand command)
+    public async Task<ActionResult<ServiceResult<AuthResponse>>> RefreshToken(
+        RefreshTokenCommand command
+    )
     {
         return Ok(await _sender.Send(command));
     }
@@ -47,20 +58,20 @@ public class IdentityController : ControllerBase
     [HttpPost("register")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServiceResult<string>>> Register(RegisterCommand command)
-        => Ok(await _sender.Send(command));
+    public async Task<ActionResult<ServiceResult<string>>> Register(RegisterCommand command) =>
+        Ok(await _sender.Send(command));
 
     [HttpPost("{userId}/assign-admin-role")]
     [Authorize(Policy = Policies.RequireAdministratorRole)]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServiceResult<string>>> AssignAdminRole(string userId)
-        => Ok(await _sender.Send(new AssignAdminRoleCommand(userId, Roles.Administrator)));
+    public async Task<ActionResult<ServiceResult<string>>> AssignAdminRole(string userId) =>
+        Ok(await _sender.Send(new AssignAdminRoleCommand(userId, Roles.Administrator)));
 
     [HttpPost("roles/{roleName}")]
     [Authorize(Policy = Policies.RequireAdministratorRole)]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServiceResult<string>>> CreateRole(string roleName)
-        => Ok(await _sender.Send(new CreateRoleCommand(roleName)));
+    public async Task<ActionResult<ServiceResult<string>>> CreateRole(string roleName) =>
+        Ok(await _sender.Send(new CreateRoleCommand(roleName)));
 
     [HttpGet("me")]
     [Authorize]
@@ -75,7 +86,9 @@ public class IdentityController : ControllerBase
     [Authorize]
     [ProducesResponseType(typeof(ServiceResult<UserInfoResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<ServiceResult<UserInfoResponse>>> UpdateMe(UpdateMeCommand command)
+    public async Task<ActionResult<ServiceResult<UserInfoResponse>>> UpdateMe(
+        UpdateMeCommand command
+    )
     {
         return Ok(await _sender.Send(command));
     }
@@ -83,7 +96,9 @@ public class IdentityController : ControllerBase
     [HttpPost("forgot-password")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServiceResult<string>>> ForgotPassword(ForgotPasswordCommand command)
+    public async Task<ActionResult<ServiceResult<string>>> ForgotPassword(
+        ForgotPasswordCommand command
+    )
     {
         return Ok(await _sender.Send(command));
     }
@@ -91,7 +106,9 @@ public class IdentityController : ControllerBase
     [HttpPost("reset-password")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ServiceResult<string>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServiceResult<string>>> ResetPassword(ResetPasswordCommand command)
+    public async Task<ActionResult<ServiceResult<string>>> ResetPassword(
+        ResetPasswordCommand command
+    )
     {
         return Ok(await _sender.Send(command));
     }
