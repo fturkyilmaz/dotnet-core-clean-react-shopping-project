@@ -31,10 +31,14 @@ public class IdentityController : ControllerBase
 
     [HttpGet("users")]
     [Authorize(Policy = Policies.RequireAdministratorRole)]
-    [ProducesResponseType(typeof(ServiceResult<PaginatedList<UserInfoResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(
+        typeof(ServiceResult<PaginatedList<UserInfoResponse>>),
+        StatusCodes.Status200OK
+    )]
     public async Task<ActionResult<ServiceResult<PaginatedList<UserInfoResponse>>>> GetAllUsers(
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+        [FromQuery] int pageSize = 10
+    )
     {
         return Ok(await _sender.Send(new GetAllUsersQuery(pageNumber, pageSize)));
     }
