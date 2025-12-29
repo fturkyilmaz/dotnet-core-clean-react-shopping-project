@@ -13,9 +13,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SignOutDialog } from '@/components/sign-out-dialog'
+import { useCurrentUser } from '@/hooks/useAuth'
 
 export function ProfileDropdown() {
   const [open, setOpen] = useDialogState()
+  const { data: user } = useCurrentUser(true)
+  const initials = (user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')
 
   return (
     <>
@@ -24,16 +27,16 @@ export function ProfileDropdown() {
           <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
             <Avatar className='h-8 w-8'>
               <AvatarImage src='/avatars/01.png' alt='@shadcn' />
-              <AvatarFallback>SN</AvatarFallback>
+              <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-56' align='end' forceMount>
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col gap-1.5'>
-              <p className='text-sm leading-none font-medium'>satnaing</p>
+              <p className='text-sm leading-none font-medium'>{user?.firstName} {user?.lastName}</p>
               <p className='text-xs leading-none text-muted-foreground'>
-                satnaingdev@gmail.com
+                {user?.email}
               </p>
             </div>
           </DropdownMenuLabel>
