@@ -1,17 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Application.Products.Specifications;
 using ShoppingProject.Application.DTOs;
+using ShoppingProject.Application.Products.Queries.GetAllProducts;
 
 namespace ShoppingProject.Application.Products.Queries.GetProducts;
 
-public class GetProductsQueryHandler
-    : IRequestHandler<GetProductsQuery, IEnumerable<ProductDto>>
+public class GetAllProductsQueryHandler
+    : IRequestHandler<GetAllProductsQuery, IEnumerable<AdminProductDto>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
 
-    public GetProductsQueryHandler(
+    public GetAllProductsQueryHandler(
         IApplicationDbContext context,
         IMapper mapper)
     {
@@ -19,16 +19,14 @@ public class GetProductsQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ProductDto>> Handle(
-        GetProductsQuery request,
+    public async Task<IEnumerable<AdminProductDto>> Handle(
+        GetAllProductsQuery request,
         CancellationToken cancellationToken)
     {
-        var spec = ActiveProductsSpecification.Create();
 
         return await _context.Products
-            .Where(spec.Criteria!)
-            .OrderBy(spec.OrderBy!)
-            .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
+            .AsNoTracking()
+            .ProjectTo<AdminProductDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
     }
 }

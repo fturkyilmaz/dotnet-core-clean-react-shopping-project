@@ -9,3 +9,14 @@ public record ProductDto(
     string Image,
     RatingDto? Rating
 );
+
+public record AdminProductDto(
+    int Id,
+    string Title,
+    decimal Price,
+    string Description,
+    string Category,
+    string Image,
+    string Status,
+    RatingDto? Rating
+);

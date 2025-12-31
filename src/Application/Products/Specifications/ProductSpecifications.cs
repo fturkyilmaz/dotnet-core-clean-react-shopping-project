@@ -3,10 +3,10 @@ using ShoppingProject.Domain.Entities;
 
 namespace ShoppingProject.Application.Products.Specifications;
 
-public sealed class ActiveProductsSpecification : BaseSpecification<Product>
+public sealed class ActiveProductsSpecification
+    : ActiveSpecification<Product>
 {
-    public ActiveProductsSpecification()
-        : base(p => p.Price > 0) { }
+    private ActiveProductsSpecification() { }
 
     public static ActiveProductsSpecification Create()
     {

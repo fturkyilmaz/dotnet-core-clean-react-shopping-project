@@ -9,6 +9,7 @@ using ShoppingProject.Application.DTOs;
 using ShoppingProject.Application.Products.Commands.CreateProduct;
 using ShoppingProject.Application.Products.Commands.DeleteProduct;
 using ShoppingProject.Application.Products.Commands.UpdateProduct;
+using ShoppingProject.Application.Products.Queries.GetAllProducts;
 using ShoppingProject.Application.Products.Queries.GetProductById;
 using ShoppingProject.Application.Products.Queries.GetProducts;
 using ShoppingProject.Application.Products.Queries.GetProductWithPagination;
@@ -40,10 +41,22 @@ namespace ShoppingProject.WebApi.Controllers
             typeof(ServiceResult<IEnumerable<ProductDto>>),
             StatusCodes.Status200OK
         )]
-        public async Task<ActionResult<ServiceResult<IEnumerable<ProductDto>>>> GetAll()
+        public async Task<ActionResult<ServiceResult<IEnumerable<ProductDto>>>> GetList()
         {
             var products = await _sender.Send(new GetProductsQuery());
             return ServiceResult<IEnumerable<ProductDto>>.Success(products);
+        }
+
+        [HttpGet("all")]
+        [Authorize(Policies.RequireAdministratorRole)]
+        [ProducesResponseType(
+            typeof(ServiceResult<IEnumerable<ProductDto>>),
+            StatusCodes.Status200OK
+        )]
+        public async Task<ActionResult<ServiceResult<IEnumerable<AdminProductDto>>>> GetAllForAdmin()
+        {
+            var products = await _sender.Send(new GetAllProductsQuery());
+            return ServiceResult<IEnumerable<AdminProductDto>>.Success(products);
         }
 
         [HttpGet("paged")]
