@@ -26,7 +26,6 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "CMS API", Version = "v1" });
             options.AddSecurityDefinition(schemeId, new OpenApiSecurityScheme
             {
                 Type = SecuritySchemeType.Http,
