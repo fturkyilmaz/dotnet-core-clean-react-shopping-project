@@ -1,10 +1,8 @@
 using Asp.Versioning;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi;
 using ShoppingProject.Infrastructure.Constants;
-using ShoppingProject.WebApi.Extensions;
 using ShoppingProject.WebApi.Handlers;
 
 namespace ShoppingProject.WebApi;
@@ -24,8 +22,25 @@ public static class DependencyInjection
         services.AddProblemDetails();
 
         // Swagger
+        const string schemeId = "bearer";
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "CMS API", Version = "v1" });
+            options.AddSecurityDefinition(schemeId, new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = schemeId, // lowercase per RFC 7235
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "JWT Authorization header using Bearer scheme",
+                Name = "Authorization",
+            });
+
+            options.AddSecurityRequirement(document => new() { [new OpenApiSecuritySchemeReference("Bearer", document)] = [] });
+        });
+
+
         services.ConfigureOptions<ConfigureSwaggerOptions>();
 
         // API Versioning
