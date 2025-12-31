@@ -6,19 +6,24 @@ This is a full-stack e-commerce application built with .NET Core 9/10, React.js,
 
 ## 🚀 Technology Stack
 
-- **Core Framework**: .NET 9/10 (C#)
+- **Core Framework**: .NET 9/10 (C#) ASP.NET Core
 - **Frontend**: React.js, React Native, Tailwind, Redux Toolkit, Firebase, Context API, React Query, Nativewind
 - **Architecture**: Clean Architecture, CQRS (MediatR)
 - **Database**: PostgreSQL (Entity Framework Core)
 - **Caching**: Redis (Distributed Cache)
 - **Messaging**: RabbitMQ (MassTransit)
 - **Background Jobs**: Hangfire
-- **Logging & Observability**: ELK Stack (Elasticsearch, Logstash, Kibana), Serilog
+- **Logging & Observability**: ELK Stack (Elasticsearch, Logstash, Kibana), Serilog, OpenTelemetry (Tracing + Metrics + Logs)
+
+Custom ActivitySource for Application layer
 - **Monitoring**: Health Checks, Health Checks UI
 - **Validation**: FluentValidation
 - **Object Mapping**: AutoMapper
 - **API Documentation**: Swagger / OpenAPI
 - **Testing**: xUnit, Moq, FluentAssertions
+
+
+
 
 ## 🏗️ Architecture Overview
 
