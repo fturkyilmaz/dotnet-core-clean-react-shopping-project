@@ -36,9 +36,12 @@ ShoppingProject/
 ├── Domain/             # Enterprise/domain entities & business rules
 ├── Application/        # Business logic & use cases
 ├── Infrastructure/     # External concerns (database, file systems, etc.)
-├── WebApi/             # User interface & API endpoints
-├── Web/                # Frontend React.js application
-└── UnitTests/          # Unit tests for all layers
+├── Presentation/       # API, Web, Admin, Mobile App project
+    ├── API/             # .Net Core API application
+    ├── Web/             # Frontend React.js application
+    ├── Mobile/          # Frontend React Native mobile application
+    ├── Admin/           # Frontend React Vite shadcn ui admin  application
+└── Tests/              # Unit tests and Integration tests for all layers
 ```
 
 ## ✨ Key Features
