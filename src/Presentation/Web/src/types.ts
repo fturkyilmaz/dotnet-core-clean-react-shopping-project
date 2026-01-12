@@ -40,11 +40,36 @@ export interface Paginate<T> {
   hasNext: boolean;
 }
 
- export interface UserInfoResponse {
+export interface UserInfoResponse {
   id: string;
   userName: string;
   email: string;
   firstName: string;
   lastName: string;
   gender: string;
+}
+
+export interface AuditLog {
+  id: number;
+  userId?: string;
+  userEmail?: string;
+  action?: string;
+  entityName?: string;
+  entityId?: string;
+  oldValues?: string;
+  newValues?: string;
+  timestamp: string;
+  correlationId?: string;
+  remoteIp?: string;
+  userAgent?: string;
+  hash?: string;
+}
+
+export interface PaginatedList<T> {
+  items: T[];
+  pageNumber: number;
+  totalPages: number;
+  totalCount: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }

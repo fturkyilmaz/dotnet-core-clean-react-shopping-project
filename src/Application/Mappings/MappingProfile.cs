@@ -1,4 +1,3 @@
-using AutoMapper;
 using ShoppingProject.Application.DTOs;
 using ShoppingProject.Domain.Common;
 using ShoppingProject.Domain.Entities;
@@ -11,7 +10,8 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         // Entity to DTO mappings
-        CreateMap<Product, ProductDto>().ReverseMap();
+        CreateMap<Product, ProductDto>();
+        CreateMap<Product, AdminProductDto>();
         CreateMap<CreateProductDto, Product>();
         CreateMap<UpdateProductDto, Product>();
         CreateMap<Rating, RatingDto>().ReverseMap();

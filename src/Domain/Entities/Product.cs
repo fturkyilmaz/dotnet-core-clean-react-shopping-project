@@ -1,6 +1,3 @@
-using System;
-using ShoppingProject.Domain.Common;
-using ShoppingProject.Domain.Events;
 using ShoppingProject.Domain.ValueObjects;
 
 namespace ShoppingProject.Domain.Entities
@@ -59,11 +56,13 @@ namespace ShoppingProject.Domain.Entities
         public void UpdateRating(Rating newRating)
         {
             Rating = newRating;
-            // Assuming we might want an event here too, but staying strictly to plan for now.
-            // Actually ProductRatingUpdatedEvent exists in ProductEvents.cs, let's use it if we had the params.
-            // But Rating value object encapsulates rate/count. Let's just set it for now or check if we need to emit.
-            // The existing ProductRatingUpdatedEvent takes (int productId, double newRating, int totalRatings).
             AddDomainEvent(new ProductRatingUpdatedEvent(Id, Rating.Rate, Rating.Count));
+        }
+
+        public void UpdateStatus(EntityStatus newStatus)
+        {
+            Status = newStatus;
+            AddDomainEvent(new ProductStatusChangedEvent(Id, newStatus));
         }
     }
 }
