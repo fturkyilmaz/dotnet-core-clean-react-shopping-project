@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, FlatList, Image, Alert, ActivityIndicator } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
-import { CartItem } from '@/types';
+import { CartItem, NavigationProp } from '@/types';
 import {
     fetchCart,
     updateCartItem,
@@ -12,11 +12,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import Toast from 'react-native-toast-message';
-import { useEffect } from 'react';
 import { useNetworkStatus } from '@/presentation/shared/hooks/useNetworkStatus';
 import { OfflineMessage } from '@/presentation/shared/components/OfflineIndicator';
 import { useNavigation } from '@react-navigation/native';
-import { NavigationProp } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks';
 
 export default function CartScreen() {
@@ -33,12 +31,12 @@ export default function CartScreen() {
     }, [dispatch]);
 
     const handleIncreaseQuantity = (item: CartItem) => {
-        dispatch(updateCartItem({ cartId: item.id, productId: item.id, quantity: item.quantity + 1 }));
+        dispatch(updateCartItem({ cartId: item.id, ...item, quantity: item.quantity + 1 }));
     };
 
     const handleDecreaseQuantity = (item: CartItem) => {
         if (item.quantity > 1) {
-            dispatch(updateCartItem({ cartId: item.id, productId: item.id, quantity: item.quantity - 1 }));
+            dispatch(updateCartItem({ cartId: item.id, ...item, quantity: item.quantity - 1 }));
         }
     };
 

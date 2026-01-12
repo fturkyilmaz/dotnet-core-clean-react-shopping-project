@@ -2,6 +2,8 @@ import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProducts, useDeleteProduct } from '@/presentation/features/product/hooks/useProducts';
 import Loader from '@/presentation/shared/components/Loader';
+import { Button } from "@/components/ui/button"
+
 
 const AdminDashboard: FC = () => {
     const navigate = useNavigate();
@@ -44,6 +46,8 @@ const AdminDashboard: FC = () => {
                     <p className="text-muted">Manage your e-commerce platform</p>
                 </div>
             </div>
+
+            <Button>shadcn works</Button>
 
             {/* Statistics Cards */}
             <div className="row g-4 mb-4">
@@ -208,6 +212,10 @@ const AdminDashboard: FC = () => {
                                     <button className="btn btn-outline-primary">
                                         <i className="bi bi-people me-2"></i>
                                         Manage Users
+                                    </button>
+                                    <button className="btn btn-outline-primary" onClick={() => navigate('/admin/audit-logs')}>
+                                        <i className="bi bi-clock-history me-2"></i>
+                                        View Audit Logs
                                     </button>
                                     <button className="btn btn-outline-primary">
                                         <i className="bi bi-gear me-2"></i>

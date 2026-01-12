@@ -3,46 +3,93 @@ using ShoppingProject.Domain.Entities;
 
 namespace ShoppingProject.Application.Products.Specifications;
 
-public class ActiveProductsSpecification : BaseSpecification<Product>
+public sealed class ActiveProductsSpecification
+    : ActiveSpecification<Product>
 {
-    public ActiveProductsSpecification()
-        : base(p => p.Price > 0) // Example: active products have price > 0
-    {
-    }
+    private ActiveProductsSpecification() { }
 
-    public void Initialize()
+    public static ActiveProductsSpecification Create()
     {
-        ApplyOrderBy(p => p.Title);
+        var spec = new ActiveProductsSpecification();
+        spec.ApplyOrderBy(p => p.Title);
+        return spec;
     }
 }
 
-public class ProductsByCategorySpecification : BaseSpecification<Product>
+public sealed class ProductsByCategorySpecification : BaseSpecification<Product>
 {
-    public ProductsByCategorySpecification(string category)
-        : base(p => p.Category == category)
-    {
-    }
+    private ProductsByCategorySpecification(string category)
+        : base(p => p.Category == category) { }
 
-    public void Initialize()
+    public static ProductsByCategorySpecification Create(string category)
     {
-        ApplyOrderBy(p => p.Title);
+        var spec = new ProductsByCategorySpecification(category);
+        spec.ApplyOrderBy(p => p.Title);
+        return spec;
     }
 }
 
-public class ProductsWithPaginationSpecification : BaseSpecification<Product>
+public sealed class ProductsWithPaginationSpecification : BaseSpecification<Product>
 {
-    private readonly int _skip;
-    private readonly int _take;
+    private ProductsWithPaginationSpecification(int skip, int take) { }
 
-    public ProductsWithPaginationSpecification(int skip, int take)
+    public static ProductsWithPaginationSpecification Create(int skip, int take)
     {
-        _skip = skip;
-        _take = take;
+        var spec = new ProductsWithPaginationSpecification(skip, take);
+        spec.ApplyPaging(skip, take);
+        spec.ApplyOrderBy(p => p.Id);
+        return spec;
+    }
+}
+
+public sealed class ProductsByCategoryWithPaginationSpecification : BaseSpecification<Product>
+{
+    private ProductsByCategoryWithPaginationSpecification(string category)
+        : base(p => p.Category == category) { }
+
+    public static ProductsByCategoryWithPaginationSpecification Create(
+        string category,
+        int skip,
+        int take
+    )
+    {
+        var spec = new ProductsByCategoryWithPaginationSpecification(category);
+        spec.ApplyPaging(skip, take);
+        spec.ApplyOrderBy(p => p.Title);
+        return spec;
+    }
+}
+
+public sealed class SearchProductsSpecification : BaseSpecification<Product>
+{
+    private SearchProductsSpecification(string searchTerm)
+        : base(p => p.Title.Contains(searchTerm) || p.Description.Contains(searchTerm)) { }
+
+    public static SearchProductsSpecification Create(string searchTerm)
+    {
+        var spec = new SearchProductsSpecification(searchTerm);
+        spec.ApplyOrderBy(p => p.Title);
+        return spec;
     }
 
-    public void Initialize()
+    public static SearchProductsSpecification Create(string searchTerm, int skip, int take)
     {
-        ApplyPaging(_skip, _take);
-        ApplyOrderBy(p => p.Id);
+        var spec = new SearchProductsSpecification(searchTerm);
+        spec.ApplyPaging(skip, take);
+        spec.ApplyOrderBy(p => p.Title);
+        return spec;
+    }
+}
+
+public sealed class ProductsByPriceRangeSpecification : BaseSpecification<Product>
+{
+    private ProductsByPriceRangeSpecification(decimal minPrice, decimal maxPrice)
+        : base(p => p.Price >= minPrice && p.Price <= maxPrice) { }
+
+    public static ProductsByPriceRangeSpecification Create(decimal minPrice, decimal maxPrice)
+    {
+        var spec = new ProductsByPriceRangeSpecification(minPrice, maxPrice);
+        spec.ApplyOrderBy(p => p.Price);
+        return spec;
     }
 }

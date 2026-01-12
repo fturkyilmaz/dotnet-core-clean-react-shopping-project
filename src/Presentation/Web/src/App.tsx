@@ -22,6 +22,7 @@ const LoginPage = lazy(() => import('@/presentation/features/auth/pages/LoginPag
 const RegisterPage = lazy(() => import('@/presentation/features/auth/pages/RegisterPage'));
 const AdminDashboard = lazy(() => import('@/presentation/features/admin/pages/AdminDashboard'));
 const AddProductPage = lazy(() => import('@/presentation/features/admin/pages/AddProductPage'));
+const AuditLogsPage = lazy(() => import('@/presentation/features/admin/pages/AuditLogsPage'));
 const NotFoundPage = lazy(() => import('@/presentation/shared/pages/NotFoundPage'));
 
 // Loading fallback component
@@ -51,6 +52,7 @@ const App = () => {
                   <Route path="/register" element={<RegisterPage />} />
                   <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/admin/products/add" element={<ProtectedRoute requireAdmin><AddProductPage /></ProtectedRoute>} />
+                  <Route path="/admin/audit-logs" element={<ProtectedRoute requireAdmin><AuditLogsPage /></ProtectedRoute>} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </Suspense>

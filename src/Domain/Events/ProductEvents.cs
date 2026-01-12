@@ -41,3 +41,15 @@ public sealed class ProductRatingUpdatedEvent : BaseEvent
     public double NewRating { get; }
     public int TotalRatings { get; }
 }
+
+public sealed class ProductStatusChangedEvent : BaseEvent
+{
+    public ProductStatusChangedEvent(int productId, EntityStatus newStatus)
+    {
+        ProductId = productId;
+        Status = newStatus;
+    }
+
+    public int ProductId { get; }
+    public EntityStatus Status { get; }
+}

@@ -17,7 +17,8 @@ public static class InitialiserExtensions
     {
         using var scope = app.Services.CreateScope();
 
-        var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
+        var initialiser =
+            scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
 
         await initialiser.InitialiseAsync();
         await initialiser.SeedAsync();
@@ -28,17 +29,21 @@ public class ApplicationDbContextInitialiser
 {
     private readonly ILogger<ApplicationDbContextInitialiser> _logger;
     private readonly ApplicationDbContext _context;
+    private readonly AuditDbContext _auditContext;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
 
     public ApplicationDbContextInitialiser(
         ILogger<ApplicationDbContextInitialiser> logger,
         ApplicationDbContext context,
+        AuditDbContext auditContext,
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole> roleManager
+    )
     {
         _logger = logger;
         _context = context;
+        _auditContext = auditContext;
         _userManager = userManager;
         _roleManager = roleManager;
     }
@@ -48,6 +53,7 @@ public class ApplicationDbContextInitialiser
         try
         {
             await _context.Database.MigrateAsync();
+            await _auditContext.Database.MigrateAsync();
         }
         catch (Exception ex)
         {
