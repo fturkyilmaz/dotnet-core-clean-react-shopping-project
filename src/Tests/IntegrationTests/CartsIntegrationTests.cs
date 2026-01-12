@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Bogus;
 using Microsoft.AspNetCore.Mvc.Testing;
 using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Application.DTOs;

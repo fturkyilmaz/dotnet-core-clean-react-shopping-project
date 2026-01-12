@@ -36,7 +36,8 @@ builder.Services.AddWebApiServices(builder.Configuration);
 builder.Services.AddOutputCache();
 
 // Health Checks
-builder.Services.AddHealthChecks()
+builder
+    .Services.AddHealthChecks()
     .AddNpgSql(
         builder.Configuration.GetConnectionString(
             ConfigurationConstants.ConnectionStrings.DefaultConnection
@@ -51,27 +52,33 @@ builder.Services.AddHealthChecks()
         name: "redis",
         tags: new[] { "ready" }
     )
-    .AddRabbitMQ(sp =>
-    {
-        var connStr = builder.Configuration.GetConnectionString(
-            ShoppingProject.Infrastructure.Constants.ConfigurationConstants.ConnectionStrings.RabbitMqConnection
-        )!;
-
-        var factory = new ConnectionFactory
+    .AddRabbitMQ(
+        sp =>
         {
-            Uri = new Uri(connStr),
-            AutomaticRecoveryEnabled = true,
-            TopologyRecoveryEnabled = true
-        };
+            var connStr = builder.Configuration.GetConnectionString(
+                ShoppingProject
+                    .Infrastructure
+                    .Constants
+                    .ConfigurationConstants
+                    .ConnectionStrings
+                    .RabbitMqConnection
+            )!;
 
-        // v7+ için: sadece async bağlantı mevcut
-        return factory.CreateConnectionAsync().GetAwaiter().GetResult();
-    },
-    name: "rabbitmq",
-    tags: new[] { "ready" });
+            var factory = new ConnectionFactory
+            {
+                Uri = new Uri(connStr),
+                AutomaticRecoveryEnabled = true,
+                TopologyRecoveryEnabled = true,
+            };
 
-builder.Services.AddHealthChecksUI()
-    .AddInMemoryStorage();
+            // v7+ için: sadece async bağlantı mevcut
+            return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+        },
+        name: "rabbitmq",
+        tags: new[] { "ready" }
+    );
+
+builder.Services.AddHealthChecksUI().AddInMemoryStorage();
 
 var app = builder.Build();
 
@@ -81,14 +88,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         app.DescribeApiVersions()
-           .Select(d => d.GroupName)
-           .ToList()
-           .ForEach(groupName =>
-               options.SwaggerEndpoint(
-                   $"/swagger/{groupName}/swagger.json",
-                   groupName.ToUpperInvariant()
-               )
-           );
+            .Select(d => d.GroupName)
+            .ToList()
+            .ForEach(groupName =>
+                options.SwaggerEndpoint(
+                    $"/swagger/{groupName}/swagger.json",
+                    groupName.ToUpperInvariant()
+                )
+            );
     });
 }
 
@@ -102,6 +109,7 @@ using (var scope = app.Services.CreateScope())
 app.UseIpRateLimiting();
 
 // Middleware pipeline
+app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();

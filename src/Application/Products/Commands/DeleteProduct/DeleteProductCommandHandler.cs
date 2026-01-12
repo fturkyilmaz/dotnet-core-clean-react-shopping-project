@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Domain.Constants;
+using ShoppingProject.Domain.Enums;
 using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Products.Commands.DeleteProduct;
@@ -20,10 +20,13 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
 
         Guard.Against.NotFound(request.Id, entity);
 
-        _context.Remove(entity);
+        entity!.UpdateStatus(
+            EntityStatus.Deleted
+        );
 
-        entity.AddDomainEvent(new ProductDeletedEvent(entity));
+        entity.RemoveDomainEvent(new ProductDeletedEvent(entity));
 
         await _context.SaveChangesAsync(cancellationToken);
     }
+
 }

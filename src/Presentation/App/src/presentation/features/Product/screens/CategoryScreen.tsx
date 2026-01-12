@@ -5,7 +5,6 @@ import { externalApi } from '@/services/api';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export default function CategoryScreen({ navigation }: any) {
     const { theme } = useTheme();
@@ -27,7 +26,7 @@ export default function CategoryScreen({ navigation }: any) {
             <View className="flex-row items-center gap-4">
                 <View className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl items-center justify-center">
                     <Ionicons
-                        name={index === 0 ? "hardware-chip-outline" : index === 1 ? "diamond-outline" : "shirt-outline"}
+                        name={index === 0 ? "hardware-chip-outline" : index === 1 ? "diamond-outline" : index === 2 ? "shirt-outline" : "woman-outline"}
                         size={24}
                         color={theme === 'dark' ? '#60a5fa' : '#2563eb'}
                     />

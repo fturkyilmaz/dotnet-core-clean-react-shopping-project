@@ -6,23 +6,23 @@ public abstract class BaseEntity
 {
     public int Id { get; set; }
 
+    public EntityStatus Status { get; set; } = EntityStatus.Active;
+
     private readonly List<BaseEvent> _domainEvents = new();
 
     [NotMapped]
     public IReadOnlyCollection<BaseEvent> DomainEvents => _domainEvents.AsReadOnly();
 
-    public void AddDomainEvent(BaseEvent domainEvent)
+    protected void SetStatus(EntityStatus status)
     {
-        _domainEvents.Add(domainEvent);
+        Status = status;
     }
 
-    public void RemoveDomainEvent(BaseEvent domainEvent)
-    {
-        _domainEvents.Remove(domainEvent);
-    }
+    public void Activate() => SetStatus(EntityStatus.Active);
+    public void Deactivate() => SetStatus(EntityStatus.Passive);
+    public void MarkAsDeleted() => SetStatus(EntityStatus.Deleted);
 
-    public void ClearDomainEvents()
-    {
-        _domainEvents.Clear();
-    }
+    public void AddDomainEvent(BaseEvent domainEvent) => _domainEvents.Add(domainEvent);
+    public void RemoveDomainEvent(BaseEvent domainEvent) => _domainEvents.Remove(domainEvent);
+    public void ClearDomainEvents() => _domainEvents.Clear();
 }

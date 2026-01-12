@@ -80,6 +80,11 @@ public class Repository<T> : IRepository<T>
         return await query.ExecuteDeleteAsync(cancellationToken);
     }
 
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.SaveChangesAsync(cancellationToken);
+    }
+
     private IQueryable<T> ApplySpecification(ISpecification<T> spec)
     {
         return SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
