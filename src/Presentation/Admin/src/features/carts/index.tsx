@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Plus, RefreshCw, Trash2 } from 'lucide-react'
-import { useCarts, useDeleteCart, useDeleteAllCarts } from '@/hooks/useCarts'
+import { useCartsPaged, useDeleteCart, useDeleteAllCarts } from '@/hooks/useCarts'
 import { Button } from '@/components/ui/button'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -12,10 +12,28 @@ import { CartDialog } from './components/cart-dialog'
 import { CartDeleteDialog } from './components/cart-delete-dialog'
 import type { CartDto } from '@/lib/api/types'
 
+const DEFAULT_PAGE_SIZE = 10
+
 export function Carts() {
-    const { data: carts, isLoading, refetch, isRefetching } = useCarts()
+    const [pageNumber, setPageNumber] = useState(1)
+    const [pageSize] = useState(DEFAULT_PAGE_SIZE)
+
+    const { data: paginatedData, isLoading, refetch, isRefetching } = useCartsPaged(pageNumber, pageSize)
     const deleteCart = useDeleteCart()
     const deleteAllCarts = useDeleteAllCarts()
+
+    // Extract pagination info
+    const carts = paginatedData?.items || []
+    const totalCount = paginatedData?.totalCount || 0
+    const totalPages = Math.ceil(totalCount / pageSize)
+    const hasPreviousPage = pageNumber > 1
+    const hasNextPage = pageNumber < totalPages
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setPageNumber(newPage)
+        }
+    }
 
     const [dialogOpen, setDialogOpen] = useState(false)
     const [editingCart, setEditingCart] = useState<CartDto | null>(null)
@@ -94,6 +112,12 @@ export function Carts() {
                     isLoading={isLoading}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    pageNumber={pageNumber}
+                    totalPages={totalPages}
+                    totalCount={totalCount}
+                    hasPreviousPage={hasPreviousPage}
+                    hasNextPage={hasNextPage}
+                    onPageChange={handlePageChange}
                 />
             </Main>
 

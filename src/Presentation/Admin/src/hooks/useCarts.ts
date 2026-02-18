@@ -5,13 +5,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { cartsApi } from '@/lib/api/carts'
-import type { CreateCartCommand, UpdateCartCommand } from '@/lib/api/types'
+import type { CartDto, CreateCartCommand, UpdateCartCommand, PaginatedList } from '@/lib/api/types'
+
+// Default page size for pagination
+const DEFAULT_PAGE_SIZE = 10
 
 export const cartKeys = {
     all: ['carts'] as const,
     lists: () => [...cartKeys.all, 'list'] as const,
     details: () => [...cartKeys.all, 'detail'] as const,
     detail: (id: number) => [...cartKeys.details(), id] as const,
+    paged: (pageNumber: number, pageSize: number) =>
+        [...cartKeys.all, 'paged', { pageNumber, pageSize }] as const,
 }
 
 export function useCarts() {
@@ -23,6 +28,39 @@ export function useCarts() {
                 throw new Error(result.message || 'Failed to fetch carts')
             }
             return result.data || []
+        },
+    })
+}
+
+/**
+ * Paginated carts hook - fetches all carts and handles pagination on the client side
+ */
+export function useCartsPaged(pageNumber: number, pageSize: number = DEFAULT_PAGE_SIZE) {
+    return useQuery({
+        queryKey: cartKeys.paged(pageNumber, pageSize),
+        queryFn: async () => {
+            const result = await cartsApi.getAll()
+            if (!result.isSuccess) {
+                throw new Error(result.message || 'Failed to fetch carts')
+            }
+
+            const allCarts = result.data || []
+            const totalCount = allCarts.length
+            const totalPages = Math.ceil(totalCount / pageSize)
+            const startIndex = (pageNumber - 1) * pageSize
+            const endIndex = startIndex + pageSize
+            const paginatedData = allCarts.slice(startIndex, endIndex)
+
+            const paginatedList: PaginatedList<CartDto> = {
+                items: paginatedData,
+                totalCount,
+                pageNumber,
+                totalPages,
+                hasPreviousPage: pageNumber > 1,
+                hasNextPage: pageNumber < totalPages,
+            }
+
+            return paginatedList
         },
     })
 }
