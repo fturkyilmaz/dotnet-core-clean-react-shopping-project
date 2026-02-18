@@ -1,3 +1,5 @@
+import { DollarSign, Users, ShoppingCart, Package } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -7,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -14,11 +17,16 @@ import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { StatisticCard } from './components/statistic-card'
 import { Analytics } from './components/analytics'
 import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
+import { useDashboardStats, useRecentSales } from './hooks/useDashboard'
 
 export function Dashboard() {
+  const { data: stats, isLoading: statsLoading, error: statsError } = useDashboardStats()
+  const { data: recentSales, isLoading: salesLoading, error: salesError } = useRecentSales(5)
+
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -58,109 +66,60 @@ export function Dashboard() {
             </TabsList>
           </div>
           <TabsContent value='overview' className='space-y-4'>
+            {/* Statistics Cards */}
             <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Total Revenue
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>$45,231.89</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +20.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Subscriptions
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-                    <circle cx='9' cy='7' r='4' />
-                    <path d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+2350</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +180.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>Sales</CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <rect width='20' height='14' x='2' y='5' rx='2' />
-                    <path d='M2 10h20' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+12,234</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +19% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Active Now
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+573</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +201 since last hour
-                  </p>
-                </CardContent>
-              </Card>
+              {statsLoading ? (
+                <>
+                  <Skeleton className='h-32' />
+                  <Skeleton className='h-32' />
+                  <Skeleton className='h-32' />
+                  <Skeleton className='h-32' />
+                </>
+              ) : statsError ? (
+                <Card className='col-span-4'>
+                  <CardContent className='pt-6'>
+                    <p className='text-sm text-red-500'>
+                      Failed to load statistics: {(statsError as Error).message}
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : stats ? (
+                <>
+                  <StatisticCard
+                    title='Total Products'
+                    value={stats.totalProducts}
+                    change={stats.productsChange}
+                    icon={Package}
+                    iconColor='text-blue-500'
+                  />
+                  <StatisticCard
+                    title='Total Carts'
+                    value={stats.totalCarts}
+                    change={stats.cartsChange}
+                    icon={ShoppingCart}
+                    iconColor='text-green-500'
+                  />
+                  <StatisticCard
+                    title='Total Users'
+                    value={stats.totalUsers}
+                    change={stats.usersChange}
+                    icon={Users}
+                    iconColor='text-purple-500'
+                  />
+                  <StatisticCard
+                    title='Recent Sales'
+                    value={stats.recentSales}
+                    change={stats.salesChange}
+                    icon={DollarSign}
+                    iconColor='text-orange-500'
+                  />
+                </>
+              ) : (
+                <Skeleton className='h-32 col-span-4' />
+              )}
             </div>
+
+            {/* Overview and Recent Sales */}
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
               <Card className='col-span-1 lg:col-span-4'>
                 <CardHeader>
@@ -174,11 +133,25 @@ export function Dashboard() {
                 <CardHeader>
                   <CardTitle>Recent Sales</CardTitle>
                   <CardDescription>
-                    You made 265 sales this month.
+                    {recentSales
+                      ? `You made ${recentSales.length} sales this month.`
+                      : 'Loading sales data...'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <RecentSales />
+                  {salesLoading ? (
+                    <div className='space-y-2'>
+                      <Skeleton className='h-12' />
+                      <Skeleton className='h-12' />
+                      <Skeleton className='h-12' />
+                    </div>
+                  ) : salesError ? (
+                    <p className='text-sm text-red-500'>
+                      Failed to load recent sales: {(salesError as Error).message}
+                    </p>
+                  ) : (
+                    <RecentSales sales={recentSales || []} />
+                  )}
                 </CardContent>
               </Card>
             </div>
