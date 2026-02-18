@@ -3,6 +3,7 @@
     "name": "ShoppingApp",
     "slug": "shopping-app",
     "version": "1.0.0",
+    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -86,6 +87,10 @@
       "eas": {
         "projectId": "your-project-id-here"
       }
+    },
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
     }
   }
 }

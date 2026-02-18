@@ -8,6 +8,7 @@ import { ThemeProvider, useTheme } from '@/presentation/shared/context/ThemeCont
 import Toast from 'react-native-toast-message';
 import { I18nextProvider } from 'react-i18next';
 import i18n from 'i18n';
+import "@/styles/global.css";
 import { View, ActivityIndicator } from 'react-native';
 import { OfflineIndicator } from '@/presentation/shared/components/OfflineIndicator';
 import { useSignalRConnection } from '@/presentation/shared/hooks/useSignalRConnection';
