@@ -22,7 +22,15 @@ public static class DataSeeder
         {
             if (!await roleManager.RoleExistsAsync(role))
             {
-                await roleManager.CreateAsync(new IdentityRole(role));
+                try
+                {
+                    await roleManager.CreateAsync(new IdentityRole(role));
+                }
+                catch (Exception ex) when (ex.InnerException?.Message.Contains("duplicate key") == true ||
+                                            ex.InnerException?.Message.Contains("RoleNameIndex") == true)
+                {
+                    // Role was created by another process or cache is stale - ignore
+                }
             }
         }
 

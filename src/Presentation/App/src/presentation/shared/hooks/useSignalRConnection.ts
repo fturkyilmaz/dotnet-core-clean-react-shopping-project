@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import secureStorage from '@/infrastructure/services/SecureStorageService';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
@@ -23,7 +23,7 @@ export const useSignalRConnection = () => {
   const [orderConnection, setOrderConnection] = useState<signalR.HubConnection | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [expoPushToken, setExpoPushToken] = useState<string>('');
-  
+
   const notificationListener = useRef<any>(null);
   const responseListener = useRef<any>(null);
 
@@ -43,21 +43,21 @@ export const useSignalRConnection = () => {
     if (Device.isDevice) {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
-      
+
       if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
-      
+
       if (finalStatus !== 'granted') {
         alert('Failed to get push token for push notification!');
         return;
       }
-      
+
       token = (await Notifications.getExpoPushTokenAsync({
         projectId: Constants.expoConfig?.extra?.eas?.projectId,
       })).data;
-      
+
       console.log('Expo Push Token:', token);
     } else {
       // alert('Must use physical device for Push Notifications');
@@ -69,8 +69,8 @@ export const useSignalRConnection = () => {
   useEffect(() => {
     const setupConnections = async () => {
       try {
-        const token = await AsyncStorage.getItem('token');
-        
+        const token = await secureStorage.getItem('token');
+
         if (!token) {
           console.log('No auth token found');
           return;
@@ -148,7 +148,7 @@ export const useSignalRConnection = () => {
       notificationConnection?.stop();
       cartConnection?.stop();
       orderConnection?.stop();
-      
+
       if (notificationListener.current) {
         Notifications.removeNotificationSubscription(notificationListener.current);
       }

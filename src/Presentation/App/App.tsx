@@ -1,9 +1,8 @@
-import './global.css';
 import { useEffect, useState } from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from '@/presentation/store';
+import { store, persistor, AppDispatch } from '@/presentation/store';
 import RootNavigator from '@/presentation/shared/navigation/RootNavigator';
 import { ThemeProvider, useTheme } from '@/presentation/shared/context/ThemeContext';
 import Toast from 'react-native-toast-message';
@@ -17,10 +16,17 @@ import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
 import analyticsService from '@/infrastructure/services/AnalyticsService';
 import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { queryClient } from '@/infrastructure/config/queryClient';
+import { initializeAuth } from '@/presentation/store/slices/authSlice';
 
 function MainApp() {
+    const dispatch = useDispatch<AppDispatch>();
     const { isOnline, isSyncing, pendingCount } = useNetworkStatus();
     useSignalRConnection();
+
+    // Initialize auth state from secure storage on app startup
+    useEffect(() => {
+        dispatch(initializeAuth());
+    }, [dispatch]);
 
     useEffect(() => {
         const initAnalytics = async () => {

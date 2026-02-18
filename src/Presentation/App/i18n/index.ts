@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Localization from 'expo-localization';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
 
 import en from './en.json';
 import tr from './tr.json';
@@ -17,11 +17,11 @@ const LANGUAGE_DETECTOR = {
   detect: async (callback: (lang: string) => void) => {
     try {
       // Check if user has manually selected a language
-      const savedLanguage = await AsyncStorage.getItem('user-language');
+      const savedLanguage = await sqliteRepository.getItem('user-language');
       if (savedLanguage) {
         return callback(savedLanguage);
       }
-      
+
       // Otherwise use device language
       const deviceLanguage = Localization.getLocales()[0].languageCode;
       return callback(deviceLanguage || 'en');
@@ -33,7 +33,7 @@ const LANGUAGE_DETECTOR = {
   init: () => {},
   cacheUserLanguage: async (language: string) => {
     try {
-      await AsyncStorage.setItem('user-language', language);
+      await sqliteRepository.setItem('user-language', language);
     } catch (error) {
       console.log('Error saving language', error);
     }
@@ -50,7 +50,7 @@ i18n
       escapeValue: false, // react already safes from xss
     },
     react: {
-      useSuspense: false, // in case you have any suspense related issues
+      useSuspense: false,
     },
   });
 

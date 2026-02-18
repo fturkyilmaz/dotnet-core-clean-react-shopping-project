@@ -4,8 +4,8 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
+    "android": "expo start:android",
+    "ios": "expo start:ios",
     "web": "expo start --web",
     "lint": "eslint . --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
     "test:e2e": "maestro test .maestro/flows",
@@ -21,7 +21,6 @@
     "@expo/vector-icons": "^15.0.3",
     "@hookform/resolvers": "^5.2.2",
     "@microsoft/signalr": "^8.0.7",
-    "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-firebase/analytics": "^23.5.0",
     "@react-native-firebase/app": "^23.5.0",

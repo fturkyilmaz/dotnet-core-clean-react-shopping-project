@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import secureStorage from '@/infrastructure/services/SecureStorageService';
 
 // Use localhost for iOS simulator, 10.0.2.2 for Android emulator
 const BASE_URL = Platform.OS === 'android'
@@ -16,7 +16,7 @@ const httpClient = axios.create({
 
 httpClient.interceptors.request.use(
   async (config) => {
-    const token = await AsyncStorage.getItem('token');
+    const token = await secureStorage.getItem('token');
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

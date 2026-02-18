@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import secureStorage from '@/infrastructure/services/SecureStorageService';
 import { setToken } from '@/presentation/store/slices/authSlice';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
@@ -14,7 +14,7 @@ export default function RootNavigator() {
     useEffect(() => {
         const checkToken = async () => {
             try {
-                const token = await AsyncStorage.getItem('token');
+                const token = await secureStorage.getItem('token');
                 if (token) {
                     dispatch(setToken(token));
                 }

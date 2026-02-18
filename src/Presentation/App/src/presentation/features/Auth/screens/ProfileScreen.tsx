@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { logout, fetchUserProfile } from '@/presentation/store/slices/authSlice';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
 import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks/useRedux';
 import { colorScheme } from 'nativewind';
 
@@ -28,7 +28,7 @@ const ProfileScreen = () => {
         try {
             console.log('Changing language to:', lang);
 
-            await AsyncStorage.setItem('user-language', lang);
+            await sqliteRepository.setItem('user-language', lang);
             await i18n.changeLanguage(lang);
         } catch (error) {
             console.error('Error changing language:', error);
