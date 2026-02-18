@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Localization from 'expo-localization';
-import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
+import * as SecureStore from 'expo-secure-store';
 
 import en from './en.json';
 import tr from './tr.json';
@@ -17,7 +17,7 @@ const LANGUAGE_DETECTOR = {
   detect: async (callback: (lang: string) => void) => {
     try {
       // Check if user has manually selected a language
-      const savedLanguage = await sqliteRepository.getItem('user-language');
+      const savedLanguage = await SecureStore.getItemAsync('user-language');
       if (savedLanguage) {
         return callback(savedLanguage);
       }
@@ -30,10 +30,10 @@ const LANGUAGE_DETECTOR = {
       callback('en');
     }
   },
-  init: () => {},
+  init: () => { },
   cacheUserLanguage: async (language: string) => {
     try {
-      await sqliteRepository.setItem('user-language', language);
+      await SecureStore.setItemAsync('user-language', language);
     } catch (error) {
       console.log('Error saving language', error);
     }

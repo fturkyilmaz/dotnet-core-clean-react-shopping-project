@@ -1,7 +1,7 @@
 {
     "name": "mobileapp",
     "version": "1.0.0",
-    "main": "index.ts",
+    "main": "expo-router/entry",
     "scripts": {
         "start": "expo start",
         "android": "expo start:android",

@@ -12,7 +12,10 @@
         "src/hooks/*"
       ],
       "@assets/*": [
-        "/assets/*"
+        "src/assets/*"
+      ],
+      "@i18n/*": [
+        "src/i18n/*"
       ]
     },
     "skipLibCheck": true
@@ -22,6 +25,8 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "nativewind-env.d.ts"
+    "nativewind-env.d.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx"
   ]
 }
