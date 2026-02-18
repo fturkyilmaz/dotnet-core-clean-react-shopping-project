@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using ShoppingProject.Infrastructure.Data;
 
 namespace ShoppingProject.Infrastructure.BackgroundJobs;
@@ -10,7 +11,7 @@ public class AuditCleanupWorker : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<AuditCleanupWorker> _logger;
-    private readonly int _retentionDays = 90; // Should be in config
+    private readonly int _retentionDays = 90;
 
     public AuditCleanupWorker(IServiceProvider serviceProvider, ILogger<AuditCleanupWorker> logger)
     {
@@ -32,6 +33,15 @@ public class AuditCleanupWorker : BackgroundService
                 using var scope = _serviceProvider.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<AuditDbContext>();
 
+                // Check if the table exists
+                var tableExists = await CheckTableExistsAsync(dbContext);
+                if (!tableExists)
+                {
+                    _logger.LogWarning("AuditLogs table does not exist. Skipping cleanup.");
+                    await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+                    continue;
+                }
+
                 var cutoffDate = DateTimeOffset.UtcNow.AddDays(-_retentionDays);
 
                 var deletedCount = await dbContext
@@ -43,6 +53,10 @@ public class AuditCleanupWorker : BackgroundService
                     deletedCount
                 );
             }
+            catch (NpgsqlException ex) when (ex.SqlState == "42P01") // Table does not exist
+            {
+                _logger.LogWarning(ex, "AuditLogs table does not exist. Skipping cleanup.");
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred during audit log cleanup.");
@@ -50,6 +64,19 @@ public class AuditCleanupWorker : BackgroundService
 
             // Run once per day
             await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+        }
+    }
+
+    private static async Task<bool> CheckTableExistsAsync(AuditDbContext context)
+    {
+        try
+        {
+            await context.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"AuditLogs\" LIMIT 1");
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 }
