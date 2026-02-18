@@ -13,10 +13,11 @@ import { CartDeleteDialog } from './components/cart-delete-dialog'
 import type { CartDto } from '@/lib/api/types'
 
 const DEFAULT_PAGE_SIZE = 10
+const PAGE_SIZE_OPTIONS = [10, 20, 30, 50] as const
 
 export function Carts() {
     const [pageNumber, setPageNumber] = useState(1)
-    const [pageSize] = useState(DEFAULT_PAGE_SIZE)
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
 
     const { data: paginatedData, isLoading, refetch, isRefetching } = useCartsPaged(pageNumber, pageSize)
     const deleteCart = useDeleteCart()
@@ -33,6 +34,11 @@ export function Carts() {
         if (newPage >= 1 && newPage <= totalPages) {
             setPageNumber(newPage)
         }
+    }
+
+    const handlePageSizeChange = (newSize: number) => {
+        setPageSize(newSize)
+        setPageNumber(1) // Reset to first page when page size changes
     }
 
     const [dialogOpen, setDialogOpen] = useState(false)
@@ -118,6 +124,9 @@ export function Carts() {
                     hasPreviousPage={hasPreviousPage}
                     hasNextPage={hasNextPage}
                     onPageChange={handlePageChange}
+                    pageSize={pageSize}
+                    onPageSizeChange={handlePageSizeChange}
+                    pageSizeOptions={PAGE_SIZE_OPTIONS}
                 />
             </Main>
 

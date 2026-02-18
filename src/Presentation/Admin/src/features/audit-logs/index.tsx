@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
+import { RefreshCw, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
 import { useAuditLogs } from '@/hooks/useAuditLogs'
 import { Button } from '@/components/ui/button'
 import { Header } from '@/components/layout/header'
@@ -16,12 +16,13 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 export function AuditLogs() {
     const [pageNumber, setPageNumber] = useState(1)
     const pageSize = 10
 
-    const { data, isLoading, refetch, isRefetching } = useAuditLogs(pageNumber, pageSize)
+    const { data, isLoading, isError, error, refetch, isRefetching } = useAuditLogs(pageNumber, pageSize)
 
     return (
         <>
@@ -53,6 +54,17 @@ export function AuditLogs() {
                         </Button>
                     </div>
                 </div>
+
+                {/* Error State */}
+                {isError && (
+                    <Alert variant="destructive" className="mb-4">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>
+                            {error?.message || 'Failed to load audit logs. Please try again.'}
+                        </AlertDescription>
+                    </Alert>
+                )}
 
                 <div className='rounded-md border'>
                     <Table>

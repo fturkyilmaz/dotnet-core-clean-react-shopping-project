@@ -1,5 +1,9 @@
 /**
  * Carts Hooks - React Query hooks for carts management
+ *
+ * Note: Currently using client-side pagination because the backend API doesn't provide
+ * a paged endpoint for carts. When a paged endpoint is added, this should be updated
+ * to use server-side pagination for better performance with large datasets.
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -9,6 +13,14 @@ import type { CartDto, CreateCartCommand, UpdateCartCommand, PaginatedList } fro
 
 // Default page size for pagination
 const DEFAULT_PAGE_SIZE = 10
+
+// Cache configuration
+const CACHE_CONFIG = {
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes (formerly cacheTime)
+    retry: 1,
+    refetchOnWindowFocus: false,
+} as const
 
 export const cartKeys = {
     all: ['carts'] as const,
@@ -29,11 +41,15 @@ export function useCarts() {
             }
             return result.data || []
         },
+        ...CACHE_CONFIG,
     })
 }
 
 /**
  * Paginated carts hook - fetches all carts and handles pagination on the client side
+ *
+ * @deprecated This approach fetches ALL carts and paginates on the client.
+ * For better performance with large datasets, use a server-side paged endpoint.
  */
 export function useCartsPaged(pageNumber: number, pageSize: number = DEFAULT_PAGE_SIZE) {
     return useQuery({
@@ -62,6 +78,7 @@ export function useCartsPaged(pageNumber: number, pageSize: number = DEFAULT_PAG
 
             return paginatedList
         },
+        ...CACHE_CONFIG,
     })
 }
 

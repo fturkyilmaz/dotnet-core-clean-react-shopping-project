@@ -9,6 +9,13 @@ import {
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import type { CartDto } from '@/lib/api/types'
 
 interface CartsTableProps {
@@ -20,9 +27,12 @@ interface CartsTableProps {
     pageNumber?: number
     totalPages?: number
     totalCount?: number
+    pageSize?: number
     hasPreviousPage?: boolean
     hasNextPage?: boolean
     onPageChange?: (page: number) => void
+    onPageSizeChange?: (pageSize: number) => void
+    pageSizeOptions?: readonly number[]
 }
 
 export function CartsTable({
@@ -33,9 +43,12 @@ export function CartsTable({
     pageNumber = 1,
     totalPages = 1,
     totalCount = 0,
+    pageSize = 10,
     hasPreviousPage = false,
     hasNextPage = false,
     onPageChange,
+    onPageSizeChange,
+    pageSizeOptions = [10, 20, 30, 50],
 }: CartsTableProps) {
     if (isLoading) {
         return (
@@ -145,10 +158,33 @@ export function CartsTable({
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {(totalPages > 1 || onPageSizeChange) && (
                 <div className='flex items-center justify-between px-2'>
-                    <div className='text-muted-foreground text-sm'>
-                        Page {pageNumber} of {totalPages} ({totalCount} total)
+                    <div className='flex items-center gap-4'>
+                        {/* Page Size Selector */}
+                        {onPageSizeChange && (
+                            <div className='flex items-center gap-2'>
+                                <span className='text-sm text-muted-foreground'>Rows per page:</span>
+                                <Select
+                                    value={pageSize.toString()}
+                                    onValueChange={(value) => onPageSizeChange(Number(value))}
+                                >
+                                    <SelectTrigger className='h-8 w-[70px]'>
+                                        <SelectValue placeholder={pageSizeOptions[0]} />
+                                    </SelectTrigger>
+                                    <SelectContent side='top'>
+                                        {pageSizeOptions.map((size) => (
+                                            <SelectItem key={size} value={size.toString()}>
+                                                {size}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+                        <div className='text-muted-foreground text-sm'>
+                            Page {pageNumber} of {totalPages} ({totalCount} total)
+                        </div>
                     </div>
                     <div className='flex gap-2'>
                         <Button
