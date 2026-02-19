@@ -107,15 +107,21 @@ export const useSignalRConnection = () => {
           .configureLogging(signalR.LogLevel.Information)
           .build();
 
-        // Start connections
-        await Promise.all([
-          notifConn.start(),
-          cartConn.start(),
-          orderConn.start(),
-        ]);
-
-        console.log('SignalR connections established');
-        setIsConnected(true);
+        // Start connections with error handling
+        try {
+          await Promise.all([
+            notifConn.start(),
+            cartConn.start(),
+            orderConn.start(),
+          ]);
+          console.log('SignalR connections established');
+          setIsConnected(true);
+        } catch (error: any) {
+          // Silently handle connection errors - backend may not be running
+          console.log('SignalR connection failed - backend may not be available');
+          setIsConnected(false);
+          return;
+        }
 
         // Register push token with backend
         if (pushToken) {

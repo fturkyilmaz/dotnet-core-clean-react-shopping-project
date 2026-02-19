@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { View, Text, FlatList, Image, Alert, ActivityIndicator } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
-import { CartItem, NavigationProp } from '@/types';
+
+import { CartItem } from '@/types';
 import {
     fetchCart,
     updateCartItem,
@@ -14,13 +15,14 @@ import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { useNetworkStatus } from '@/presentation/shared/hooks/useNetworkStatus';
 import { OfflineMessage } from '@/presentation/shared/components/OfflineIndicator';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks';
 
 export default function CartScreen() {
-    const navigation = useNavigation<NavigationProp>();
+    const router = useRouter();
     const { t } = useTranslation();
     const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const dispatch = useAppDispatch();
     const cart = useAppSelector((state) => state.cart.cart);
     const loading = useAppSelector((state) => state.cart.loading);
@@ -81,7 +83,7 @@ export default function CartScreen() {
 
     const renderCartItem = ({ item }: { item: CartItem }) => (
         <View className="bg-white dark:bg-slate-800 rounded-2xl p-4 mb-4 flex-row shadow-sm border border-slate-100 dark:border-slate-700">
-            <View className="bg-slate-50 dark:bg-white rounded-xl p-2 mr-4">
+            <View className="bg-slate-50 dark:bg-slate-900 rounded-xl p-2 mr-4">
                 <Image
                     source={{ uri: item.image }}
                     className="w-20 h-20"
@@ -207,7 +209,7 @@ export default function CartScreen() {
                     <AccessibleTouchable
                         accessibilityLabel={t('cart.checkout')}
                         className="bg-primary dark:bg-primary rounded-xl py-4 items-center shadow-lg shadow-slate-200 dark:shadow-none active:bg-primary-700 dark:active:bg-primary-700"
-                        onPress={() => navigation.navigate('Checkout')}
+                        onPress={() => router.push('/checkout')}
                     >
                         <Text className="text-white font-bold text-lg">{t('cart.checkout')}</Text>
                     </AccessibleTouchable>

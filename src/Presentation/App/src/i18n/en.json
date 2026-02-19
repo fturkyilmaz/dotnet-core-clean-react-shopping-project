@@ -46,7 +46,9 @@
         "reviews": "reviews",
         "description": "Description",
         "category": "Category",
-        "addedToCart": "Added to cart successfully!"
+        "addedToCart": "Added to cart successfully!",
+        "emptyMessage": "Check back later for new products",
+        "noProducts": "No products available"
     },
     "cart": {
         "title": "Shopping Cart",
@@ -96,7 +98,8 @@
         "electronics": "Electronics",
         "jewelery": "Jewelery",
         "mensClothing": "Men's Clothing",
-        "womensClothing": "Women's Clothing"
+        "womensClothing": "Women's Clothing",
+        "noProducts": "No products available"
     },
     "category": {
         "browse": "Browse Categories",

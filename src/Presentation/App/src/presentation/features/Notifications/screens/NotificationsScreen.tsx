@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 export default function NotificationsScreen() {
     const { t } = useTranslation();
     const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const {
         notificationConnection,
         cartConnection,

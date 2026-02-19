@@ -12,11 +12,15 @@ import { AppDispatch } from "@/presentation/store";
 import { addToCart } from "@/presentation/store/slices/cartSlice";
 import Toast from "react-native-toast-message";
 import { CartItem, Product } from "@/types";
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 
-export default function ProductDetailScreen({ route, navigation }: any) {
-  const { productId } = route.params;
+export default function ProductDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+  const productId = id;
   const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -79,7 +83,7 @@ export default function ProductDetailScreen({ route, navigation }: any) {
           <AccessibleTouchable
             accessibilityLabel="Go back"
             className="mr-3 p-2 -ml-2"
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
           >
             <Ionicons
               name="arrow-back"

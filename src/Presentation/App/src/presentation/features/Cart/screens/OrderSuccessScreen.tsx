@@ -8,11 +8,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { clearCart } from '@/presentation/store/slices/cartSlice';
 import LottieView from 'lottie-react-native';
 import { useAppDispatch } from '@/presentation/store/hooks';
-import successAnimation from '../../../../../assets/animations/success.json';
+import { useRouter } from 'expo-router';
+import successAnimation from '@/assets/animations/success.json';
 import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
 
-export default function OrderSuccessScreen({ navigation }: any) {
+export default function OrderSuccessScreen() {
+    const router = useRouter();
     const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
 
@@ -87,7 +90,7 @@ export default function OrderSuccessScreen({ navigation }: any) {
                     <AccessibleTouchable
                         accessibilityLabel="Continue Shopping"
                         className="bg-primary dark:bg-primary rounded-xl py-4 items-center shadow-lg shadow-primary/20 active:bg-primary-700 dark:active:bg-primary-700"
-                        onPress={() => navigation.navigate('MainTabs', { screen: 'Home' })}
+                        onPress={() => router.push('/(tabs)')}
                     >
                         <View className="flex-row items-center">
                             <Ionicons name="home-outline" size={24} color="white" />
@@ -100,7 +103,7 @@ export default function OrderSuccessScreen({ navigation }: any) {
                     <AccessibleTouchable
                         accessibilityLabel="View Orders"
                         className="bg-slate-100 dark:bg-slate-700 rounded-xl py-4 items-center active:bg-slate-200 dark:active:bg-slate-600"
-                        onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
+                        onPress={() => router.push('/(tabs)/profile')}
                     >
                         <Text className="text-slate-900 dark:text-white font-semibold text-lg">
                             View My Orders

@@ -6,7 +6,7 @@ import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { removeAllCartItems } from '@/presentation/store/slices/cartSlice';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { CheckoutForm, checkoutSchema } from '../validation/checkoutSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,8 +14,9 @@ import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks';
 
 export default function CheckoutScreen() {
     const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const { t } = useTranslation();
-    const navigation = useNavigation<any>();
+    const router = useRouter();
     const dispatch = useAppDispatch();
     const cart = useAppSelector((state) => state.cart.cart);
     const [loading, setLoading] = React.useState(false);
@@ -46,7 +47,7 @@ export default function CheckoutScreen() {
                 t('checkout.success') || 'Order Placed!',
                 t('checkout.successMessage') || 'Your order has been placed successfully.',
                 [{
-                    text: 'OK', onPress: () => navigation.navigate('OrderSuccess')
+                    text: 'OK', onPress: () => router.push('/order-success')
                 }]
             );
         }, 2000);
@@ -92,7 +93,7 @@ export default function CheckoutScreen() {
                 <AccessibleTouchable
                     accessibilityLabel="Go back"
                     className="mr-3 p-2 -ml-2"
-                    onPress={() => navigation.goBack()}
+                    onPress={() => router.back()}
                 >
                     <Ionicons
                         name="arrow-back"

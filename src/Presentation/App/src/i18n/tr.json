@@ -46,7 +46,9 @@
         "reviews": "değerlendirme",
         "description": "Açıklama",
         "category": "Kategori",
-        "addedToCart": "Sepete başarıyla eklendi!"
+        "addedToCart": "Sepete başarıyla eklendi!",
+        "emptyMessage": "Yeni ürünler için daha sonra tekrar kontrol edin",
+        "noProducts": "Ürün bulunmuyor"
     },
     "cart": {
         "title": "Alışveriş Sepeti",
@@ -96,7 +98,8 @@
         "electronics": "Elektronik",
         "jewelery": "Mücevher",
         "mensClothing": "Erkek Giyim",
-        "womensClothing": "Kadın Giyim"
+        "womensClothing": "Kadın Giyim",
+        "noProducts": "Ürün bulunmuyor"
     },
     "category": {
         "browse": "Kategorilere Göz At",

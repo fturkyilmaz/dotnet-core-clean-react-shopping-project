@@ -2,10 +2,10 @@ import { View, Text, FlatList, Image, ActivityIndicator } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/presentation/features/Product/hooks/useProducts';
-import { Product, NavigationProp } from '@/types';
+import { Product } from '@/types';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import Toast from 'react-native-toast-message';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { useNetworkStatus } from '@/presentation/shared/hooks/useNetworkStatus';
 import { OfflineMessage } from '@/presentation/shared/components/OfflineIndicator';
 import { useDispatch } from 'react-redux';
@@ -13,10 +13,11 @@ import { AppDispatch } from '@/presentation/store';
 import { addToCart } from '@/presentation/store/slices/cartSlice';
 
 export default function ProductsScreen() {
-    const navigation = useNavigation<NavigationProp>();
+    const router = useRouter();
     const { t } = useTranslation();
     const { data: products, isLoading, error } = useProducts();
     const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const { isOnline } = useNetworkStatus();
     const dispatch = useDispatch<AppDispatch>();
 
@@ -37,10 +38,10 @@ export default function ProductsScreen() {
     const renderProduct = ({ item }: { item: Product }) => (
         <AccessibleTouchable
             accessibilityLabel={`View ${item.title} `}
-            onPress={() => navigation.navigate('ProductDetails', { productId: item.id })}
+            onPress={() => router.push(`/product/${item.id}`)}
         >
             <View className="bg-white dark:bg-slate-800 rounded-2xl p-4 mb-4 shadow-sm border border-slate-100 dark:border-slate-700">
-                <View className="bg-white dark:bg-white rounded-xl overflow-hidden mb-4 p-2">
+                <View className="bg-slate-50 dark:bg-slate-900 rounded-xl overflow-hidden mb-4 p-2">
                     <Image
                         source={{ uri: item.image }}
                         className="w-full h-48"
@@ -108,8 +109,21 @@ export default function ProductsScreen() {
                 data={products}
                 renderItem={renderProduct}
                 keyExtractor={(item) => item?.id?.toString()}
-                contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+                contentContainerStyle={{ padding: 16, paddingBottom: 100, flexGrow: 1 }}
                 showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                    <View className="flex-1 items-center justify-center py-20">
+                        <View className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 items-center justify-center mb-4">
+                            <Text className="text-5xl">📦</Text>
+                        </View>
+                        <Text className="text-slate-700 dark:text-slate-300 font-semibold text-lg mb-2">
+                            {t('products.noProducts')}
+                        </Text>
+                        <Text className="text-slate-500 dark:text-slate-400 text-sm text-center px-8">
+                            {t('products.emptyMessage')}
+                        </Text>
+                    </View>
+                }
             />
         </View>
     );
