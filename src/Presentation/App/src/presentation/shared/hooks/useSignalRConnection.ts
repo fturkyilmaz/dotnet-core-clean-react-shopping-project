@@ -88,7 +88,7 @@ export const useSignalRConnection = () => {
             accessTokenFactory: () => token,
           })
           .withAutomaticReconnect()
-          .configureLogging(signalR.LogLevel.Information)
+          .configureLogging(signalR.LogLevel.Warning)
           .build();
 
         const cartConn = new signalR.HubConnectionBuilder()
@@ -96,7 +96,7 @@ export const useSignalRConnection = () => {
             accessTokenFactory: () => token,
           })
           .withAutomaticReconnect()
-          .configureLogging(signalR.LogLevel.Information)
+          .configureLogging(signalR.LogLevel.Warning)
           .build();
 
         const orderConn = new signalR.HubConnectionBuilder()
@@ -104,7 +104,7 @@ export const useSignalRConnection = () => {
             accessTokenFactory: () => token,
           })
           .withAutomaticReconnect()
-          .configureLogging(signalR.LogLevel.Information)
+          .configureLogging(signalR.LogLevel.Warning)
           .build();
 
         // Start connections with error handling

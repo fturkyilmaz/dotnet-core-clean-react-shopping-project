@@ -6,7 +6,6 @@ import {
     Platform,
     ScrollView,
     Alert,
-    Image,
 } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +44,10 @@ export default function LoginScreen() {
     });
 
     const onSubmit = async (data: LoginFormData) => {
-        await dispatch(login(data));
+        const result = await dispatch(login(data));
+        if (login.fulfilled.match(result)) {
+            router.replace('/(tabs)');
+        }
     };
 
     const handleBiometricLogin = async () => {
