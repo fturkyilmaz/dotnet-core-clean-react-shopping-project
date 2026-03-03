@@ -63,7 +63,7 @@ export function ProductsTable({
                     </TableHeader>
                     <TableBody>
                         {[...Array(5)].map((_, i) => (
-                            <TableRow key={i}>
+                            <TableRow key={`skeleton-${i}`}>
                                 <TableCell><Skeleton className='h-4 w-8' /></TableCell>
                                 <TableCell><Skeleton className='h-12 w-12 rounded' /></TableCell>
                                 <TableCell><Skeleton className='h-4 w-48' /></TableCell>

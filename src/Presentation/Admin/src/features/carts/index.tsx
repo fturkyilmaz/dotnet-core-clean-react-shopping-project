@@ -16,8 +16,12 @@ const DEFAULT_PAGE_SIZE = 10
 const PAGE_SIZE_OPTIONS = [10, 20, 30, 50] as const
 
 export function Carts() {
-    const [pageNumber, setPageNumber] = useState(1)
-    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+    const [pagination, setPagination] = useState({
+        pageNumber: 1,
+        pageSize: DEFAULT_PAGE_SIZE
+    })
+
+    const { pageNumber, pageSize } = pagination
 
     const { data: paginatedData, isLoading, refetch, isRefetching } = useCartsPaged(pageNumber, pageSize)
     const deleteCart = useDeleteCart()
@@ -32,13 +36,12 @@ export function Carts() {
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= totalPages) {
-            setPageNumber(newPage)
+            setPagination(prev => ({ ...prev, pageNumber: newPage }))
         }
     }
 
     const handlePageSizeChange = (newSize: number) => {
-        setPageSize(newSize)
-        setPageNumber(1) // Reset to first page when page size changes
+        setPagination({ pageNumber: 1, pageSize: newSize })
     }
 
     const [dialogOpen, setDialogOpen] = useState(false)

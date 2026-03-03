@@ -16,14 +16,18 @@ const DEFAULT_PAGE_SIZE = 10
 const PAGE_SIZE_OPTIONS = [10, 20, 30, 50] as const
 
 export function Products() {
-    const [pageNumber, setPageNumber] = useState(1)
-    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+    const [pagination, setPagination] = useState({
+        pageNumber: 1,
+        pageSize: DEFAULT_PAGE_SIZE
+    })
+
+    const { pageNumber, pageSize } = pagination
 
     const { data: paginatedData, isLoading, refetch, isRefetching } = useProductsPaged(pageNumber, pageSize)
     const deleteProduct = useDeleteProduct()
 
     // Extract pagination info from response
-    const pagination = useMemo<PaginatedList<ProductDto>>(() => {
+    const paginationData = useMemo<PaginatedList<ProductDto>>(() => {
         if (!paginatedData) {
             return {
                 items: [],
@@ -44,7 +48,7 @@ export function Products() {
         }
     }, [paginatedData])
 
-    const products = pagination.items || []
+    const products = paginationData.items || []
 
     const [dialogOpen, setDialogOpen] = useState(false)
     const [editingProduct, setEditingProduct] = useState<ProductDto | null>(null)
@@ -75,12 +79,11 @@ export function Products() {
     }
 
     const handlePageChange = (newPage: number) => {
-        setPageNumber(newPage)
+        setPagination(prev => ({ ...prev, pageNumber: newPage }))
     }
 
     const handlePageSizeChange = (newSize: number) => {
-        setPageSize(newSize)
-        setPageNumber(1) // Reset to first page when page size changes
+        setPagination({ pageNumber: 1, pageSize: newSize })
     }
 
     return (
