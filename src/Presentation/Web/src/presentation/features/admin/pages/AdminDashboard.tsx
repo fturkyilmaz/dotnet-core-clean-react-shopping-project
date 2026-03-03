@@ -4,7 +4,312 @@ import { useProducts, useDeleteProduct } from '@/presentation/features/product/h
 import Loader from '@/presentation/shared/components/Loader';
 import { Button } from "@/components/ui/button"
 
+// Types
+interface Stats {
+    totalProducts: number;
+    totalOrders: number;
+    totalRevenue: number;
+    activeUsers: number;
+}
 
+interface Product {
+    id: number;
+    title: string;
+    image: string;
+    category: string;
+    price: number;
+    rating: { rate: number };
+}
+
+// StatsCards Component
+const StatsCards: FC<{ stats: Stats }> = ({ stats }) => {
+    return (
+        <div className="row g-4 mb-4">
+            <div className="col-md-3">
+                <div className="card border-0 shadow-sm h-100">
+                    <div className="card-body">
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p className="text-muted mb-1">Total Products</p>
+                                <h3 className="fw-bold mb-0">{stats.totalProducts}</h3>
+                            </div>
+                            <div className="bg-primary bg-opacity-10 p-3 rounded">
+                                <i className="bi bi-box-seam fs-3 text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="col-md-3">
+                <div className="card border-0 shadow-sm h-100">
+                    <div className="card-body">
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p className="text-muted mb-1">Total Orders</p>
+                                <h3 className="fw-bold mb-0">{stats.totalOrders}</h3>
+                            </div>
+                            <div className="bg-success bg-opacity-10 p-3 rounded">
+                                <i className="bi bi-cart-check fs-3 text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="col-md-3">
+                <div className="card border-0 shadow-sm h-100">
+                    <div className="card-body">
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p className="text-muted mb-1">Total Revenue</p>
+                                <h3 className="fw-bold mb-0">${stats.totalRevenue.toLocaleString()}</h3>
+                            </div>
+                            <div className="bg-warning bg-opacity-10 p-3 rounded">
+                                <i className="bi bi-currency-dollar fs-3 text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="col-md-3">
+                <div className="card border-0 shadow-sm h-100">
+                    <div className="card-body">
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p className="text-muted mb-1">Active Users</p>
+                                <h3 className="fw-bold mb-0">{stats.activeUsers}</h3>
+                            </div>
+                            <div className="bg-info bg-opacity-10 p-3 rounded">
+                                <i className="bi bi-people fs-3 text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// DashboardTabs Component
+const DashboardTabs: FC<{
+    activeTab: 'overview' | 'products' | 'orders';
+    setActiveTab: (tab: 'overview' | 'products' | 'orders') => void;
+}> = ({ activeTab, setActiveTab }) => {
+    return (
+        <ul className="nav nav-tabs mb-4">
+            <li className="nav-item">
+                <button
+                    className={`nav-link ${activeTab === 'overview' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('overview')}
+                >
+                    <i className="bi bi-speedometer2 me-2"></i>
+                    Overview
+                </button>
+            </li>
+            <li className="nav-item">
+                <button
+                    className={`nav-link ${activeTab === 'products' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('products')}
+                >
+                    <i className="bi bi-box-seam me-2"></i>
+                    Products
+                </button>
+            </li>
+            <li className="nav-item">
+                <button
+                    className={`nav-link ${activeTab === 'orders' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('orders')}
+                >
+                    <i className="bi bi-receipt me-2"></i>
+                    Orders
+                </button>
+            </li>
+        </ul>
+    );
+};
+
+// OverviewTab Component
+interface OverviewTabProps {
+    onAddProduct: () => void;
+    onViewAuditLogs: () => void;
+}
+
+const OverviewTab: FC<OverviewTabProps> = ({ onAddProduct, onViewAuditLogs }) => {
+    return (
+        <div className="row g-4">
+            <div className="col-md-8">
+                <div className="card border-0 shadow-sm">
+                    <div className="card-body">
+                        <h5 className="card-title fw-bold mb-4">Recent Activity</h5>
+                        <div className="list-group list-group-flush">
+                            <div className="list-group-item border-0 px-0">
+                                <div className="d-flex align-items-center">
+                                    <div className="bg-success bg-opacity-10 p-2 rounded me-3">
+                                        <i className="bi bi-check-circle text-success"></i>
+                                    </div>
+                                    <div className="flex-grow-1">
+                                        <p className="mb-0 fw-semibold">New order received</p>
+                                        <small className="text-muted">Order #1234 - $299.99</small>
+                                    </div>
+                                    <small className="text-muted">2 min ago</small>
+                                </div>
+                            </div>
+                            <div className="list-group-item border-0 px-0">
+                                <div className="d-flex align-items-center">
+                                    <div className="bg-primary bg-opacity-10 p-2 rounded me-3">
+                                        <i className="bi bi-box-seam text-primary"></i>
+                                    </div>
+                                    <div className="flex-grow-1">
+                                        <p className="mb-0 fw-semibold">Product added</p>
+                                        <small className="text-muted">New product in Electronics</small>
+                                    </div>
+                                    <small className="text-muted">1 hour ago</small>
+                                </div>
+                            </div>
+                            <div className="list-group-item border-0 px-0">
+                                <div className="d-flex align-items-center">
+                                    <div className="bg-info bg-opacity-10 p-2 rounded me-3">
+                                        <i className="bi bi-person-plus text-info"></i>
+                                    </div>
+                                    <div className="flex-grow-1">
+                                        <p className="mb-0 fw-semibold">New user registered</p>
+                                        <small className="text-muted">john.doe@example.com</small>
+                                    </div>
+                                    <small className="text-muted">3 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="col-md-4">
+                <div className="card border-0 shadow-sm">
+                    <div className="card-body">
+                        <h5 className="card-title fw-bold mb-4">Quick Actions</h5>
+                        <div className="d-grid gap-2">
+                            <button className="btn btn-primary" onClick={onAddProduct}>
+                                <i className="bi bi-plus-circle me-2"></i>
+                                Add New Product
+                            </button>
+                            <button className="btn btn-outline-primary">
+                                <i className="bi bi-receipt me-2"></i>
+                                View All Orders
+                            </button>
+                            <button className="btn btn-outline-primary">
+                                <i className="bi bi-people me-2"></i>
+                                Manage Users
+                            </button>
+                            <button className="btn btn-outline-primary" onClick={onViewAuditLogs}>
+                                <i className="bi bi-clock-history me-2"></i>
+                                View Audit Logs
+                            </button>
+                            <button className="btn btn-outline-primary">
+                                <i className="bi bi-gear me-2"></i>
+                                Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ProductsTab Component
+interface ProductsTabProps {
+    products?: Product[];
+    onAddProduct: () => void;
+    onDeleteProduct: (id: number) => void;
+}
+
+const ProductsTab: FC<ProductsTabProps> = ({ products, onAddProduct, onDeleteProduct }) => {
+    return (
+        <div className="card border-0 shadow-sm">
+            <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h5 className="card-title fw-bold mb-0">Product Management</h5>
+                    <button className="btn btn-primary" onClick={onAddProduct}>
+                        <i className="bi bi-plus-circle me-2"></i>
+                        Add Product
+                    </button>
+                </div>
+
+                <div className="table-responsive">
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Rating</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {products?.slice(0, 10).map((product) => (
+                                <tr key={product.id}>
+                                    <td>
+                                        <img
+                                            src={product.image}
+                                            alt={product.title}
+                                            style={{ width: '50px', height: '50px', objectFit: 'contain' }}
+                                        />
+                                    </td>
+                                    <td>
+                                        <div className="fw-semibold">{product.title.substring(0, 40)}...</div>
+                                    </td>
+                                    <td>
+                                        <span className="badge bg-secondary">{product.category}</span>
+                                    </td>
+                                    <td className="fw-bold">${product.price}</td>
+                                    <td>
+                                        <span className="text-warning">
+                                            ★ {product.rating.rate}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div className="btn-group btn-group-sm">
+                                            <button className="btn btn-outline-primary">
+                                                <i className="bi bi-pencil"></i>
+                                            </button>
+                                            <button
+                                                className="btn btn-outline-danger"
+                                                onClick={() => onDeleteProduct(product.id)}
+                                            >
+                                                <i className="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// OrdersTab Component
+const OrdersTab: FC = () => {
+    return (
+        <div className="card border-0 shadow-sm">
+            <div className="card-body">
+                <h5 className="card-title fw-bold mb-4">Recent Orders</h5>
+                <div className="alert alert-info">
+                    <i className="bi bi-info-circle me-2"></i>
+                    Order management feature coming soon!
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Main AdminDashboard Component
 const AdminDashboard: FC = () => {
     const navigate = useNavigate();
     const { data: products, isLoading } = useProducts();
@@ -12,7 +317,7 @@ const AdminDashboard: FC = () => {
     const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders'>('overview');
 
     // Mock statistics
-    const stats = {
+    const stats: Stats = {
         totalProducts: products?.length || 0,
         totalOrders: 156,
         totalRevenue: 45678.90,
@@ -27,6 +332,10 @@ const AdminDashboard: FC = () => {
 
     const handleAddProduct = (): void => {
         navigate('/admin/products/add');
+    };
+
+    const handleViewAuditLogs = (): void => {
+        navigate('/admin/audit-logs');
     };
 
     if (isLoading) {
@@ -50,261 +359,26 @@ const AdminDashboard: FC = () => {
             <Button>shadcn works</Button>
 
             {/* Statistics Cards */}
-            <div className="row g-4 mb-4">
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm h-100">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1">Total Products</p>
-                                    <h3 className="fw-bold mb-0">{stats.totalProducts}</h3>
-                                </div>
-                                <div className="bg-primary bg-opacity-10 p-3 rounded">
-                                    <i className="bi bi-box-seam fs-3 text-primary"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm h-100">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1">Total Orders</p>
-                                    <h3 className="fw-bold mb-0">{stats.totalOrders}</h3>
-                                </div>
-                                <div className="bg-success bg-opacity-10 p-3 rounded">
-                                    <i className="bi bi-cart-check fs-3 text-success"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm h-100">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1">Total Revenue</p>
-                                    <h3 className="fw-bold mb-0">${stats.totalRevenue.toLocaleString()}</h3>
-                                </div>
-                                <div className="bg-warning bg-opacity-10 p-3 rounded">
-                                    <i className="bi bi-currency-dollar fs-3 text-warning"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm h-100">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1">Active Users</p>
-                                    <h3 className="fw-bold mb-0">{stats.activeUsers}</h3>
-                                </div>
-                                <div className="bg-info bg-opacity-10 p-3 rounded">
-                                    <i className="bi bi-people fs-3 text-info"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <StatsCards stats={stats} />
 
             {/* Tabs */}
-            <ul className="nav nav-tabs mb-4">
-                <li className="nav-item">
-                    <button
-                        className={`nav-link ${activeTab === 'overview' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('overview')}
-                    >
-                        <i className="bi bi-speedometer2 me-2"></i>
-                        Overview
-                    </button>
-                </li>
-                <li className="nav-item">
-                    <button
-                        className={`nav-link ${activeTab === 'products' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('products')}
-                    >
-                        <i className="bi bi-box-seam me-2"></i>
-                        Products
-                    </button>
-                </li>
-                <li className="nav-item">
-                    <button
-                        className={`nav-link ${activeTab === 'orders' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('orders')}
-                    >
-                        <i className="bi bi-receipt me-2"></i>
-                        Orders
-                    </button>
-                </li>
-            </ul>
+            <DashboardTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
             {/* Tab Content */}
             {activeTab === 'overview' && (
-                <div className="row g-4">
-                    <div className="col-md-8">
-                        <div className="card border-0 shadow-sm">
-                            <div className="card-body">
-                                <h5 className="card-title fw-bold mb-4">Recent Activity</h5>
-                                <div className="list-group list-group-flush">
-                                    <div className="list-group-item border-0 px-0">
-                                        <div className="d-flex align-items-center">
-                                            <div className="bg-success bg-opacity-10 p-2 rounded me-3">
-                                                <i className="bi bi-check-circle text-success"></i>
-                                            </div>
-                                            <div className="flex-grow-1">
-                                                <p className="mb-0 fw-semibold">New order received</p>
-                                                <small className="text-muted">Order #1234 - $299.99</small>
-                                            </div>
-                                            <small className="text-muted">2 min ago</small>
-                                        </div>
-                                    </div>
-                                    <div className="list-group-item border-0 px-0">
-                                        <div className="d-flex align-items-center">
-                                            <div className="bg-primary bg-opacity-10 p-2 rounded me-3">
-                                                <i className="bi bi-box-seam text-primary"></i>
-                                            </div>
-                                            <div className="flex-grow-1">
-                                                <p className="mb-0 fw-semibold">Product added</p>
-                                                <small className="text-muted">New product in Electronics</small>
-                                            </div>
-                                            <small className="text-muted">1 hour ago</small>
-                                        </div>
-                                    </div>
-                                    <div className="list-group-item border-0 px-0">
-                                        <div className="d-flex align-items-center">
-                                            <div className="bg-info bg-opacity-10 p-2 rounded me-3">
-                                                <i className="bi bi-person-plus text-info"></i>
-                                            </div>
-                                            <div className="flex-grow-1">
-                                                <p className="mb-0 fw-semibold">New user registered</p>
-                                                <small className="text-muted">john.doe@example.com</small>
-                                            </div>
-                                            <small className="text-muted">3 hours ago</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="col-md-4">
-                        <div className="card border-0 shadow-sm">
-                            <div className="card-body">
-                                <h5 className="card-title fw-bold mb-4">Quick Actions</h5>
-                                <div className="d-grid gap-2">
-                                    <button className="btn btn-primary" onClick={handleAddProduct}>
-                                        <i className="bi bi-plus-circle me-2"></i>
-                                        Add New Product
-                                    </button>
-                                    <button className="btn btn-outline-primary">
-                                        <i className="bi bi-receipt me-2"></i>
-                                        View All Orders
-                                    </button>
-                                    <button className="btn btn-outline-primary">
-                                        <i className="bi bi-people me-2"></i>
-                                        Manage Users
-                                    </button>
-                                    <button className="btn btn-outline-primary" onClick={() => navigate('/admin/audit-logs')}>
-                                        <i className="bi bi-clock-history me-2"></i>
-                                        View Audit Logs
-                                    </button>
-                                    <button className="btn btn-outline-primary">
-                                        <i className="bi bi-gear me-2"></i>
-                                        Settings
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <OverviewTab onAddProduct={handleAddProduct} onViewAuditLogs={handleViewAuditLogs} />
             )}
 
             {activeTab === 'products' && (
-                <div className="card border-0 shadow-sm">
-                    <div className="card-body">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h5 className="card-title fw-bold mb-0">Product Management</h5>
-                            <button className="btn btn-primary" onClick={handleAddProduct}>
-                                <i className="bi bi-plus-circle me-2"></i>
-                                Add Product
-                            </button>
-                        </div>
-
-                        <div className="table-responsive">
-                            <table className="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Image</th>
-                                        <th>Name</th>
-                                        <th>Category</th>
-                                        <th>Price</th>
-                                        <th>Rating</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {products?.slice(0, 10).map((product) => (
-                                        <tr key={product.id}>
-                                            <td>
-                                                <img
-                                                    src={product.image}
-                                                    alt={product.title}
-                                                    style={{ width: '50px', height: '50px', objectFit: 'contain' }}
-                                                />
-                                            </td>
-                                            <td>
-                                                <div className="fw-semibold">{product.title.substring(0, 40)}...</div>
-                                            </td>
-                                            <td>
-                                                <span className="badge bg-secondary">{product.category}</span>
-                                            </td>
-                                            <td className="fw-bold">${product.price}</td>
-                                            <td>
-                                                <span className="text-warning">
-                                                    ★ {product.rating.rate}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div className="btn-group btn-group-sm">
-                                                    <button className="btn btn-outline-primary">
-                                                        <i className="bi bi-pencil"></i>
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-outline-danger"
-                                                        onClick={() => handleDeleteProduct(product.id)}
-                                                    >
-                                                        <i className="bi bi-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                <ProductsTab
+                    products={products}
+                    onAddProduct={handleAddProduct}
+                    onDeleteProduct={handleDeleteProduct}
+                />
             )}
 
             {activeTab === 'orders' && (
-                <div className="card border-0 shadow-sm">
-                    <div className="card-body">
-                        <h5 className="card-title fw-bold mb-4">Recent Orders</h5>
-                        <div className="alert alert-info">
-                            <i className="bi bi-info-circle me-2"></i>
-                            Order management feature coming soon!
-                        </div>
-                    </div>
-                </div>
+                <OrdersTab />
             )}
         </div>
     );
