@@ -1,12 +1,9 @@
 import { useState } from 'react'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
+import { useNavigate } from '@tanstack/react-router'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { Loader2, LogIn } from 'lucide-react'
-import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
-import { useLogin } from '@/hooks/useAuth'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Eye, EyeOff, Loader2, Github, Chrome } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -17,99 +14,195 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/password-input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Separator } from '@/components/ui/separator'
+import { useLogin } from '@/hooks/useAuth'
+import { cn } from '@/lib/utils'
 
 const formSchema = z.object({
-  email: z.email({
-    error: (iss) => (iss.input === '' ? 'Please enter your email' : undefined),
-  }),
+  email: z
+    .string()
+    .min(1, { message: 'E-posta adresi gereklidir' })
+    .email({ message: 'Geçerli bir e-posta adresi giriniz' }),
   password: z
     .string()
-    .min(1, 'Please enter your password')
-    .min(7, 'Password must be at least 7 characters long'),
+    .min(1, { message: 'Şifre gereklidir' })
+    .min(6, { message: 'Şifre en az 6 karakter olmalıdır' }),
+  rememberMe: z.boolean(),
 })
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
+type FormData = z.infer<typeof formSchema>
+
+interface UserAuthFormProps {
   redirectTo?: string
 }
 
-export function UserAuthForm({
-  className,
-  redirectTo,
-  ...props
-}: UserAuthFormProps) {
+export function UserAuthForm({ redirectTo = '/' }: UserAuthFormProps) {
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
   const loginMutation = useLogin()
+  const isLoading = loginMutation.isPending
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
+      rememberMe: false,
     },
   })
 
-  async function onSubmit(data: z.infer<typeof formSchema>) {
+  async function onSubmit(data: FormData) {
     try {
       await loginMutation.mutateAsync({
         email: data.email,
         password: data.password,
       })
-
-      toast.success(`Welcome back, ${data.email}!`)
-
-      // Redirect to the stored location or default to dashboard
-      const targetPath = redirectTo || '/'
-      navigate({ to: targetPath, replace: true })
+      navigate({ to: redirectTo })
     } catch {
-      // Error is already handled in the hook
+      // Error is handled by the useLogin hook (toast notification)
     }
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-3', className)}
-        {...props}
-      >
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='name@example.com' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='password'
-          render={({ field }) => (
-            <FormItem className='relative'>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <PasswordInput placeholder='********' {...field} />
-              </FormControl>
-              <FormMessage />
-              <Link
-                to='/forgot-password'
-                className='absolute end-0 -top-0.5 text-sm font-medium text-muted-foreground hover:opacity-75'
-              >
-                Forgot password?
-              </Link>
-            </FormItem>
-          )}
-        />
-        <Button className='mt-2' disabled={loginMutation.isPending}>
-          {loginMutation.isPending ? <Loader2 className='animate-spin' /> : <LogIn />}
-          Sign in
+    <div className="space-y-6">
+      {/* Social Login Buttons */}
+      <div className="grid grid-cols-2 gap-3">
+        <Button variant="outline" type="button" className="w-full">
+          <Github className="mr-2 h-4 w-4" />
+          GitHub
         </Button>
-      </form>
-    </Form>
+        <Button variant="outline" type="button" className="w-full">
+          <Chrome className="mr-2 h-4 w-4" />
+          Google
+        </Button>
+      </div>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <Separator className="w-full" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-card px-2 text-muted-foreground">
+            veya e-posta ile devam et
+          </span>
+        </div>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>E-posta</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="ornek@firma.com"
+                    autoComplete="email"
+                    disabled={isLoading}
+                    className={cn(
+                      form.formState.errors.email && 'border-destructive'
+                    )}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Şifre</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      autoComplete="current-password"
+                      disabled={isLoading}
+                      className={cn(
+                        'pr-10',
+                        form.formState.errors.password && 'border-destructive'
+                      )}
+                      {...field}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={isLoading}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <span className="sr-only">
+                        {showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'}
+                      </span>
+                    </Button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex items-center justify-between">
+            <FormField
+              control={form.control}
+              name="rememberMe"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormLabel className="text-sm font-normal cursor-pointer">
+                    Beni hatırla
+                  </FormLabel>
+                </FormItem>
+              )}
+            />
+            <Button
+              variant="link"
+              size="sm"
+              className="px-0 font-normal"
+              type="button"
+              onClick={() => navigate({ to: '/forgot-password' })}
+            >
+              Şifremi unuttum?
+            </Button>
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full btn-press"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Giriş yapılıyor...
+              </>
+            ) : (
+              'Giriş Yap'
+            )}
+          </Button>
+        </form>
+      </Form>
+    </div>
   )
 }
