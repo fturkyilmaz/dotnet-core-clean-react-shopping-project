@@ -1,0 +1,2 @@
+cd src/Presentation/Web
+npx lint-staged

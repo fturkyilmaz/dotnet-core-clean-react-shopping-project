@@ -6,18 +6,28 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:analyze": "tsc && vite build && npx serve dist",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
     "preview": "vite preview",
-    "type-check": "tsc",
+    "type-check": "tsc --noEmit",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e:ci": "playwright test --reporter=html,junit",
     "test:e2e:headed": "playwright test --headed",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "codegen": "orval --config orval.config.js"
+    "codegen": "orval --config orval.config.js",
+    "analyze": "vite-bundle-visualizer",
+    "ci": "npm run type-check && npm run lint && npm run build && npm run test:coverage",
+    "prepare": "cd ../.. && husky src/Presentation/Web/.husky || true"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md,css}": ["prettier --write"]
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
@@ -33,8 +43,8 @@
     "clsx": "^2.1.1",
     "i18next": "^25.6.3",
     "i18next-browser-languagedetector": "^8.2.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "react-hook-form": "^7.66.1",
     "react-i18next": "^16.3.5",
     "react-redux": "^9.2.0",
@@ -45,7 +55,6 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "orval": "^7.17.2",
     "@playwright/test": "^1.57.0",
     "@storybook/addon-a11y": "^8.5.0",
     "@storybook/addon-essentials": "^8.5.0",
@@ -59,9 +68,9 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.10.1",
-    "@types/react": "^19.2.6",
+    "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^4.2.1",
+    "@vitejs/plugin-react-swc": "^4.2.2",
     "@vitest/ui": "^4.0.13",
     "autoprefixer": "^10.4.22",
     "eslint": "^9.14.0",
@@ -69,13 +78,19 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "eslint-plugin-storybook": "^0.11.1",
+    "husky": "^9.1.7",
     "jsdom": "^27.2.0",
+    "lint-staged": "^16.3.1",
+    "orval": "^7.17.2",
     "postcss": "^8.5.6",
     "rollup-plugin-visualizer": "^6.0.5",
     "storybook": "^8.5.0",
     "tailwindcss": "^4.1.17",
+    "terser": "^5.46.0",
     "typescript": "^5.9.3",
-    "vite": "^5.0.8",
+    "vite": "^7.3.1",
+    "vite-bundle-visualizer": "^1.2.1",
     "vitest": "^4.0.13"
   }
 }
+
