@@ -50,8 +50,14 @@ const RegisterPage: FC = () => {
                                         className="form-control form-control-lg"
                                         id="email"
                                         {...register('email')}
+                                        aria-invalid={!!errors.email}
+                                        aria-describedby={errors.email ? 'email-error' : undefined}
                                     />
-                                    {errors.email && <small className="text-danger">{errors.email.message}</small>}
+                                    {errors.email && (
+                                        <small id="email-error" className="text-danger">
+                                            {errors.email.message}
+                                        </small>
+                                    )}
                                 </div>
 
                                 <div className="mb-3">
@@ -63,8 +69,14 @@ const RegisterPage: FC = () => {
                                         className="form-control form-control-lg"
                                         id="password"
                                         {...register('password')}
+                                        aria-invalid={!!errors.password}
+                                        aria-describedby={errors.password ? 'password-error' : undefined}
                                     />
-                                    {errors.password && <small className="text-danger">{errors.password.message}</small>}
+                                    {errors.password && (
+                                        <small id="password-error" className="text-danger">
+                                            {errors.password.message}
+                                        </small>
+                                    )}
                                 </div>
 
                                 <div className="mb-4">
@@ -76,9 +88,13 @@ const RegisterPage: FC = () => {
                                         className="form-control form-control-lg"
                                         id="confirmPassword"
                                         {...register('confirmPassword')}
+                                        aria-invalid={!!errors.confirmPassword}
+                                        aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
                                     />
                                     {errors.confirmPassword && (
-                                        <small className="text-danger">{errors.confirmPassword.message}</small>
+                                        <small id="confirmPassword-error" className="text-danger">
+                                            {errors.confirmPassword.message}
+                                        </small>
                                     )}
                                 </div>
 
