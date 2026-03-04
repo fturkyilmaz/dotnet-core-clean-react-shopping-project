@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, TouchableOpacityProps, StyleSheet } from 'react-native';
+import { TouchableOpacity, TouchableOpacityProps } from 'react-native';
 
 /**
  * AccessibleTouchable
@@ -12,7 +12,7 @@ import { TouchableOpacity, TouchableOpacityProps, StyleSheet } from 'react-nativ
  *   <AccessibleTouchable
  *       accessibilityLabel="Add to cart"
  *       onPress={handleAdd}
- *       style={styles.button}
+ *       className="bg-primary"
  *   >
  *       <Text>Add</Text>
  *   </AccessibleTouchable>
@@ -26,7 +26,8 @@ const AccessibleTouchable: React.FC<TouchableOpacityProps & { accessibilityLabel
     <TouchableOpacity
         accessibilityLabel={accessibilityLabel}
         accessibilityRole="button"
-        style={[styles.touchable, style]}
+        className="min-h-12 min-w-12 justify-center items-center"
+        style={style}
         {...rest}
     >
         {children}
@@ -34,12 +35,3 @@ const AccessibleTouchable: React.FC<TouchableOpacityProps & { accessibilityLabel
 );
 
 export default AccessibleTouchable;
-
-const styles = StyleSheet.create({
-    touchable: {
-        minHeight: 48,
-        minWidth: 48,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-});

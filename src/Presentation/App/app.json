@@ -4,7 +4,6 @@
     "slug": "shopping-app",
     "version": "1.0.0",
     "scheme": "shoppingapp",
-    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -82,6 +81,16 @@
               "RNFBFirestore"
             ]
           }
+        }
+      ],
+      "expo-image",
+      "expo-web-browser",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "your-sentry-org",
+          "project": "shopping-app",
+          "url": "https://sentry.io"
         }
       ]
     ],

@@ -3,7 +3,7 @@
  * All API calls are now integrated with React Query
  */
 
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type { CreateProduct, UpdateProduct } from '@core/domain/entities/Product';
 import {
@@ -14,7 +14,7 @@ import {
   useDeleteApiV1ProductsId,
   usePostApiV1ProductsSearch,
 } from '@/infrastructure/api/generated/products/products';
-import type { DynamicQuery, PostApiV1ProductsSearchParams } from '@/infrastructure/api/generated/shoppingProjectAPI.schemas';
+import type { DynamicQuery } from '@/infrastructure/api/generated/shoppingProjectAPI.schemas';
 
 export const productKeys = {
   all: ['products'] as const,
@@ -29,7 +29,7 @@ export const productKeys = {
  * Get all products
  */
 export const useProducts = () => {
-  const { data, isLoading, error } = useGetApiV1Products({
+  const result = useGetApiV1Products({
     query: {
       queryKey: productKeys.lists(),
       select: (response) => response.data.data || [],
@@ -37,9 +37,11 @@ export const useProducts = () => {
   });
 
   return {
-    data,
-    isLoading,
-    error,
+    data: result.data,
+    isLoading: result.isLoading,
+    isError: result.isError,
+    isSuccess: result.isSuccess,
+    error: result.error,
   };
 };
 
@@ -47,7 +49,7 @@ export const useProducts = () => {
  * Get single product by ID
  */
 export const useProduct = (id: number) => {
-  const { data, isLoading, error } = useGetApiV1ProductsId(id, {
+  const result = useGetApiV1ProductsId(id, {
     query: {
       queryKey: productKeys.detail(id),
       select: (response) => response.data.data,
@@ -56,9 +58,11 @@ export const useProduct = (id: number) => {
   });
 
   return {
-    data,
-    isLoading,
-    error,
+    data: result.data,
+    isLoading: result.isLoading,
+    isError: result.isError,
+    isSuccess: result.isSuccess,
+    error: result.error,
   };
 };
 

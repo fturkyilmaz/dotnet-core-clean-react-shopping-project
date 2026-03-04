@@ -8,7 +8,7 @@ import * as SecureStore from 'expo-secure-store';
 export class SecureStorageService {
   private static instance: SecureStorageService;
 
-  private constructor() {}
+  private constructor() { }
 
   static getInstance(): SecureStorageService {
     if (!SecureStorageService.instance) {
@@ -24,7 +24,9 @@ export class SecureStorageService {
     try {
       return await SecureStore.getItemAsync(key);
     } catch (error) {
-      console.error(`Error getting secure item ${key}:`, error);
+      if (__DEV__) {
+        console.error(`Error getting secure item ${key}:`, error);
+      }
       return null;
     }
   }
@@ -36,7 +38,9 @@ export class SecureStorageService {
     try {
       await SecureStore.setItemAsync(key, value);
     } catch (error) {
-      console.error(`Error setting secure item ${key}:`, error);
+      if (__DEV__) {
+        console.error(`Error setting secure item ${key}:`, error);
+      }
       throw error;
     }
   }
@@ -48,7 +52,9 @@ export class SecureStorageService {
     try {
       await SecureStore.deleteItemAsync(key);
     } catch (error) {
-      console.error(`Error removing secure item ${key}:`, error);
+      if (__DEV__) {
+        console.error(`Error removing secure item ${key}:`, error);
+      }
       throw error;
     }
   }

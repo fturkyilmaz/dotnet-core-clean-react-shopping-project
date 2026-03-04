@@ -1,11 +1,8 @@
 import axios from 'axios';
-import { Platform } from 'react-native';
 import secureStorage from '@/infrastructure/services/SecureStorageService';
 
-// Use localhost for iOS simulator, 10.0.2.2 for Android emulator
-const BASE_URL = Platform.OS === 'android'
-  ? 'http://10.0.2.2:5000/api/v1'
-  : 'http://localhost:5000/api/v1';
+// API URL from environment variables
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
 const httpClient = axios.create({
   baseURL: BASE_URL,

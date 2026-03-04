@@ -9,7 +9,7 @@ export class AnalyticsService implements IAnalyticsService {
   private metrics: any[] = [];
   private static instance: AnalyticsService;
 
-  private constructor() {}
+  private constructor() { }
 
   static getInstance(): AnalyticsService {
     if (!AnalyticsService.instance) {
@@ -27,15 +27,21 @@ export class AnalyticsService implements IAnalyticsService {
       params,
       timestamp: Date.now(),
     });
-    console.log(`📊 Event: ${name}`);
+    if (__DEV__) {
+      console.log(`📊 Event: ${name}`);
+    }
   }
 
   async setUserProperties(properties: Record<string, any>): Promise<void> {
-    console.log('User properties set:', properties);
+    if (__DEV__) {
+      console.log('User properties set:', properties);
+    }
   }
 
   async setUserId(userId: string): Promise<void> {
-    console.log('User ID set:', userId);
+    if (__DEV__) {
+      console.log('User ID set:', userId);
+    }
   }
 
   // Legacy methods kept for compatibility or internal use

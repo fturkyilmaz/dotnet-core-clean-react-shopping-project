@@ -3,7 +3,7 @@
  * All API calls are now integrated with React Query
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -32,13 +32,15 @@ export const useCart = () => {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   // Fetch cart items
-  const { data: cartItems = [], isLoading, error } = useGetApiV1Carts({
+  const result = useGetApiV1Carts({
     query: {
       queryKey: cartKeys.list(),
       select: (response) => response.data.data || [],
       enabled: isAuthenticated,
     },
   });
+
+  const cartItems = result.data || [];
 
   // Add to cart mutation
   const addToCartMutation = usePostApiV1Carts({
@@ -126,8 +128,10 @@ export const useCart = () => {
 
   return {
     cartItems,
-    isLoading,
-    error,
+    isLoading: result.isLoading,
+    isError: result.isError,
+    isSuccess: result.isSuccess,
+    error: result.error,
     addToCart,
     updateCartItem,
     removeFromCart,

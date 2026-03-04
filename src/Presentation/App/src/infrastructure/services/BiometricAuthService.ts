@@ -20,7 +20,7 @@ export class BiometricAuthService {
     try {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      
+
       let biometryType;
       if (hasHardware && isEnrolled) {
         const supported = await LocalAuthentication.supportedAuthenticationTypesAsync();
@@ -33,7 +33,9 @@ export class BiometricAuthService {
         biometryType,
       };
     } catch (error) {
-      console.error('Error checking biometric availability:', error);
+      if (__DEV__) {
+        console.error('Error checking biometric availability:', error);
+      }
       return {
         hasHardware: false,
         isEnrolled: false,
@@ -47,7 +49,7 @@ export class BiometricAuthService {
   async authenticate(): Promise<BiometricAuthResult> {
     try {
       const availability = await this.checkAvailability();
-      
+
       if (!availability.hasHardware || !availability.isEnrolled) {
         return {
           success: false,
@@ -69,8 +71,10 @@ export class BiometricAuthService {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown authentication error';
-      console.error('Biometric authentication error:', error);
-      
+      if (__DEV__) {
+        console.error('Biometric authentication error:', error);
+      }
+
       return {
         success: false,
         error: errorMessage,
@@ -88,7 +92,7 @@ export class BiometricAuthService {
   }): Promise<BiometricAuthResult> {
     try {
       const availability = await this.checkAvailability();
-      
+
       if (!availability.hasHardware || !availability.isEnrolled) {
         return {
           success: false,
@@ -122,7 +126,7 @@ export class BiometricAuthService {
    */
   getBiometryTypeName(type?: LocalAuthentication.AuthenticationType): string {
     if (!type) return 'Unknown';
-    
+
     switch (type) {
       case LocalAuthentication.AuthenticationType.FINGERPRINT:
         return 'Fingerprint';

@@ -44,13 +44,16 @@ export const login = createAsyncThunk(
       await secureStorage.setItem('token', accessToken);
       await secureStorage.setItem('refreshToken', refreshToken);
 
-      // Save credentials securely for biometric login
+      // Save email for biometric login identification only
+      // Password is NEVER stored - refresh token is used instead
       await secureStorage.setItem('user_email', credentials.email);
-      await secureStorage.setItem('user_password', credentials.password);
+      await secureStorage.setItem('biometric_enabled', 'true');
 
       return response.data.data;
     } catch (error: any) {
-      console.error('Login error:', error);
+      if (__DEV__) {
+        console.error('Login error:', error);
+      }
       if (error.response && error.response.data) {
         return rejectWithValue(error.response.data.message || error.message || 'Login failed');
       }
@@ -61,21 +64,41 @@ export const login = createAsyncThunk(
 
 export const biometricLogin = createAsyncThunk(
   'auth/biometricLogin',
-  async (_, { dispatch, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const email = await secureStorage.getItem('user_email');
-      const password = await secureStorage.getItem('user_password');
+      const refreshToken = await secureStorage.getItem('refreshToken');
+      const biometricEnabled = await secureStorage.getItem('biometric_enabled');
 
-      if (email && password) {
-        // Reuse normal login flow
-        await dispatch(login({ email, password }));
-        return { email };
-      } else {
-        return rejectWithValue('No credentials stored for biometric login');
+      if (!biometricEnabled || biometricEnabled !== 'true') {
+        return rejectWithValue('Biometric login not enabled');
       }
-    } catch (error) {
-      console.error('Biometric login error:', error);
-      return rejectWithValue('Biometric login failed');
+
+      if (email && refreshToken) {
+        // Use refresh token for biometric authentication
+        const response = await api.post<ApiResponse<AuthResponse>>('/identity/refresh', {
+          refreshToken,
+        });
+
+        if (!response.data.isSuccess) {
+          return rejectWithValue('Session expired. Please login with credentials.');
+        }
+
+        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+
+        // Update tokens
+        await secureStorage.setItem('token', accessToken);
+        await secureStorage.setItem('refreshToken', newRefreshToken);
+
+        return { email, accessToken };
+      } else {
+        return rejectWithValue('No valid session for biometric login');
+      }
+    } catch (error: any) {
+      if (__DEV__) {
+        console.error('Biometric login error:', error);
+      }
+      return rejectWithValue(error.response?.data?.message || 'Biometric login failed');
     }
   }
 );
@@ -84,7 +107,7 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   await secureStorage.removeItem('token');
   await secureStorage.removeItem('refreshToken');
   await secureStorage.removeItem('user_email');
-  await secureStorage.removeItem('user_password');
+  await secureStorage.removeItem('biometric_enabled');
 });
 
 export const fetchUserProfile = createAsyncThunk(

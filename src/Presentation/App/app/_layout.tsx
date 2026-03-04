@@ -35,7 +35,9 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
                     dispatch(setToken(token));
                 }
             } catch (error) {
-                console.error('Failed to load token', error);
+                if (__DEV__) {
+                    console.error('Failed to load token', error);
+                }
             } finally {
                 setIsLoading(false);
             }
@@ -43,12 +45,16 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
 
         const initAnalytics = async () => {
             try {
-                console.log('✅ App: Analytics initialized');
+                if (__DEV__) {
+                    console.log('✅ App: Analytics initialized');
+                }
                 analyticsService.logEvent('app_launched', {
                     timestamp: new Date().toISOString(),
                 });
             } catch (error) {
-                console.error('App: Failed to initialize analytics:', error);
+                if (__DEV__) {
+                    console.error('App: Failed to initialize analytics:', error);
+                }
             }
         };
 
@@ -58,7 +64,7 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
 
     if (isLoading) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+            <View className="flex-1 justify-center items-center bg-white">
                 <ActivityIndicator size="large" color="#2563EB" />
             </View>
         );
@@ -101,10 +107,14 @@ function AppInitializer() {
         const initDB = async () => {
             try {
                 await sqliteRepository.initialize();
-                console.log('App: SQLite database initialized');
+                if (__DEV__) {
+                    console.log('App: SQLite database initialized');
+                }
                 setIsDbReady(true);
             } catch (error) {
-                console.error('App: Failed to initialize SQLite database:', error);
+                if (__DEV__) {
+                    console.error('App: Failed to initialize SQLite database:', error);
+                }
                 setIsDbReady(true);
             }
         };
