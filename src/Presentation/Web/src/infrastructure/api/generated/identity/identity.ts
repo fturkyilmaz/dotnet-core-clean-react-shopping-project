@@ -24,7 +24,7 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import axios from 'axios';
+import { httpClient } from '../../httpClient';
 import type {
   AxiosError,
   AxiosRequestConfig,
@@ -53,7 +53,7 @@ export const postApiV1IdentityLogin = (
  ): Promise<AxiosResponse<AuthResponseServiceResult>> => {
     
     
-    return axios.post(
+    return httpClient.post(
       `/api/v1/Identity/login`,
       loginCommand,options
     );
@@ -108,7 +108,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<AuthResponseServiceResult>> => {
     
     
-    return axios.post(
+    return httpClient.post(
       `/api/v1/Identity/refresh-token`,
       refreshTokenCommand,options
     );
@@ -163,7 +163,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<StringServiceResult>> => {
     
     
-    return axios.post(
+    return httpClient.post(
       `/api/v1/Identity/register`,
       registerCommand,options
     );
@@ -218,7 +218,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<StringServiceResult>> => {
     
     
-    return axios.post(
+    return httpClient.post(
       `/api/v1/Identity/${userId}/assign-admin-role`,undefined,options
     );
   }
@@ -272,7 +272,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<StringServiceResult>> => {
     
     
-    return axios.post(
+    return httpClient.post(
       `/api/v1/Identity/roles/${roleName}`,undefined,options
     );
   }
@@ -326,7 +326,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<UserInfoResponseServiceResult>> => {
     
     
-    return axios.get(
+    return httpClient.get(
       `/api/v1/Identity/me`,options
     );
   }
@@ -410,7 +410,7 @@ export const putApiV1IdentityMe = (
  ): Promise<AxiosResponse<UserInfoResponseServiceResult>> => {
     
     
-    return axios.put(
+    return httpClient.put(
       `/api/v1/Identity/me`,
       updateMeCommand,options
     );
@@ -465,7 +465,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<StringServiceResult>> => {
     
     
-    return axios.post(
+    return httpClient.post(
       `/api/v1/Identity/forgot-password`,
       forgotPasswordCommand,options
     );
@@ -520,7 +520,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<StringServiceResult>> => {
     
     
-    return axios.post(
+    return httpClient.post(
       `/api/v1/Identity/reset-password`,
       resetPasswordCommand,options
     );

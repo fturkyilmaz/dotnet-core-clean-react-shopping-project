@@ -24,7 +24,7 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import axios from 'axios';
+import { httpClient } from '../../httpClient';
 import type {
   AxiosError,
   AxiosRequestConfig,
@@ -46,7 +46,7 @@ export const getApiV1CacheKey = (
  ): Promise<AxiosResponse<StringServiceResult>> => {
     
     
-    return axios.get(
+    return httpClient.get(
       `/api/v1/Cache/${key}`,options
     );
   }
@@ -130,7 +130,7 @@ export const deleteApiV1CacheKey = (
  ): Promise<AxiosResponse<BooleanServiceResult>> => {
     
     
-    return axios.delete(
+    return httpClient.delete(
       `/api/v1/Cache/${key}`,options
     );
   }
@@ -184,7 +184,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<BooleanServiceResult>> => {
     
     
-    return axios.post(
+    return httpClient.post(
       `/api/v1/Cache/set`,
       redisCacheRequest,options
     );

@@ -24,7 +24,7 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import axios from 'axios';
+import { httpClient } from '../../httpClient';
 import type {
   AxiosError,
   AxiosRequestConfig,
@@ -49,7 +49,7 @@ export const getApiV1Carts = (
  ): Promise<AxiosResponse<CartDtoListServiceResult>> => {
     
     
-    return axios.get(
+    return httpClient.get(
       `/api/v1/Carts`,options
     );
   }
@@ -133,7 +133,7 @@ export const postApiV1Carts = (
  ): Promise<AxiosResponse<Int32ServiceResult>> => {
     
     
-    return axios.post(
+    return httpClient.post(
       `/api/v1/Carts`,
       createCartCommand,options
     );
@@ -188,7 +188,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<CartDtoServiceResult>> => {
     
     
-    return axios.get(
+    return httpClient.get(
       `/api/v1/Carts/${id}`,options
     );
   }
@@ -273,7 +273,7 @@ export const putApiV1CartsId = (
  ): Promise<AxiosResponse<BooleanServiceResult>> => {
     
     
-    return axios.put(
+    return httpClient.put(
       `/api/v1/Carts/${id}`,
       updateCartCommand,options
     );
@@ -328,7 +328,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<BooleanServiceResult>> => {
     
     
-    return axios.delete(
+    return httpClient.delete(
       `/api/v1/Carts/${id}`,options
     );
   }
@@ -382,7 +382,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  ): Promise<AxiosResponse<BooleanServiceResult | BooleanServiceResult>> => {
     
     
-    return axios.delete(
+    return httpClient.delete(
       `/api/v1/Carts/delete-all`,options
     );
   }

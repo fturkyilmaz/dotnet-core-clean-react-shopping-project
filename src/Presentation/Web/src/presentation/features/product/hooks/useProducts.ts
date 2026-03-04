@@ -1,11 +1,20 @@
 /**
- * Product Hooks - Using Repository Pattern
+ * Product Hooks - Using Generated React Query API
+ * All API calls are now integrated with React Query
  */
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { productRepository } from '@services/dependencyInjector';
 import type { CreateProduct, UpdateProduct } from '@core/domain/entities/Product';
+import {
+  useGetApiV1Products,
+  useGetApiV1ProductsId,
+  usePostApiV1Products,
+  usePutApiV1ProductsId,
+  useDeleteApiV1ProductsId,
+  usePostApiV1ProductsSearch,
+} from '@/infrastructure/api/generated/products/products';
+import type { DynamicQuery, PostApiV1ProductsSearchParams } from '@/infrastructure/api/generated/shoppingProjectAPI.schemas';
 
 export const productKeys = {
   all: ['products'] as const,
@@ -20,32 +29,55 @@ export const productKeys = {
  * Get all products
  */
 export const useProducts = () => {
-  return useQuery({
-    queryKey: productKeys.lists(),
-    queryFn: () => productRepository.getAll(),
+  const { data, isLoading, error } = useGetApiV1Products({
+    query: {
+      queryKey: productKeys.lists(),
+      select: (response) => response.data.data || [],
+    },
   });
+
+  return {
+    data,
+    isLoading,
+    error,
+  };
 };
 
 /**
  * Get single product by ID
  */
 export const useProduct = (id: number) => {
-  return useQuery({
-    queryKey: productKeys.detail(id),
-    queryFn: () => productRepository.getById(id),
-    enabled: !!id,
+  const { data, isLoading, error } = useGetApiV1ProductsId(id, {
+    query: {
+      queryKey: productKeys.detail(id),
+      select: (response) => response.data.data,
+      enabled: !!id,
+    },
   });
+
+  return {
+    data,
+    isLoading,
+    error,
+  };
 };
 
 /**
- * Search products
+ * Search products with dynamic query
+ * Returns a mutation that can be called with search parameters
  */
-export const useSearchProducts = (query: string) => {
-  return useQuery({
-    queryKey: productKeys.search(query),
-    queryFn: () => productRepository.search({ query }),
-    placeholderData: keepPreviousData,
-    enabled: query.length > 0,
+export const useSearchProducts = () => {
+  const queryClient = useQueryClient();
+
+  return usePostApiV1ProductsSearch({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: productKeys.all });
+      },
+      onError: (error: any) => {
+        toast.error(error?.message || 'Search failed');
+      },
+    },
   });
 };
 
@@ -55,14 +87,15 @@ export const useSearchProducts = (query: string) => {
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (newProduct: CreateProduct) => productRepository.create(newProduct),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-      toast.success('Product created successfully');
-    },
-    onError: (error: any) => {
-      toast.error(error?.message || 'Failed to create product');
+  return usePostApiV1Products({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+        toast.success('Product created successfully');
+      },
+      onError: (error: any) => {
+        toast.error(error?.message || 'Failed to create product');
+      },
     },
   });
 };
@@ -73,15 +106,16 @@ export const useCreateProduct = () => {
 export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (product: UpdateProduct) => productRepository.update(product),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-      toast.success('Product updated successfully');
-    },
-    onError: (error: any) => {
-      toast.error(error?.message || 'Failed to update product');
+  return usePutApiV1ProductsId({
+    mutation: {
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: productKeys.detail(variables.id) });
+        queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+        toast.success('Product updated successfully');
+      },
+      onError: (error: any) => {
+        toast.error(error?.message || 'Failed to update product');
+      },
     },
   });
 };
@@ -92,14 +126,15 @@ export const useUpdateProduct = () => {
 export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (id: number) => productRepository.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-      toast.success('Product deleted successfully');
-    },
-    onError: (error: any) => {
-      toast.error(error?.message || 'Failed to delete product');
+  return useDeleteApiV1ProductsId({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+        toast.success('Product deleted successfully');
+      },
+      onError: (error: any) => {
+        toast.error(error?.message || 'Failed to delete product');
+      },
     },
   });
 };

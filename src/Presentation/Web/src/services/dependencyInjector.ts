@@ -1,23 +1,45 @@
 /**
  * Dependency Injection Container
- * Creates singleton instances of repositories and services
+ *
+ * NOTE: This file is kept for backwards compatibility.
+ * All API calls now use generated React Query hooks directly.
+ *
+ * Import hooks from respective feature folders instead:
+ * - useProducts, useProduct, etc. from '@/presentation/features/product/hooks/useProducts'
+ * - useCart from '@/presentation/features/cart/hooks/useCart'
+ * - useAuth from '@/presentation/features/auth/hooks/useAuth'
+ *
+ * Generated API hooks are available at:
+ * - '@/infrastructure/api/generated/products/products'
+ * - '@/infrastructure/api/generated/carts/carts'
+ * - '@/infrastructure/api/generated/identity/identity'
  */
 
-import { ProductAPIRepository } from '@/infrastructure/persistence/ProductAPIRepository';
-import { CartAPIRepository } from '@/infrastructure/persistence/CartAPIRepository';
-import { AuthAPIService } from '@/infrastructure/persistence/AuthAPIService';
+// Re-export generated hooks for convenience
+export {
+  useGetApiV1Products,
+  useGetApiV1ProductsId,
+  usePostApiV1Products,
+  usePutApiV1ProductsId,
+  useDeleteApiV1ProductsId,
+  usePostApiV1ProductsSearch,
+} from '@/infrastructure/api/generated/products/products';
 
-// Singleton instances
-export const productRepository = new ProductAPIRepository();
-export const cartRepository = new CartAPIRepository();
-export const authService = new AuthAPIService();
+export {
+  useGetApiV1Carts,
+  usePostApiV1Carts,
+  usePutApiV1CartsId,
+  useDeleteApiV1CartsId,
+  useDeleteApiV1CartsDeleteAll,
+} from '@/infrastructure/api/generated/carts/carts';
 
-// Export for convenience
-export const repositories = {
-  product: productRepository,
-  cart: cartRepository,
-};
+export {
+  usePostApiV1IdentityLogin,
+  usePostApiV1IdentityRegister,
+  useGetApiV1IdentityMe,
+  usePostApiV1IdentityRefreshToken,
+} from '@/infrastructure/api/generated/identity/identity';
 
-export const services = {
-  auth: authService,
-};
+// Legacy exports (deprecated) - will be removed in future versions
+export const repositories = {};
+export const services = {};

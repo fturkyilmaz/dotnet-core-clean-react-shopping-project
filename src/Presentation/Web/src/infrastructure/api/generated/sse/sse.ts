@@ -20,7 +20,7 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import axios from 'axios';
+import { httpClient } from '../../httpClient';
 import type {
   AxiosError,
   AxiosRequestConfig,
@@ -40,7 +40,7 @@ export const getApiV1SseEvents = (
  ): Promise<AxiosResponse<void>> => {
     
     
-    return axios.get(
+    return httpClient.get(
       `/api/v1/sse/events`,options
     );
   }
