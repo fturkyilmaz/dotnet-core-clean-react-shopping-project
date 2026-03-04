@@ -1,25 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- PWA Meta Tags -->
-    <meta name="description" content="A modern, scalable e-commerce application built with React and .NET" />
-    <meta name="theme-color" content="#007bff" />
+    <meta name="description" content="Furkan Store - Modern e-commerce experience with premium products" />
+    <meta name="theme-color" content="#3b82f6" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="ShopProject" />
+    <meta name="apple-mobile-web-app-title" content="Furkan Store" />
     <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- PWA Links -->
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icon-192x192.png" />
 
-    <!-- Preconnect to external domains for performance -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
     <!-- DNS prefetch for API calls -->
     <link rel="dns-prefetch" href="//localhost:5000" />
@@ -27,7 +28,37 @@
     <!-- Preload critical resources -->
     <link rel="modulepreload" href="/src/index.tsx" />
 
-    <title>Furkan TÜRKYILMAZ Shop</title>
+    <title>Furkan Store | Modern E-Commerce</title>
+
+    <style>
+      /* Prevent FOUC for dark mode */
+      html {
+        color-scheme: dark light;
+      }
+      html.dark {
+        color-scheme: dark;
+      }
+      html.light {
+        color-scheme: light;
+      }
+    </style>
+
+    <script>
+      // Prevent FOUC (Flash of Unstyled Content)
+      (function() {
+        const theme = localStorage.getItem('furkan-store-theme') || 'system';
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = theme === 'dark' || (theme === 'system' && systemDark);
+
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        } else {
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

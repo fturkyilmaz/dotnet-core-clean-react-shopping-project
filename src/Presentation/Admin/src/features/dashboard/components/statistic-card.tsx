@@ -240,7 +240,7 @@ export function ComparisonStat({
               ? 'bg-success'
               : percentage >= 50
               ? 'bg-primary'
-              : 'bg-warning-foreground'
+              : 'bg-warning'
           )}
           style={{ width: `${percentage}%` }}
         />
