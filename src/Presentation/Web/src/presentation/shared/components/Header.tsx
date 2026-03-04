@@ -175,7 +175,7 @@ const Header = () => {
                 <Button variant="ghost" asChild>
                   <Link to="/login">{t("signIn")}</Link>
                 </Button>
-                <Button asChild>
+                <Button className="bg-white text-black border border-gray-200 hover:bg-gray-100" asChild>
                   <Link to="/register">{t("signUp")}</Link>
                 </Button>
               </div>

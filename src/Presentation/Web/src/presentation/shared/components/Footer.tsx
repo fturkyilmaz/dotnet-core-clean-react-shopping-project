@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Store, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Github } from "lucide-react";
+import { Store, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Github, Linkedin } from "lucide-react";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -27,6 +27,7 @@ const Footer = () => {
     { icon: Facebook, href: "#", label: "Facebook" },
     { icon: Twitter, href: "#", label: "Twitter" },
     { icon: Instagram, href: "#", label: "Instagram" },
+    { icon: Linkedin, href: "#", label: "LinkedIn" },
     { icon: Github, href: "#", label: "Github" },
   ];
 

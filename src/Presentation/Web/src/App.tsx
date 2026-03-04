@@ -1,17 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { ToastContainer } from 'react-toastify';
 import { Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
-import 'react-toastify/dist/ReactToastify.css';
 import './i18n/config'; // Initialize i18n
 import './styles/globals.css'; // New design system styles
 
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './presentation/store';
 import { queryClient } from '@/services/queryClient';
-import { ThemeProvider } from '@/context/theme-provider';
+import { ThemeProvider, useTheme } from '@/context/theme-provider';
 import Header from '@/presentation/shared/components/Header';
 import Footer from '@/presentation/shared/components/Footer';
 import ProtectedRoute from '@/presentation/shared/components/ProtectedRoute';
@@ -49,6 +47,8 @@ const PageLoader = () => (
   </div>
 );
 
+import { Toaster } from '@/components/ui/sonner';
+
 const App = () => {
   return (
     <Provider store={store}>
@@ -77,18 +77,7 @@ const App = () => {
                   </main>
                   <Footer />
                 </div>
-                <ToastContainer
-                  position="top-right"
-                  autoClose={3000}
-                  hideProgressBar={false}
-                  newestOnTop={false}
-                  closeOnClick
-                  rtl={false}
-                  pauseOnFocusLoss
-                  draggable
-                  pauseOnHover
-                  theme="colored"
-                />
+                <Toaster />
               </ErrorBoundary>
             </BrowserRouter>
           </ThemeProvider>

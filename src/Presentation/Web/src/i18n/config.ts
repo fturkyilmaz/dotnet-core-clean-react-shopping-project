@@ -15,7 +15,8 @@ const resources = {
       login: 'Login',
       register: 'Register',
       logout: 'Logout',
-      
+      admin: 'Admin',
+
       // Common
       search: 'Search',
       searchPlaceholder: 'Search products...',
@@ -28,7 +29,14 @@ const resources = {
       save: 'Save',
       delete: 'Delete',
       edit: 'Edit',
-      
+      close: 'Close',
+      open: 'Open',
+      back: 'Back',
+      next: 'Next',
+      previous: 'Previous',
+      submit: 'Submit',
+      confirm: 'Confirm',
+
       // Product
       price: 'Price',
       category: 'Category',
@@ -38,12 +46,29 @@ const resources = {
       inStock: 'In Stock',
       outOfStock: 'Out of Stock',
       productNotFound: 'Product not found',
+      productNotFoundDesc: 'The product you are looking for could not be found. It may have been removed or is temporarily unavailable.',
       buyNow: 'Buy Now',
+      topRated: 'Top Rated',
+      addedToWishlist: 'Added to wishlist!',
+      linkCopied: 'Link copied to clipboard!',
+      shareProduct: 'Share Product',
+
+      // Features
       freeShippingTitle: 'Free Shipping',
       freeShippingSubtitle: 'Orders over $50',
+      freeShipping: 'Free Shipping',
+      freeShippingDesc: 'On orders over $50',
       easyReturnsTitle: 'Easy Returns',
       easyReturnsSubtitle: '30 Days Return',
-      
+      easyReturns: 'Easy Returns',
+      easyReturnsDesc: '30-day return policy',
+      securePayment: 'Secure Payment',
+      securePaymentDesc: '100% secure checkout',
+      giftWrapping: 'Gift Wrapping',
+      giftWrappingDesc: 'Special packaging available',
+      _24_7Support: '24/7 Support',
+      _24_7SupportDesc: 'Always here to help',
+
       // Cart
       cartEmpty: 'Your cart is empty',
       cartEmptyTitle: 'Your cart is empty',
@@ -56,7 +81,11 @@ const resources = {
       quantity: 'Quantity',
       remove: 'Remove',
       clearCart: 'Clear Cart',
-      
+      shoppingCart: 'Shopping Cart',
+      orderSummary: 'Order Summary',
+      estimatedShipping: 'Estimated Shipping',
+      estimatedTax: 'Estimated Tax',
+
       // Auth
       email: 'Email',
       password: 'Password',
@@ -66,7 +95,13 @@ const resources = {
       createAccount: 'Create Account',
       alreadyHaveAccount: 'Already have an account?',
       dontHaveAccount: "Don't have an account?",
-      
+      welcomeBack: 'Welcome Back!',
+      loginDescription: 'Sign in to access your account and continue shopping.',
+      joinUs: 'Join Us Today!',
+      registerDescription: 'Create an account and start shopping with exclusive deals and offers.',
+      forgotPassword: 'Forgot Password?',
+      resetPassword: 'Reset Password',
+
       // Messages
       loginSuccess: 'Login successful!',
       loginFailed: 'Login failed',
@@ -74,20 +109,173 @@ const resources = {
       registerFailed: 'Registration failed',
       addedToCart: 'Added to cart!',
       removedFromCart: 'Removed from cart',
-      
+      cartCleared: 'Cart cleared successfully',
+      orderPlaced: 'Order placed successfully!',
+
       // Settings
       settings: 'Settings',
       language: 'Language',
       theme: 'Theme',
       darkMode: 'Dark Mode',
       lightMode: 'Light Mode',
+      systemMode: 'System',
       preferences: 'Preferences',
       currency: 'Currency',
       notifications: 'Notifications',
-      
+
       // Category
       selectCategory: 'Select a category to start shopping',
       viewAllProducts: 'View products from all categories',
+      categoriesDescription: 'Explore our wide range of products across different categories',
+      allProducts: 'All Products',
+      browseAllProducts: 'Browse all our products',
+      electronics: 'Electronics',
+      latestGadgets: 'Latest gadgets and tech',
+      jewelry: 'Jewelry',
+      elegantJewelry: 'Elegant jewelry pieces',
+      mensClothing: "Men's Clothing",
+      mensFashion: "Men's fashion collection",
+      womensClothing: "Women's Clothing",
+      womensFashion: "Women's fashion collection",
+
+      // Home
+      newCollection: 'New Collection 2024',
+      heroTitle: 'Discover the Latest',
+      heroTitleHighlight: 'Trends & Styles',
+      heroDescription: 'Explore our curated collection of premium products. Quality meets style in every piece.',
+      shopNow: 'Shop Now',
+      viewCategories: 'View Categories',
+      featuredProducts: 'Featured Products',
+
+      // Newsletter
+      newsletterTitle: 'Subscribe to Our Newsletter',
+      newsletterDescription: 'Get the latest updates on new products and upcoming sales.',
+      emailPlaceholder: 'Enter your email address',
+      subscribe: 'Subscribe',
+
+      // 404 Page
+      pageNotFound: 'Page Not Found',
+      pageNotFoundDesc: "Oops! The page you're looking for seems to have wandered off. Let's get you back on track.",
+      backToHome: 'Back to Home',
+      browseProducts: 'Browse Products',
+      goBack: 'Go Back',
+      needHelp: 'Need help? Try these:',
+      allCategories: 'All Categories',
+
+      // Products Page
+      productsFound: '{{count}} products found',
+      viewAll: 'View All',
+      failedToLoadProducts: 'Failed to load products',
+      noProductsFound: 'No products found',
+      tryDifferentCategory: 'Try selecting a different category or browse all products',
+      viewAllCategories: 'View All Categories',
+      noProductsInCategory: 'No products in this category',
+
+      // Cart Page
+      itemsInCart: '{{count}} items in cart',
+      items: 'items',
+      free: 'Free',
+      freeShippingOver: 'Free shipping on orders over',
+      couponCode: 'Coupon code',
+      apply: 'Apply',
+      checkout: 'Checkout',
+
+      // Wishlist
+      removedFromWishlist: 'Removed from wishlist',
+      addToWishlist: 'Add to wishlist',
+      removeFromWishlist: 'Remove from wishlist',
+
+      // Product Detail
+      home: 'Home',
+      shipsWithin24h: 'Ships within 24 hours',
+
+      // Footer
+      allRightsReserved: 'All rights reserved',
+
+      // Auth
+      agreeToTerms: 'I agree to the',
+      and: 'and',
+      orContinueWith: 'Or continue with',
+
+      // Footer
+      footerDescription: 'Your one-stop shop for quality products. We offer the best selection at competitive prices.',
+      shop: 'Shop',
+      support: 'Support',
+      legal: 'Legal',
+      contact: 'Contact',
+      faq: 'FAQ',
+      shipping: 'Shipping Info',
+      privacyPolicy: 'Privacy Policy',
+      termsOfService: 'Terms of Service',
+      followUs: 'Follow Us',
+
+      // Admin
+      adminDashboard: 'Admin Dashboard',
+      manageYourPlatform: 'Manage your e-commerce platform',
+      addNewProduct: 'Add New Product',
+      fillProductDetails: 'Fill in the product details below',
+      productInformation: 'Product Information',
+      productTitle: 'Product Title',
+      enterProductTitle: 'Enter product title',
+      productTitleRequired: 'Product title is required',
+      productDescriptionRequired: 'Product description is required',
+      priceMustBeGreaterThanZero: 'Price must be greater than 0',
+      pleaseSelectCategory: 'Please select a category',
+      productImageRequired: 'Product image URL is required',
+      provideDetailedDescription: 'Provide a detailed description of the product',
+      imageUrl: 'Image URL',
+      enterValidImageUrl: 'Enter a valid image URL',
+      imagePreview: 'Image Preview',
+      addingProduct: 'Adding Product...',
+      confirmCancel: 'Are you sure you want to cancel? All changes will be lost.',
+      dashboard: 'Dashboard',
+      totalProducts: 'Total Products',
+      totalOrders: 'Total Orders',
+      totalRevenue: 'Total Revenue',
+      activeUsers: 'Active Users',
+      overview: 'Overview',
+      orders: 'Orders',
+      recentActivity: 'Recent Activity',
+      addProduct: 'Add Product',
+      viewAuditLogs: 'View Audit Logs',
+      viewAllOrders: 'View All Orders',
+      manageUsers: 'Manage Users',
+      auditLogs: 'Audit Logs',
+      quickActions: 'Quick Actions',
+      productManagement: 'Product Management',
+      recentOrders: 'Recent Orders',
+      orderManagementComingSoon: 'Order management feature coming soon!',
+      confirmDeleteProduct: 'Are you sure you want to delete this product?',
+      productName: 'Product Name',
+      image: 'Image',
+      actions: 'Actions',
+      trackChanges: 'Track all changes made across the system',
+      timestamp: 'Timestamp',
+      user: 'User',
+      action: 'Action',
+      correlationId: 'Correlation ID',
+      integrity: 'Integrity',
+      changes: 'Changes',
+      unsigned: 'Unsigned',
+      page: 'Page',
+      of: 'of',
+
+      // Form validation
+      required: 'This field is required',
+      invalidEmail: 'Please enter a valid email',
+      passwordMinLength: 'Password must be at least 8 characters',
+      passwordMismatch: 'Passwords do not match',
+
+      // Password strength
+      atLeast8Chars: 'At least 8 characters',
+      containsUppercase: 'Contains uppercase letter',
+      containsLowercase: 'Contains lowercase letter',
+      containsNumber: 'Contains number',
+      containsSpecialChar: 'Contains special character',
+      passwordStrength: 'Password Strength',
+      weak: 'Weak',
+      medium: 'Medium',
+      strong: 'Strong',
     },
   },
   tr: {
@@ -101,7 +289,8 @@ const resources = {
       login: 'Giriş Yap',
       register: 'Kayıt Ol',
       logout: 'Çıkış Yap',
-      
+      admin: 'Yönetim',
+
       // Common
       search: 'Ara',
       searchPlaceholder: 'Ürün ara...',
@@ -114,7 +303,14 @@ const resources = {
       save: 'Kaydet',
       delete: 'Sil',
       edit: 'Düzenle',
-      
+      close: 'Kapat',
+      open: 'Aç',
+      back: 'Geri',
+      next: 'İleri',
+      previous: 'Önceki',
+      submit: 'Gönder',
+      confirm: 'Onayla',
+
       // Product
       price: 'Fiyat',
       category: 'Kategori',
@@ -124,12 +320,29 @@ const resources = {
       inStock: 'Stokta Var',
       outOfStock: 'Stokta Yok',
       productNotFound: 'Ürün bulunamadı',
+      productNotFoundDesc: 'Aradığınız ürün bulunamadı. Ürün kaldırılmış veya geçici olarak kullanılamıyor olabilir.',
       buyNow: 'Hemen Satın Al',
+      topRated: 'En Çok Oy Alan',
+      addedToWishlist: 'İstek listesine eklendi!',
+      linkCopied: 'Bağlantı panoya kopyalandı!',
+      shareProduct: 'Ürünü Paylaş',
+
+      // Features
       freeShippingTitle: 'Ücretsiz Kargo',
       freeShippingSubtitle: '500₺ üzeri alışverişlerde',
+      freeShipping: 'Ücretsiz Kargo',
+      freeShippingDesc: '500₺ üzeri alışverişlerde',
       easyReturnsTitle: 'Kolay İade',
       easyReturnsSubtitle: '30 gün içinde iade',
-      
+      easyReturns: 'Kolay İade',
+      easyReturnsDesc: '30 gün iade garantisi',
+      securePayment: 'Güvenli Ödeme',
+      securePaymentDesc: '%100 güvenli ödeme',
+      giftWrapping: 'Hediye Paketi',
+      giftWrappingDesc: 'Özel paketleme mevcut',
+      _24_7Support: '7/24 Destek',
+      _24_7SupportDesc: 'Her zaman yanınızdayız',
+
       // Cart
       cartEmpty: 'Sepetiniz boş',
       cartEmptyTitle: 'Sepetiniz Boş',
@@ -142,7 +355,11 @@ const resources = {
       quantity: 'Adet',
       remove: 'Kaldır',
       clearCart: 'Sepeti Temizle',
-      
+      shoppingCart: 'Alışveriş Sepeti',
+      orderSummary: 'Sipariş Özeti',
+      estimatedShipping: 'Tahmini Kargo',
+      estimatedTax: 'Tahmini Vergi',
+
       // Auth
       email: 'E-posta',
       password: 'Şifre',
@@ -152,7 +369,13 @@ const resources = {
       createAccount: 'Hesap Oluştur',
       alreadyHaveAccount: 'Zaten hesabınız var mı?',
       dontHaveAccount: 'Hesabınız yok mu?',
-      
+      welcomeBack: 'Tekrar Hoş Geldiniz!',
+      loginDescription: 'Hesabınıza giriş yaparak alışverişe devam edin.',
+      joinUs: 'Bugün Bize Katılın!',
+      registerDescription: 'Hesap oluşturun ve özel fırsatlarla alışverişe başlayın.',
+      forgotPassword: 'Şifremi Unuttum?',
+      resetPassword: 'Şifreyi Sıfırla',
+
       // Messages
       loginSuccess: 'Giriş başarılı!',
       loginFailed: 'Giriş başarısız',
@@ -160,20 +383,169 @@ const resources = {
       registerFailed: 'Kayıt başarısız',
       addedToCart: 'Sepete eklendi!',
       removedFromCart: 'Sepetten kaldırıldı',
-      
+      cartCleared: 'Sepet başarıyla temizlendi',
+      orderPlaced: 'Sipariş başarıyla oluşturuldu!',
+
       // Settings
       settings: 'Ayarlar',
       language: 'Dil',
       theme: 'Tema',
       darkMode: 'Karanlık Mod',
       lightMode: 'Aydınlık Mod',
+      systemMode: 'Sistem',
       preferences: 'Tercihler',
       currency: 'Para Birimi',
       notifications: 'Bildirimler',
-      
+
       // Category
       selectCategory: 'İlgilendiğiniz kategoriyi seçin ve alışverişe başlayın',
       viewAllProducts: 'Tüm kategorilerdeki ürünleri görüntüleyin',
+      categoriesDescription: 'Farklı kategorilerdeki geniş ürün yelpazemizi keşfedin',
+      allProducts: 'Tüm Ürünler',
+      browseAllProducts: 'Tüm ürünlerimize göz atın',
+      electronics: 'Elektronik',
+      latestGadgets: 'En son cihazlar ve teknoloji',
+      jewelry: 'Takı',
+      elegantJewelry: 'Şık takı parçaları',
+      mensClothing: 'Erkek Giyim',
+      mensFashion: 'Erkek moda koleksiyonu',
+      womensClothing: 'Kadın Giyim',
+      womensFashion: 'Kadın moda koleksiyonu',
+
+      // Home
+      newCollection: 'Yeni Koleksiyon 2024',
+      heroTitle: 'En Son Trendleri',
+      heroTitleHighlight: 'Keşfedin',
+      heroDescription: 'Özenle seçilmiş premium ürün koleksiyonumuzu keşfedin. Kalite her parçada stille buluşuyor.',
+      shopNow: 'Hemen Alışveriş Yap',
+      viewCategories: 'Kategorileri Gör',
+      featuredProducts: 'Öne Çıkan Ürünler',
+
+      // Newsletter
+      newsletterTitle: 'Bültenimize Abone Olun',
+      newsletterDescription: 'Yeni ürünler ve yaklaşan kampanyalar hakkında en son güncellemeleri alın.',
+      emailPlaceholder: 'E-posta adresinizi girin',
+      subscribe: 'Abone Ol',
+
+      // 404 Page
+      pageNotFound: 'Sayfa Bulunamadı',
+      pageNotFoundDesc: 'Ups! Aradığınız sayfa bulunamadı. Sizi doğru yola yönlendirelim.',
+      backToHome: 'Ana Sayfaya Dön',
+      browseProducts: 'Ürünlere Göz At',
+      goBack: 'Geri Git',
+      needHelp: 'Yardıma mı ihtiyacınız var? Şunları deneyin:',
+      allCategories: 'Tüm Kategoriler',
+
+      // Products Page
+      productsFound: '{{count}} ürün bulundu',
+      viewAll: 'Tümünü Gör',
+      failedToLoadProducts: 'Ürünler yüklenirken hata oluştu',
+      noProductsFound: 'Ürün bulunamadı',
+      tryDifferentCategory: 'Farklı bir kategori seçin veya tüm ürünleri görüntüleyin',
+      viewAllCategories: 'Tüm Kategorileri Gör',
+      noProductsInCategory: 'Bu kategoride ürün yok',
+
+      // Cart Page
+      itemsInCart: 'Sepette {{count}} ürün',
+      items: 'ürün',
+      free: 'Ücretsiz',
+      freeShippingOver: '500₺ üzeri siparişlerde ücretsiz kargo',
+      couponCode: 'Kupon kodu',
+      apply: 'Uygula',
+
+      // Wishlist
+      removedFromWishlist: 'İstek listesinden kaldırıldı',
+      addToWishlist: 'İstek listesine ekle',
+      removeFromWishlist: 'İstek listesinden kaldır',
+
+      // Product Detail
+      shipsWithin24h: '24 saat içinde kargoya verilir',
+
+      // Footer
+      allRightsReserved: 'Tüm hakları saklıdır',
+
+      // Auth
+      agreeToTerms: 'Kabul ediyorum',
+      and: 've',
+      orContinueWith: 'Veya şununla devam et',
+      footerDescription: 'Kaliteli ürünler için tek adresiniz. Rekabetçi fiyatlarla en iyi seçimi sunuyoruz.',
+      shop: 'Mağaza',
+      support: 'Destek',
+      legal: 'Yasal',
+      contact: 'İletişim',
+      faq: 'SSS',
+      shipping: 'Kargo Bilgisi',
+      privacyPolicy: 'Gizlilik Politikası',
+      termsOfService: 'Kullanım Koşulları',
+      followUs: 'Bizi Takip Edin',
+
+      // Admin
+      adminDashboard: 'Yönetici Paneli',
+      manageYourPlatform: 'E-ticaret platformunuzu yönetin',
+      addNewProduct: 'Yeni Ürün Ekle',
+      fillProductDetails: 'Aşağıdaki ürün bilgilerini doldurun',
+      productInformation: 'Ürün Bilgileri',
+      productTitle: 'Ürün Başlığı',
+      enterProductTitle: 'Ürün başlığını girin',
+      productTitleRequired: 'Ürün başlığı zorunludur',
+      productDescriptionRequired: 'Ürün açıklaması zorunludur',
+      priceMustBeGreaterThanZero: 'Fiyat 0\'dan büyük olmalıdır',
+      pleaseSelectCategory: 'Lütfen bir kategori seçin',
+      productImageRequired: 'Ürün görsel URL\'si zorunludur',
+      provideDetailedDescription: 'Ürünün detaylı bir açıklamasını sağlayın',
+      imageUrl: 'Görsel URL',
+      enterValidImageUrl: 'Geçerli bir görsel URL\'si girin',
+      imagePreview: 'Görsel Önizleme',
+      addingProduct: 'Ürün Ekleniyor...',
+      confirmCancel: 'İptal etmek istediğinize emin misiniz? Tüm değişiklikler kaybolacak.',
+      dashboard: 'Kontrol Paneli',
+      totalProducts: 'Toplam Ürün',
+      totalOrders: 'Toplam Sipariş',
+      totalRevenue: 'Toplam Gelir',
+      activeUsers: 'Aktif Kullanıcı',
+      overview: 'Genel Bakış',
+      orders: 'Siparişler',
+      recentActivity: 'Son Aktiviteler',
+      addProduct: 'Ürün Ekle',
+      viewAuditLogs: 'Denetim Kayıtlarını Gör',
+      viewAllOrders: 'Tüm Siparişleri Gör',
+      manageUsers: 'Kullanıcıları Yönet',
+      auditLogs: 'Denetim Kayıtları',
+      quickActions: 'Hızlı İşlemler',
+      productManagement: 'Ürün Yönetimi',
+      recentOrders: 'Son Siparişler',
+      orderManagementComingSoon: 'Sipariş yönetimi özelliği yakında geliyor!',
+      confirmDeleteProduct: 'Bu ürünü silmek istediğinize emin misiniz?',
+      productName: 'Ürün Adı',
+      image: 'Görsel',
+      actions: 'İşlemler',
+      trackChanges: 'Sistemde yapılan tüm değişiklikleri takip edin',
+      timestamp: 'Zaman',
+      user: 'Kullanıcı',
+      action: 'İşlem',
+      correlationId: 'Korelasyon ID',
+      integrity: 'Bütünlük',
+      changes: 'Değişiklikler',
+      unsigned: 'İmzasız',
+      page: 'Sayfa',
+      of: '/',
+
+      // Form validation
+      required: 'Bu alan zorunludur',
+      invalidEmail: 'Geçerli bir e-posta adresi girin',
+      passwordMinLength: 'Şifre en az 8 karakter olmalıdır',
+      passwordMismatch: 'Şifreler eşleşmiyor',
+
+      // Password strength
+      atLeast8Chars: 'En az 8 karakter',
+      containsUppercase: 'Büyük harf içeriyor',
+      containsLowercase: 'Küçük harf içeriyor',
+      containsNumber: 'Rakam içeriyor',
+      containsSpecialChar: 'Özel karakter içeriyor',
+      passwordStrength: 'Şifre Gücü',
+      weak: 'Zayıf',
+      medium: 'Orta',
+      strong: 'Güçlü',
     },
   },
 };

@@ -93,7 +93,7 @@ const HomePage: FC = () => {
                 {t("heroDescription") || "Explore our curated collection of premium products. Quality meets style in every piece."}
               </p>
               <div className="flex flex-wrap gap-4">
-                <Button size="lg" asChild>
+                <Button size="lg" className="bg-white text-black hover:bg-gray-100 border border-gray-200" asChild>
                   <Link to="/category">
                     {t("shopNow") || "Shop Now"}
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -220,7 +220,7 @@ const HomePage: FC = () => {
               <input
                 type="email"
                 placeholder={t("emailPlaceholder") || "Enter your email"}
-                className="flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="flex-1 px-4 py-3 rounded-lg bg-primary-foreground/10 border border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
               />
               <Button variant="secondary" className="px-6">
                 {t("subscribe") || "Subscribe"}

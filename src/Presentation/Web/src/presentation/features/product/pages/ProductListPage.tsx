@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { useProducts } from '../hooks/useProducts';
 import { addToCart } from '@/presentation/store/slices/cartSlice';
 import type { Product } from '@/types/product';
@@ -40,10 +40,10 @@ export default function ProductListPage() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('products')}</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-8">{t('products')}</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {products?.map((product) => (
-                    <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <div key={product.id} className="bg-background rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border">
                         <Link to={`/products/${product.id}`}>
                             <img
                                 src={product.image}
@@ -53,13 +53,13 @@ export default function ProductListPage() {
                         </Link>
                         <div className="p-4">
                             <Link to={`/products/${product.id}`}>
-                                <h3 className="text-lg font-semibold text-gray-900 hover:text-primary-600 line-clamp-2">
+                                <h3 className="text-lg font-semibold text-foreground hover:text-primary line-clamp-2">
                                     {product.title}
                                 </h3>
                             </Link>
-                            <p className="text-sm text-gray-500 mt-1">{product.category}</p>
+                            <p className="text-sm text-muted-foreground mt-1">{product.category}</p>
                             <div className="mt-4 flex items-center justify-between">
-                                <span className="text-2xl font-bold text-gray-900">
+                                <span className="text-2xl font-bold text-foreground">
                                     ${product.price.toFixed(2)}
                                 </span>
                                 <button

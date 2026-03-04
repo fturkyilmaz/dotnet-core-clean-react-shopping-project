@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useBasket } from "@/hooks";
 import type { Product } from "@/types/product";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;

@@ -3,8 +3,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import LoginPage from '@/presentation/features/auth/pages/LoginPage';
 
-// Mock react-toastify
-vi.mock('react-toastify', () => ({
+// Mock sonner
+vi.mock('sonner', () => ({
     toast: {
         success: vi.fn(),
         error: vi.fn(),

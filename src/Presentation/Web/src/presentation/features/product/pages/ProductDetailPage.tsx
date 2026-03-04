@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProduct } from "@/presentation/features/product/hooks/useProducts";
 import { useBasket } from "@/hooks";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -141,7 +141,7 @@ const ProductDetailPage = () => {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4"
           >
-            <div className="relative aspect-square bg-white rounded-2xl overflow-hidden shadow-sm">
+            <div className="relative aspect-square bg-background rounded-2xl overflow-hidden shadow-sm border">
               <motion.img
                 key={selectedImage}
                 src={product.image}

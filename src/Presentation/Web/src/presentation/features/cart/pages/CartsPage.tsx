@@ -40,7 +40,7 @@ const EmptyCart = () => {
         {t("cartEmptySubtitle")}
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <Button size="lg" asChild>
+        <Button size="lg" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700" asChild>
           <Link to="/">{t("startShopping")}</Link>
         </Button>
         <Button size="lg" variant="outline" asChild>
@@ -93,7 +93,7 @@ const CartItem = ({
     >
       {/* Image */}
       <Link to={`/product/${item.id}`} className="shrink-0">
-        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-lg overflow-hidden">
+        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-background rounded-lg overflow-hidden border">
           <img
             src={item.image}
             alt={item.title}

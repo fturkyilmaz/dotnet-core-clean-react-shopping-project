@@ -34,15 +34,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           aria-describedby={error ? `${inputId}-error` : undefined}
           {...props}
         />
-        {error && (
-          <p
-            id={`${inputId}-error`}
-            className="mt-1.5 text-sm text-destructive"
-            role="alert"
-          >
-            {error}
-          </p>
-        )}
+        <div className="min-h-[24px]">
+          {error && (
+            <p
+              id={`${inputId}-error`}
+              className="mt-1.5 text-sm text-destructive"
+              role="alert"
+            >
+              {error}
+            </p>
+          )}
+        </div>
       </div>
     );
   }
