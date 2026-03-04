@@ -4,31 +4,44 @@ using Moq;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Products.Commands.DeleteProduct;
 using ShoppingProject.Domain.Entities;
+using ShoppingProject.Domain.Enums;
 using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.UnitTests.Application.Commands;
 
 public class DeleteProductCommandTests
 {
-    private readonly Mock<IApplicationDbContext> _mockContext;
+    private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IRepository<Product>> _mockProductRepository;
     private readonly DeleteProductCommandHandler _handler;
 
     public DeleteProductCommandTests()
     {
-        _mockContext = new Mock<IApplicationDbContext>();
-        _handler = new DeleteProductCommandHandler(_mockContext.Object);
+        _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockProductRepository = new Mock<IRepository<Product>>();
+
+        _mockUnitOfWork
+            .Setup(x => x.Repository<Product>())
+            .Returns(_mockProductRepository.Object);
+
+        // Setup ExecuteInTransactionAsync to execute the lambda immediately
+        _mockUnitOfWork
+            .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<Task>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<Task>, CancellationToken>((func, _) => func());
+
+        _handler = new DeleteProductCommandHandler(_mockUnitOfWork.Object);
     }
 
     [Fact]
-    public async Task Handle_ValidCommand_ShouldDeleteProduct()
+    public async Task Handle_ValidCommand_ShouldSoftDeleteProduct()
     {
         // Arrange
         var existingProduct = Product.Create("Test Product", 10m, "Test", "test", "test.jpg");
         typeof(Product).GetProperty(nameof(Product.Id))!.SetValue(existingProduct, 1);
 
-        var products = new List<Product> { existingProduct }.AsQueryable();
-        _mockContext.Setup(x => x.Products).Returns(products);
-        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        _mockProductRepository
+            .Setup(x => x.GetByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingProduct);
 
         var command = new DeleteProductCommand(1);
 
@@ -36,8 +49,9 @@ public class DeleteProductCommandTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        _mockContext.Verify(x => x.Remove(existingProduct), Times.Once);
-        _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        existingProduct.Status.Should().Be(EntityStatus.Deleted);
+        _mockProductRepository.Verify(x => x.Update(It.IsAny<Product>()), Times.Once);
+        _mockUnitOfWork.Verify(x => x.ExecuteInTransactionAsync(It.IsAny<Func<Task>>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -47,9 +61,9 @@ public class DeleteProductCommandTests
         var existingProduct = Product.Create("Test Product", 10m, "Test", "test", "test.jpg");
         typeof(Product).GetProperty(nameof(Product.Id))!.SetValue(existingProduct, 1);
 
-        var products = new List<Product> { existingProduct }.AsQueryable();
-        _mockContext.Setup(x => x.Products).Returns(products);
-        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        _mockProductRepository
+            .Setup(x => x.GetByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingProduct);
 
         var command = new DeleteProductCommand(1);
 
@@ -57,20 +71,21 @@ public class DeleteProductCommandTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        existingProduct.DomainEvents.Should().Contain(x => x is ProductDeletedEvent);
+        existingProduct.DomainEvents.Should().Contain(x => x is ProductStatusChangedEvent);
+        existingProduct.DomainEvents.First().Should().BeOfType<ProductStatusChangedEvent>();
 
-        existingProduct.DomainEvents.First().Should().BeOfType<ProductDeletedEvent>();
-
-        var domainEvent = existingProduct.DomainEvents.First() as ProductDeletedEvent;
-        domainEvent!.Item.Should().Be(existingProduct);
+        var domainEvent = existingProduct.DomainEvents.First() as ProductStatusChangedEvent;
+        domainEvent!.ProductId.Should().Be(existingProduct.Id);
+        domainEvent.Status.Should().Be(EntityStatus.Deleted);
     }
 
     [Fact]
     public async Task Handle_NonExistentProduct_ShouldThrowNotFoundException()
     {
         // Arrange
-        var products = new List<Product>().AsQueryable();
-        _mockContext.Setup(x => x.Products).Returns(products);
+        _mockProductRepository
+            .Setup(x => x.GetByIdAsync(999, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Product?)null);
 
         var command = new DeleteProductCommand(999);
 
@@ -78,7 +93,5 @@ public class DeleteProductCommandTests
         await Assert.ThrowsAsync<NotFoundException>(() =>
             _handler.Handle(command, CancellationToken.None)
         );
-
-        _mockContext.Verify(x => x.Remove(It.IsAny<Product>()), Times.Never);
     }
 }

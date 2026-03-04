@@ -18,4 +18,4 @@ var app = builder.Build();
 
 app.MapReverseProxy();
 
-app.Run();
+await app.RunAsync();

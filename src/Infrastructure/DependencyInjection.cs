@@ -84,6 +84,9 @@ public static class DependencyInjection
         builder.Services.AddSingleton<IClock, SystemClock>();
         builder.Services.AddTransient<IIdentityService, IdentityService>();
 
+        // Unit of Work
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         // Repositories
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();

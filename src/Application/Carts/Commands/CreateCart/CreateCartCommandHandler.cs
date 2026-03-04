@@ -1,35 +1,35 @@
-using MediatR;
 using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Domain.Entities;
-using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Carts.Commands.CreateCart;
 
+/// <summary>
+/// Handler for creating a new cart item using UnitOfWork pattern.
+/// </summary>
 public class CreateCartCommandHandler : IRequestHandler<CreateCartCommand, int>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateCartCommandHandler(IApplicationDbContext context)
+    public CreateCartCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task<int> Handle(CreateCartCommand request, CancellationToken cancellationToken)
     {
-        var entity = new Cart
+        return await _unitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            Title = request.Title,
-            Price = request.Price,
-            Image = request.Image ?? string.Empty,
-            Quantity = request.Quantity,
-        };
+            var entity = Cart.Create(
+                request.Title,
+                request.Price,
+                request.Image ?? string.Empty,
+                request.Quantity,
+                request.OwnerId
+            );
 
-        entity.AddDomainEvent(new CartCreatedEvent(entity));
+            _unitOfWork.Repository<Cart>().Add(entity);
 
-        _context.Add<Cart>(entity);
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return entity.Id;
+            return entity.Id;
+        }, cancellationToken);
     }
 }

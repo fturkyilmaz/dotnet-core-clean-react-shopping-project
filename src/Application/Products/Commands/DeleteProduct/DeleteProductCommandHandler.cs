@@ -1,32 +1,33 @@
 ﻿using Ardalis.GuardClauses;
 using ShoppingProject.Application.Common.Interfaces;
+using ShoppingProject.Domain.Entities;
 using ShoppingProject.Domain.Enums;
-using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Products.Commands.DeleteProduct;
 
+/// <summary>
+/// Handler for deleting (soft delete) a product using UnitOfWork pattern.
+/// </summary>
 public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteProductCommandHandler(IApplicationDbContext context)
+    public DeleteProductCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-        var entity = _context.Products.FirstOrDefault(p => p.Id == request.Id);
+        await _unitOfWork.ExecuteInTransactionAsync(async () =>
+        {
+            var entity = await _unitOfWork.Repository<Product>().GetByIdAsync(request.Id, cancellationToken);
+            Guard.Against.NotFound(request.Id, entity);
 
-        Guard.Against.NotFound(request.Id, entity);
+            // Soft delete - update status instead of removing
+            entity!.UpdateStatus(EntityStatus.Deleted);
 
-        entity!.UpdateStatus(
-            EntityStatus.Deleted
-        );
-
-        entity.RemoveDomainEvent(new ProductDeletedEvent(entity));
-
-        await _context.SaveChangesAsync(cancellationToken);
+            _unitOfWork.Repository<Product>().Update(entity);
+        }, cancellationToken);
     }
-
 }

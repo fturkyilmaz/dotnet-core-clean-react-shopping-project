@@ -3,8 +3,10 @@ using Bogus;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ShoppingProject.Application.Common.Interfaces;
 using ShoppingProject.Application.Common.Models;
 using ShoppingProject.Application.Contracts.Audit;
 using ShoppingProject.Application.DTOs;
@@ -56,7 +58,7 @@ public class AuditIntegrationTests : IClassFixture<WebApplicationFactory<Program
             var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
             await initialiser.InitialiseAsync();
         }
-        
+
         var harness = factory.Services.GetRequiredService<ITestHarness>();
 
         // Login as admin
@@ -120,6 +122,5 @@ public class AuditIntegrationTests : IClassFixture<WebApplicationFactory<Program
         Assert.Equal("Added", publishedMessage.Context.Message.Action);
         Assert.Equal("Product", publishedMessage.Context.Message.EntityName);
         Assert.NotNull(publishedMessage.Context.Message.CorrelationId);
-    }
     }
 }

@@ -52,7 +52,8 @@ public class GetCurrentUserInfoQueryTests
             _faker.Name.LastName(),
             _faker.Internet.UserName(),
             "Male",
-            new List<string> { "Client" }
+            new List<string> { "Client" },
+            _faker.Phone.PhoneNumber()
         );
 
         _mockIdentityService

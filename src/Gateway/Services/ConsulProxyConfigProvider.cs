@@ -133,9 +133,24 @@ public class ConsulProxyConfigProvider : IProxyConfigProvider
             _cts.Cancel();
         }
 
+        private bool _disposed;
+
         public void Dispose()
         {
-            _cts.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _cts.Dispose();
+                }
+                _disposed = true;
+            }
         }
     }
 }

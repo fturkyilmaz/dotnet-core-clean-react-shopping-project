@@ -6,46 +6,73 @@ namespace ShoppingProject.Application.Products.Specifications;
 public sealed class ActiveProductsSpecification
     : ActiveSpecification<Product>
 {
-    private ActiveProductsSpecification() { }
+    // Public constructor for test compatibility
+    public ActiveProductsSpecification()
+    {
+        ApplyOrderBy(p => p.Id);
+    }
 
     public static ActiveProductsSpecification Create()
     {
-        var spec = new ActiveProductsSpecification();
-        spec.ApplyOrderBy(p => p.Title);
-        return spec;
+        return new ActiveProductsSpecification();
     }
 }
 
 public sealed class ProductsByCategorySpecification : BaseSpecification<Product>
 {
-    private ProductsByCategorySpecification(string category)
-        : base(p => p.Category == category) { }
+    // Public constructor for test compatibility
+    public ProductsByCategorySpecification(string category)
+        : base(p => p.Category == category)
+    {
+        ApplyOrderBy(p => p.Title);
+    }
 
     public static ProductsByCategorySpecification Create(string category)
     {
-        var spec = new ProductsByCategorySpecification(category);
-        spec.ApplyOrderBy(p => p.Title);
-        return spec;
+        return new ProductsByCategorySpecification(category);
     }
 }
 
 public sealed class ProductsWithPaginationSpecification : BaseSpecification<Product>
 {
-    private ProductsWithPaginationSpecification(int skip, int take) { }
+    // Public constructor for test compatibility (pageIndex is 1-based)
+    public ProductsWithPaginationSpecification(int pageIndex, int pageSize)
+        : base(_ => true)
+    {
+        ApplyPaging((pageIndex - 1) * pageSize, pageSize);
+        ApplyOrderBy(p => p.Id);
+    }
+
+    // Static factory for skip/take pattern (backward compatibility)
+    public static ProductsWithPaginationSpecification FromSkipTake(int skip, int take)
+    {
+        var pageIndex = (skip / take) + 1;
+        return new ProductsWithPaginationSpecification(pageIndex, take);
+    }
 
     public static ProductsWithPaginationSpecification Create(int skip, int take)
     {
-        var spec = new ProductsWithPaginationSpecification(skip, take);
-        spec.ApplyPaging(skip, take);
-        spec.ApplyOrderBy(p => p.Id);
-        return spec;
+        return FromSkipTake(skip, take);
+    }
+
+    /// <summary>
+    /// Initializes the specification (for backward compatibility with tests).
+    /// </summary>
+    public void Initialize()
+    {
+        // No-op - constructor already initializes
     }
 }
 
 public sealed class ProductsByCategoryWithPaginationSpecification : BaseSpecification<Product>
 {
-    private ProductsByCategoryWithPaginationSpecification(string category)
-        : base(p => p.Category == category) { }
+    // Public constructor for test compatibility
+    public ProductsByCategoryWithPaginationSpecification(string category, int pageIndex, int pageSize)
+        : base(p => p.Category == category)
+    {
+        ApplyPaging((pageIndex - 1) * pageSize, pageSize);
+        ApplyOrderBy(p => p.Title);
+    }
 
     public static ProductsByCategoryWithPaginationSpecification Create(
         string category,
@@ -53,43 +80,82 @@ public sealed class ProductsByCategoryWithPaginationSpecification : BaseSpecific
         int take
     )
     {
-        var spec = new ProductsByCategoryWithPaginationSpecification(category);
+        var spec = new ProductsByCategoryWithPaginationSpecification(category, 1, take);
         spec.ApplyPaging(skip, take);
-        spec.ApplyOrderBy(p => p.Title);
         return spec;
     }
 }
 
 public sealed class SearchProductsSpecification : BaseSpecification<Product>
 {
-    private SearchProductsSpecification(string searchTerm)
-        : base(p => p.Title.Contains(searchTerm) || p.Description.Contains(searchTerm)) { }
+    // Public constructor for test compatibility (string, int, int) - search with pagination
+    public SearchProductsSpecification(string searchTerm, int skip, int take)
+        : base(p => p.Title.Contains(searchTerm) || (p.Description != null && p.Description.Contains(searchTerm)))
+    {
+        ApplyPaging(skip, take);
+        ApplyOrderBy(p => p.Title);
+    }
+
+    // Public constructor for test compatibility (string, bool, bool)
+    public SearchProductsSpecification(string searchTerm, bool searchInDescription = false, bool caseSensitive = false)
+        : base(_ => true)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            ApplyOrderBy(p => p.Title);
+            return;
+        }
+
+        if (caseSensitive)
+        {
+            if (searchInDescription)
+            {
+                Criteria = p => p.Title.Contains(searchTerm) || (p.Description != null && p.Description.Contains(searchTerm));
+            }
+            else
+            {
+                Criteria = p => p.Title.Contains(searchTerm);
+            }
+        }
+        else
+        {
+            var lowerSearchTerm = searchTerm.ToLower();
+            if (searchInDescription)
+            {
+                Criteria = p => p.Title.ToLower().Contains(lowerSearchTerm) ||
+                    (p.Description != null && p.Description.ToLower().Contains(lowerSearchTerm));
+            }
+            else
+            {
+                Criteria = p => p.Title.ToLower().Contains(lowerSearchTerm);
+            }
+        }
+
+        ApplyOrderBy(p => p.Title);
+    }
 
     public static SearchProductsSpecification Create(string searchTerm)
     {
-        var spec = new SearchProductsSpecification(searchTerm);
-        spec.ApplyOrderBy(p => p.Title);
-        return spec;
+        return new SearchProductsSpecification(searchTerm, false, false);
     }
 
     public static SearchProductsSpecification Create(string searchTerm, int skip, int take)
     {
-        var spec = new SearchProductsSpecification(searchTerm);
-        spec.ApplyPaging(skip, take);
-        spec.ApplyOrderBy(p => p.Title);
-        return spec;
+        return new SearchProductsSpecification(searchTerm, skip, take);
     }
 }
 
 public sealed class ProductsByPriceRangeSpecification : BaseSpecification<Product>
 {
-    private ProductsByPriceRangeSpecification(decimal minPrice, decimal maxPrice)
-        : base(p => p.Price >= minPrice && p.Price <= maxPrice) { }
+    // Public constructor for test compatibility
+    public ProductsByPriceRangeSpecification(decimal minPrice, decimal maxPrice)
+        : base(p => p.Price >= minPrice && p.Price <= maxPrice)
+    {
+        ApplyOrderBy(p => p.Price);
+    }
 
     public static ProductsByPriceRangeSpecification Create(decimal minPrice, decimal maxPrice)
     {
-        var spec = new ProductsByPriceRangeSpecification(minPrice, maxPrice);
-        spec.ApplyOrderBy(p => p.Price);
-        return spec;
+        return new ProductsByPriceRangeSpecification(minPrice, maxPrice);
     }
 }

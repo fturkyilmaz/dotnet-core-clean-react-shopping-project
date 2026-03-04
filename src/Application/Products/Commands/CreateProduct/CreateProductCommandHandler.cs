@@ -1,35 +1,36 @@
 ﻿using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Application.Common.Security;
-using ShoppingProject.Domain.Constants;
 using ShoppingProject.Domain.Entities;
-using ShoppingProject.Domain.Events;
-using ShoppingProject.Domain.ValueObjects;
 
 namespace ShoppingProject.Application.Products.Commands.CreateProduct;
 
+/// <summary>
+/// Handler for creating a new product using UnitOfWork pattern.
+/// </summary>
 public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, int>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateProductCommandHandler(IApplicationDbContext context)
+    public CreateProductCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task<int> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
-        var entity = Product.Create(
-            request.Title ?? string.Empty,
-            request.Price,
-            request.Description ?? string.Empty,
-            request.Category ?? string.Empty,
-            request.Image ?? string.Empty
-        );
+        return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+        {
+            var entity = Product.Create(
+                request.Title ?? string.Empty,
+                request.Price,
+                request.Description ?? string.Empty,
+                request.Category ?? string.Empty,
+                request.Image ?? string.Empty
+            );
 
-        _context.Add(entity);
+            _unitOfWork.Repository<Product>().Add(entity);
 
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return entity.Id;
+            // SaveChanges is called by ExecuteInTransactionAsync upon commit
+            return entity.Id;
+        }, cancellationToken);
     }
 }

@@ -5,88 +5,152 @@ using ShoppingProject.Infrastructure.Data;
 
 namespace ShoppingProject.Infrastructure.Repositories;
 
+/// <summary>
+/// Generic repository implementation.
+/// Note: This repository does not call SaveChanges - it must be done via IUnitOfWork.
+/// </summary>
 public class Repository<T> : IRepository<T>
     where T : class
 {
     protected readonly ApplicationDbContext _context;
+    protected readonly DbSet<T> _dbSet;
 
     public Repository(ApplicationDbContext context)
     {
-        _context = context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _dbSet = context.Set<T>();
     }
 
+    /// <inheritdoc />
     public virtual async Task<T?> GetByIdAsync(
         int id,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
-        return await _context.Set<T>().FindAsync(new object[] { id }, cancellationToken);
+        return await _dbSet.FindAsync(new object[] { id }, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<T>> ListAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Set<T>().ToListAsync(cancellationToken);
+        return await _dbSet.ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<T>> ListAsync(
         ISpecification<T> spec,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         return await ApplySpecification(spec).ToListAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<T?> FirstOrDefaultAsync(
         ISpecification<T> spec,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         return await ApplySpecification(spec).FirstOrDefaultAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<int> CountAsync(
         ISpecification<T> spec,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         return await ApplySpecification(spec).CountAsync(cancellationToken);
     }
 
-    public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public void Add(T entity)
     {
-        await _context.Set<T>().AddAsync(entity, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-        return entity;
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
+
+        _dbSet.Add(entity);
     }
 
-    public async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public void Update(T entity)
     {
-        _context.Entry(entity).State = EntityState.Modified;
-        await _context.SaveChangesAsync(cancellationToken);
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
+
+        _dbSet.Update(entity);
     }
 
-    public async Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public void Delete(T entity)
     {
-        _context.Set<T>().Remove(entity);
-        await _context.SaveChangesAsync(cancellationToken);
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
+
+        _dbSet.Remove(entity);
     }
 
+    /// <inheritdoc />
     public async Task<int> DeleteRangeAsync(
         ISpecification<T> spec,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         var query = ApplySpecification(spec);
         return await query.ExecuteDeleteAsync(cancellationToken);
     }
 
-    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<bool> ExistsAsync(
+        ISpecification<T> spec,
+        CancellationToken cancellationToken = default)
     {
-        return await _context.SaveChangesAsync(cancellationToken);
+        return await ApplySpecification(spec).AnyAsync(cancellationToken);
     }
 
-    private IQueryable<T> ApplySpecification(ISpecification<T> spec)
+    /// <summary>
+    /// Applies the specification to the query.
+    /// </summary>
+    protected virtual IQueryable<T> ApplySpecification(ISpecification<T> spec)
     {
-        return SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
+        return SpecificationEvaluator<T>.GetQuery(_dbSet.AsQueryable(), spec);
     }
+
+    #region Backward Compatibility (for tests)
+
+    /// <summary>
+    /// Adds an entity asynchronously.
+    /// Note: Use Add() with IUnitOfWork for proper transaction control.
+    /// </summary>
+    public Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
+    {
+        Add(entity);
+        return Task.FromResult(entity);
+    }
+
+    /// <summary>
+    /// Updates an entity asynchronously.
+    /// Note: Use Update() with IUnitOfWork for proper transaction control.
+    /// </summary>
+    public Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
+    {
+        Update(entity);
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Deletes an entity asynchronously.
+    /// Note: Use Delete() with IUnitOfWork for proper transaction control.
+    /// </summary>
+    public Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
+    {
+        Delete(entity);
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Saves changes asynchronously.
+    /// Note: Use IUnitOfWork for proper transaction control.
+    /// </summary>
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return _context.SaveChangesAsync(cancellationToken);
+    }
+
+    #endregion
 }

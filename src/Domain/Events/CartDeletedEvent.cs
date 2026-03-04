@@ -1,11 +1,18 @@
+using ShoppingProject.Domain.Common;
+
 namespace ShoppingProject.Domain.Events;
 
+/// <summary>
+/// Event raised when a cart item is deleted.
+/// </summary>
 public class CartDeletedEvent : BaseEvent
 {
-    public CartDeletedEvent(Cart item)
+    public CartDeletedEvent(int cartId, string ownerId)
     {
-        Item = item;
+        CartId = cartId;
+        OwnerId = ownerId;
     }
 
-    public Cart Item { get; }
+    public int CartId { get; }
+    public string OwnerId { get; }
 }

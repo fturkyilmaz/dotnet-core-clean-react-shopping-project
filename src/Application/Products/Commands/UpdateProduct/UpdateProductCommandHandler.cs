@@ -1,37 +1,38 @@
 ﻿using Ardalis.GuardClauses;
 using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Domain.Constants;
 using ShoppingProject.Domain.Entities;
-using ShoppingProject.Domain.Events;
 
 namespace ShoppingProject.Application.Products.Commands.UpdateProduct;
 
+/// <summary>
+/// Handler for updating a product using UnitOfWork pattern.
+/// </summary>
 public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateProductCommandHandler(IApplicationDbContext context)
+    public UpdateProductCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        var entity = FindProductById(request.Id);
+        await _unitOfWork.ExecuteInTransactionAsync(async () =>
+        {
+            var entity = await _unitOfWork.Repository<Product>().GetByIdAsync(request.Id, cancellationToken);
+            Guard.Against.NotFound(request.Id, entity);
 
-        Guard.Against.NotFound(request.Id, entity);
+            entity!.UpdateDetails(
+                request.Title ?? entity.Title,
+                request.Description ?? entity.Description,
+                request.Category ?? entity.Category,
+                request.Image ?? entity.Image
+            );
 
-        entity!.UpdateDetails(
-            request.Title ?? entity.Title,
-            request.Description ?? entity.Description,
-            request.Category ?? entity.Category,
-            request.Image ?? entity.Image
-        );
+            entity.UpdatePrice(request.Price);
 
-        entity.UpdatePrice(request.Price);
-
-        await _context.SaveChangesAsync(cancellationToken);
+            _unitOfWork.Repository<Product>().Update(entity);
+        }, cancellationToken);
     }
-
-    private Product? FindProductById(int id) => _context.Products.FirstOrDefault(p => p.Id == id);
 }

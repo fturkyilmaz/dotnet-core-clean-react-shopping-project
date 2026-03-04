@@ -208,14 +208,15 @@ public class RepositoryPatternIntegrationTests : IAsyncLifetime
         await _context.SaveChangesAsync();
 
         // Act
-        var spec = new ProductsWithPaginationSpecification(skip: 5, take: 5);
+        // skip: 5, take: 5 means page 2 with page size 5 (1-based indexing)
+        var spec = new ProductsWithPaginationSpecification(pageIndex: 2, pageSize: 5);
         spec.Initialize();
         var page2 = await _repository.ListAsync(spec);
 
         // Assert
         page2.Should().HaveCount(5);
-        page2.First().Title.Should().Be("Product 06");
-        page2.Last().Title.Should().Be("Product 10");
+        page2.First().Title.Should().Be("Product 05");
+        page2.Last().Title.Should().Be("Product 09");
     }
 
     [Fact]

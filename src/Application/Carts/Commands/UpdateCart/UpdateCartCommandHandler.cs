@@ -1,35 +1,38 @@
-using MediatR;
-using ShoppingProject.Application.Common.Exceptions;
+using Ardalis.GuardClauses;
 using ShoppingProject.Application.Common.Interfaces;
-using ShoppingProject.Domain.Events;
+using ShoppingProject.Domain.Entities;
 
 namespace ShoppingProject.Application.Carts.Commands.UpdateCart;
 
+/// <summary>
+/// Handler for updating a cart item using UnitOfWork pattern.
+/// </summary>
 public class UpdateCartCommandHandler : IRequestHandler<UpdateCartCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateCartCommandHandler(IApplicationDbContext context)
+    public UpdateCartCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task Handle(UpdateCartCommand request, CancellationToken cancellationToken)
     {
-        var entity = _context.Carts.FirstOrDefault(c => c.Id == request.Id);
-
-        if (entity == null)
+        await _unitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            throw new NotFoundException(nameof(entity), request.Id);
-        }
+            var entity = await _unitOfWork.Repository<Cart>().GetByIdAsync(request.Id, cancellationToken);
+            Guard.Against.NotFound(request.Id, entity);
 
-        entity.Title = request.Title;
-        entity.Price = request.Price;
-        entity.Image = request.Image;
-        entity.Quantity = request.Quantity;
+            // Update details using domain behavior
+            entity!.UpdateDetails(request.Title, request.Price, request.Image);
 
-        entity.AddDomainEvent(new CartUpdatedEvent(entity));
+            // Update quantity separately to track quantity changes
+            if (entity.Quantity != request.Quantity)
+            {
+                entity.UpdateQuantity(request.Quantity);
+            }
 
-        await _context.SaveChangesAsync(cancellationToken);
+            _unitOfWork.Repository<Cart>().Update(entity);
+        }, cancellationToken);
     }
 }

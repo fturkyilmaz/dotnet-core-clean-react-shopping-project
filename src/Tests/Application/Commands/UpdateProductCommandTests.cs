@@ -10,15 +10,27 @@ namespace ShoppingProject.UnitTests.Application.Commands;
 
 public class UpdateProductCommandTests
 {
-    private readonly Mock<IApplicationDbContext> _mockContext;
+    private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IRepository<Product>> _mockProductRepository;
     private readonly UpdateProductCommandHandler _handler;
     private readonly Faker _faker;
 
     public UpdateProductCommandTests()
     {
-        _mockContext = new Mock<IApplicationDbContext>();
-        _handler = new UpdateProductCommandHandler(_mockContext.Object);
+        _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockProductRepository = new Mock<IRepository<Product>>();
         _faker = new Faker();
+
+        _mockUnitOfWork
+            .Setup(x => x.Repository<Product>())
+            .Returns(_mockProductRepository.Object);
+
+        // Setup ExecuteInTransactionAsync to execute the lambda immediately
+        _mockUnitOfWork
+            .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<Task>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<Task>, CancellationToken>((func, _) => func());
+
+        _handler = new UpdateProductCommandHandler(_mockUnitOfWork.Object);
     }
 
     [Fact]
@@ -30,15 +42,13 @@ public class UpdateProductCommandTests
             10m,
             "Old Description",
             "old",
-            _faker.Image.PicsumUrl() // geçerli URL
+            _faker.Image.PicsumUrl()
         );
-
-        // Id setlemek için reflection (test amaçlı)
         typeof(Product).GetProperty(nameof(Product.Id))!.SetValue(existingProduct, 1);
 
-        var products = new List<Product> { existingProduct }.AsQueryable();
-        _mockContext.Setup(x => x.Products).Returns(products);
-        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        _mockProductRepository
+            .Setup(x => x.GetByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingProduct);
 
         var command = new UpdateProductCommand(
             1,
@@ -46,7 +56,7 @@ public class UpdateProductCommandTests
             20m,
             "New Description",
             "new",
-            _faker.Image.PicsumUrl() // geçerli URL
+            _faker.Image.PicsumUrl()
         );
 
         // Act
@@ -59,15 +69,17 @@ public class UpdateProductCommandTests
         existingProduct.Category.Should().Be("new");
         existingProduct.Image.Should().Be(command.Image);
 
-        _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _mockProductRepository.Verify(x => x.Update(It.IsAny<Product>()), Times.Once);
+        _mockUnitOfWork.Verify(x => x.ExecuteInTransactionAsync(It.IsAny<Func<Task>>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task Handle_NonExistentProduct_ShouldThrowNotFoundException()
     {
         // Arrange
-        var products = new List<Product>().AsQueryable();
-        _mockContext.Setup(x => x.Products).Returns(products);
+        _mockProductRepository
+            .Setup(x => x.GetByIdAsync(999, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Product?)null);
 
         var command = new UpdateProductCommand(999, "Test", 10m, null, null, null);
 
@@ -86,13 +98,13 @@ public class UpdateProductCommandTests
             15m,
             "Original Description",
             "original",
-            _faker.Image.PicsumUrl() // geçerli URL
+            _faker.Image.PicsumUrl()
         );
         typeof(Product).GetProperty(nameof(Product.Id))!.SetValue(existingProduct, 1);
 
-        var products = new List<Product> { existingProduct }.AsQueryable();
-        _mockContext.Setup(x => x.Products).Returns(products);
-        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        _mockProductRepository
+            .Setup(x => x.GetByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingProduct);
 
         var command = new UpdateProductCommand(1, null, 25m, null, null, null);
 
@@ -104,6 +116,5 @@ public class UpdateProductCommandTests
         existingProduct.Description.Should().Be("Original Description");
         existingProduct.Price.Should().Be(25m);
         existingProduct.Category.Should().Be("original");
-        existingProduct.Image.Should().NotBeNullOrEmpty(); // Faker URL korunur
     }
 }
