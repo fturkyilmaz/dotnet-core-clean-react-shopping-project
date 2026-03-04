@@ -1,7 +1,7 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import ReduxSQLiteStorage from '@/infrastructure/persistence/ReduxSQLiteStorage';
 import authReducer from '@/presentation/store/slices/authSlice';
 import productsReducer from '@/presentation/store/slices/productsSlice';
 import cartReducer from '@/presentation/store/slices/cartSlice';
@@ -15,8 +15,8 @@ const rootReducer = combineReducers({
 
 const persistConfig = {
   key: 'root',
-  storage: AsyncStorage,
-  whitelist: ['auth', 'cart'],
+  storage: ReduxSQLiteStorage,
+  whitelist: ['cart'], // Only persist cart - auth tokens are stored in secureStorage
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

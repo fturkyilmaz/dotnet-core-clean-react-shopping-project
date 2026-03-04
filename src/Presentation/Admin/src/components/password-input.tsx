@@ -13,14 +13,21 @@ type PasswordInputProps = Omit<
 export function PasswordInput({
   className,
   disabled,
+  label,
+  id,
   ref,
   ...props
-}: PasswordInputProps) {
+}: PasswordInputProps & { label?: string; id?: string }) {
   const [showPassword, setShowPassword] = React.useState(false)
+  const inputId = id || React.useId()
 
   return (
     <div className={cn('relative rounded-md', className)}>
+      <label htmlFor={inputId} className="sr-only">
+        {label || 'Password'}
+      </label>
       <input
+        id={inputId}
         type={showPassword ? 'text' : 'password'}
         className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50'
         ref={ref}

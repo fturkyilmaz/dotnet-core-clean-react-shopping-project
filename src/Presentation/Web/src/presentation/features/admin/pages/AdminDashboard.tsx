@@ -1,313 +1,409 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useProducts, useDeleteProduct } from '@/presentation/features/product/hooks/useProducts';
 import Loader from '@/presentation/shared/components/Loader';
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Package,
+  ShoppingCart,
+  DollarSign,
+  Users,
+  Plus,
+  Receipt,
+  UserCog,
+  Clock,
+  Settings,
+  Pencil,
+  Trash2,
+  CheckCircle,
+  Info,
+  Box,
+  UserPlus,
+  LayoutDashboard,
+  Star
+} from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Alert,
+  AlertDescription,
+} from "@/components/ui/alert";
 
+// Types
+interface Stats {
+  totalProducts: number;
+  totalOrders: number;
+  totalRevenue: number;
+  activeUsers: number;
+}
 
-const AdminDashboard: FC = () => {
-    const navigate = useNavigate();
-    const { data: products, isLoading } = useProducts();
-    const { mutate: deleteProduct } = useDeleteProduct();
-    const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders'>('overview');
+interface Product {
+  id: number;
+  title: string;
+  image: string;
+  category: string;
+  price: number;
+  rating: { rate: number };
+}
 
-    // Mock statistics
-    const stats = {
-        totalProducts: products?.length || 0,
-        totalOrders: 156,
-        totalRevenue: 45678.90,
-        activeUsers: 1234,
-    };
+// StatsCards Component
+const StatsCards: FC<{ stats: Stats }> = ({ stats }) => {
+  const { t } = useTranslation();
 
-    const handleDeleteProduct = (id: number): void => {
-        if (window.confirm('Are you sure you want to delete this product?')) {
-            deleteProduct(id);
-        }
-    };
+  const cards = [
+    {
+      title: t('totalProducts'),
+      value: stats.totalProducts,
+      icon: Package,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+    },
+    {
+      title: t('totalOrders'),
+      value: stats.totalOrders,
+      icon: ShoppingCart,
+      color: 'text-green-600',
+      bgColor: 'bg-green-100 dark:bg-green-900/30',
+    },
+    {
+      title: t('totalRevenue'),
+      value: `$${stats.totalRevenue.toLocaleString()}`,
+      icon: DollarSign,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
+    },
+    {
+      title: t('activeUsers'),
+      value: stats.activeUsers,
+      icon: Users,
+      color: 'text-cyan-600',
+      bgColor: 'bg-cyan-100 dark:bg-cyan-900/30',
+    },
+  ];
 
-    const handleAddProduct = (): void => {
-        navigate('/admin/products/add');
-    };
-
-    if (isLoading) {
-        return (
-            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-                <Loader />
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {cards.map((card) => (
+        <Card key={card.title} className="border-0 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">{card.title}</p>
+                <h3 className="text-2xl font-bold">{card.value}</h3>
+              </div>
+              <div className={`${card.bgColor} p-3 rounded-lg`}>
+                <card.icon className={`h-6 w-6 ${card.color}`} />
+              </div>
             </div>
-        );
-    }
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+};
 
-    return (
-        <div className="container-fluid py-4">
-            {/* Header */}
-            <div className="row mb-4">
-                <div className="col">
-                    <h1 className="display-5 fw-bold">Admin Dashboard</h1>
-                    <p className="text-muted">Manage your e-commerce platform</p>
-                </div>
-            </div>
+// Activity Item Component
+interface ActivityItemProps {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  time: string;
+  color: string;
+  bgColor: string;
+}
 
-            <Button>shadcn works</Button>
+const ActivityItem: FC<ActivityItemProps> = ({ icon: Icon, title, description, time, color, bgColor }) => (
+  <div className="flex items-center py-3 border-b border-border last:border-0">
+    <div className={`${bgColor} p-2 rounded-lg mr-3`}>
+      <Icon className={`h-4 w-4 ${color}`} />
+    </div>
+    <div className="flex-grow">
+      <p className="text-sm font-medium">{title}</p>
+      <p className="text-xs text-muted-foreground">{description}</p>
+    </div>
+    <span className="text-xs text-muted-foreground">{time}</span>
+  </div>
+);
 
-            {/* Statistics Cards */}
-            <div className="row g-4 mb-4">
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm h-100">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1">Total Products</p>
-                                    <h3 className="fw-bold mb-0">{stats.totalProducts}</h3>
-                                </div>
-                                <div className="bg-primary bg-opacity-10 p-3 rounded">
-                                    <i className="bi bi-box-seam fs-3 text-primary"></i>
-                                </div>
-                            </div>
-                        </div>
+// OverviewTab Component
+interface OverviewTabProps {
+  onAddProduct: () => void;
+  onViewAuditLogs: () => void;
+}
+
+const OverviewTab: FC<OverviewTabProps> = ({ onAddProduct, onViewAuditLogs }) => {
+  const { t } = useTranslation();
+
+  const activities = [
+    {
+      icon: CheckCircle,
+      title: 'New order received',
+      description: 'Order #1234 - $299.99',
+      time: '2 min ago',
+      color: 'text-green-600',
+      bgColor: 'bg-green-100 dark:bg-green-900/30',
+    },
+    {
+      icon: Box,
+      title: 'Product added',
+      description: 'New product in Electronics',
+      time: '1 hour ago',
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+    },
+    {
+      icon: UserPlus,
+      title: 'New user registered',
+      description: 'john.doe@example.com',
+      time: '3 hours ago',
+      color: 'text-cyan-600',
+      bgColor: 'bg-cyan-100 dark:bg-cyan-900/30',
+    },
+  ];
+
+  const quickActions = [
+    { icon: Plus, label: t('addProduct'), onClick: onAddProduct, variant: 'default' as const },
+    { icon: Receipt, label: t('viewAllOrders'), onClick: () => {}, variant: 'outline' as const },
+    { icon: UserCog, label: t('manageUsers'), onClick: () => {}, variant: 'outline' as const },
+    { icon: Clock, label: t('viewAuditLogs'), onClick: onViewAuditLogs, variant: 'outline' as const },
+    { icon: Settings, label: t('settings'), onClick: () => {}, variant: 'outline' as const },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Recent Activity */}
+      <Card className="lg:col-span-2 border-0 shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-lg">{t('recentActivity')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {activities.map((activity, index) => (
+            <ActivityItem key={index} {...activity} />
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Quick Actions */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-lg">{t('quickActions')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {quickActions.map((action) => (
+            <Button
+              key={action.label}
+              variant={action.variant}
+              className="w-full justify-start"
+              onClick={action.onClick}
+            >
+              <action.icon className="h-4 w-4 mr-2" />
+              {action.label}
+            </Button>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// ProductsTab Component
+interface ProductsTabProps {
+  products?: Product[];
+  onAddProduct: () => void;
+  onDeleteProduct: (id: number) => void;
+}
+
+const ProductsTab: FC<ProductsTabProps> = ({ products, onAddProduct, onDeleteProduct }) => {
+  const { t } = useTranslation();
+
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-lg">{t('productManagement')}</CardTitle>
+        <Button onClick={onAddProduct}>
+          <Plus className="h-4 w-4 mr-2" />
+          {t('addProduct')}
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('image')}</TableHead>
+                <TableHead>{t('productName')}</TableHead>
+                <TableHead>{t('category')}</TableHead>
+                <TableHead>{t('price')}</TableHead>
+                <TableHead>{t('rating')}</TableHead>
+                <TableHead className="text-right">{t('actions')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products?.slice(0, 10).map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="w-12 h-12 object-contain rounded bg-background"
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium max-w-xs truncate">
+                    {product.title}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{product.category}</Badge>
+                  </TableCell>
+                  <TableCell className="font-bold">${product.price}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-yellow-500">
+                      <Star className="h-4 w-4 fill-current mr-1" />
+                      {product.rating.rate}
                     </div>
-                </div>
-
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm h-100">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1">Total Orders</p>
-                                    <h3 className="fw-bold mb-0">{stats.totalOrders}</h3>
-                                </div>
-                                <div className="bg-success bg-opacity-10 p-3 rounded">
-                                    <i className="bi bi-cart-check fs-3 text-success"></i>
-                                </div>
-                            </div>
-                        </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button variant="outline" size="icon">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => onDeleteProduct(product.id)}
+                        className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                </div>
-
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm h-100">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1">Total Revenue</p>
-                                    <h3 className="fw-bold mb-0">${stats.totalRevenue.toLocaleString()}</h3>
-                                </div>
-                                <div className="bg-warning bg-opacity-10 p-3 rounded">
-                                    <i className="bi bi-currency-dollar fs-3 text-warning"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm h-100">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1">Active Users</p>
-                                    <h3 className="fw-bold mb-0">{stats.activeUsers}</h3>
-                                </div>
-                                <div className="bg-info bg-opacity-10 p-3 rounded">
-                                    <i className="bi bi-people fs-3 text-info"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Tabs */}
-            <ul className="nav nav-tabs mb-4">
-                <li className="nav-item">
-                    <button
-                        className={`nav-link ${activeTab === 'overview' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('overview')}
-                    >
-                        <i className="bi bi-speedometer2 me-2"></i>
-                        Overview
-                    </button>
-                </li>
-                <li className="nav-item">
-                    <button
-                        className={`nav-link ${activeTab === 'products' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('products')}
-                    >
-                        <i className="bi bi-box-seam me-2"></i>
-                        Products
-                    </button>
-                </li>
-                <li className="nav-item">
-                    <button
-                        className={`nav-link ${activeTab === 'orders' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('orders')}
-                    >
-                        <i className="bi bi-receipt me-2"></i>
-                        Orders
-                    </button>
-                </li>
-            </ul>
-
-            {/* Tab Content */}
-            {activeTab === 'overview' && (
-                <div className="row g-4">
-                    <div className="col-md-8">
-                        <div className="card border-0 shadow-sm">
-                            <div className="card-body">
-                                <h5 className="card-title fw-bold mb-4">Recent Activity</h5>
-                                <div className="list-group list-group-flush">
-                                    <div className="list-group-item border-0 px-0">
-                                        <div className="d-flex align-items-center">
-                                            <div className="bg-success bg-opacity-10 p-2 rounded me-3">
-                                                <i className="bi bi-check-circle text-success"></i>
-                                            </div>
-                                            <div className="flex-grow-1">
-                                                <p className="mb-0 fw-semibold">New order received</p>
-                                                <small className="text-muted">Order #1234 - $299.99</small>
-                                            </div>
-                                            <small className="text-muted">2 min ago</small>
-                                        </div>
-                                    </div>
-                                    <div className="list-group-item border-0 px-0">
-                                        <div className="d-flex align-items-center">
-                                            <div className="bg-primary bg-opacity-10 p-2 rounded me-3">
-                                                <i className="bi bi-box-seam text-primary"></i>
-                                            </div>
-                                            <div className="flex-grow-1">
-                                                <p className="mb-0 fw-semibold">Product added</p>
-                                                <small className="text-muted">New product in Electronics</small>
-                                            </div>
-                                            <small className="text-muted">1 hour ago</small>
-                                        </div>
-                                    </div>
-                                    <div className="list-group-item border-0 px-0">
-                                        <div className="d-flex align-items-center">
-                                            <div className="bg-info bg-opacity-10 p-2 rounded me-3">
-                                                <i className="bi bi-person-plus text-info"></i>
-                                            </div>
-                                            <div className="flex-grow-1">
-                                                <p className="mb-0 fw-semibold">New user registered</p>
-                                                <small className="text-muted">john.doe@example.com</small>
-                                            </div>
-                                            <small className="text-muted">3 hours ago</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="col-md-4">
-                        <div className="card border-0 shadow-sm">
-                            <div className="card-body">
-                                <h5 className="card-title fw-bold mb-4">Quick Actions</h5>
-                                <div className="d-grid gap-2">
-                                    <button className="btn btn-primary" onClick={handleAddProduct}>
-                                        <i className="bi bi-plus-circle me-2"></i>
-                                        Add New Product
-                                    </button>
-                                    <button className="btn btn-outline-primary">
-                                        <i className="bi bi-receipt me-2"></i>
-                                        View All Orders
-                                    </button>
-                                    <button className="btn btn-outline-primary">
-                                        <i className="bi bi-people me-2"></i>
-                                        Manage Users
-                                    </button>
-                                    <button className="btn btn-outline-primary" onClick={() => navigate('/admin/audit-logs')}>
-                                        <i className="bi bi-clock-history me-2"></i>
-                                        View Audit Logs
-                                    </button>
-                                    <button className="btn btn-outline-primary">
-                                        <i className="bi bi-gear me-2"></i>
-                                        Settings
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {activeTab === 'products' && (
-                <div className="card border-0 shadow-sm">
-                    <div className="card-body">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h5 className="card-title fw-bold mb-0">Product Management</h5>
-                            <button className="btn btn-primary" onClick={handleAddProduct}>
-                                <i className="bi bi-plus-circle me-2"></i>
-                                Add Product
-                            </button>
-                        </div>
-
-                        <div className="table-responsive">
-                            <table className="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Image</th>
-                                        <th>Name</th>
-                                        <th>Category</th>
-                                        <th>Price</th>
-                                        <th>Rating</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {products?.slice(0, 10).map((product) => (
-                                        <tr key={product.id}>
-                                            <td>
-                                                <img
-                                                    src={product.image}
-                                                    alt={product.title}
-                                                    style={{ width: '50px', height: '50px', objectFit: 'contain' }}
-                                                />
-                                            </td>
-                                            <td>
-                                                <div className="fw-semibold">{product.title.substring(0, 40)}...</div>
-                                            </td>
-                                            <td>
-                                                <span className="badge bg-secondary">{product.category}</span>
-                                            </td>
-                                            <td className="fw-bold">${product.price}</td>
-                                            <td>
-                                                <span className="text-warning">
-                                                    ★ {product.rating.rate}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div className="btn-group btn-group-sm">
-                                                    <button className="btn btn-outline-primary">
-                                                        <i className="bi bi-pencil"></i>
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-outline-danger"
-                                                        onClick={() => handleDeleteProduct(product.id)}
-                                                    >
-                                                        <i className="bi bi-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {activeTab === 'orders' && (
-                <div className="card border-0 shadow-sm">
-                    <div className="card-body">
-                        <h5 className="card-title fw-bold mb-4">Recent Orders</h5>
-                        <div className="alert alert-info">
-                            <i className="bi bi-info-circle me-2"></i>
-                            Order management feature coming soon!
-                        </div>
-                    </div>
-                </div>
-            )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// OrdersTab Component
+const OrdersTab: FC = () => {
+  const { t } = useTranslation();
+
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardHeader>
+        <CardTitle className="text-lg">{t('recentOrders')}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            {t('orderManagementComingSoon')}
+          </AlertDescription>
+        </Alert>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Main AdminDashboard Component
+const AdminDashboard: FC = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { data: products, isLoading } = useProducts();
+  const { mutate: deleteProduct } = useDeleteProduct();
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders'>('overview');
+
+  // Mock statistics
+  const stats: Stats = {
+    totalProducts: products?.length || 0,
+    totalOrders: 156,
+    totalRevenue: 45678.90,
+    activeUsers: 1234,
+  };
+
+  const handleDeleteProduct = (id: number): void => {
+    if (window.confirm(t('confirmDeleteProduct'))) {
+      deleteProduct(id);
+    }
+  };
+
+  const handleAddProduct = (): void => {
+    navigate('/admin/products/add');
+  };
+
+  const handleViewAuditLogs = (): void => {
+    navigate('/admin/audit-logs');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Loader />
+      </div>
     );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <LayoutDashboard className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-bold">{t('adminDashboard')}</h1>
+        </div>
+        <p className="text-muted-foreground">{t('manageYourPlatform')}</p>
+      </div>
+
+      {/* Statistics Cards */}
+      <StatsCards stats={stats} />
+
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+          <TabsTrigger value="overview" className="flex items-center gap-2">
+            <LayoutDashboard className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('overview')}</span>
+          </TabsTrigger>
+          <TabsTrigger value="products" className="flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('products')}</span>
+          </TabsTrigger>
+          <TabsTrigger value="orders" className="flex items-center gap-2">
+            <Receipt className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('orders')}</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview">
+          <OverviewTab onAddProduct={handleAddProduct} onViewAuditLogs={handleViewAuditLogs} />
+        </TabsContent>
+
+        <TabsContent value="products">
+          <ProductsTab
+            products={products}
+            onAddProduct={handleAddProduct}
+            onDeleteProduct={handleDeleteProduct}
+          />
+        </TabsContent>
+
+        <TabsContent value="orders">
+          <OrdersTab />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
 };
 
 export default AdminDashboard;

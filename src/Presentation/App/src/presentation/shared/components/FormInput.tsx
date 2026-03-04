@@ -25,6 +25,7 @@ export default function FormInput<T>({
   inputClassName = '',
 }: FormInputProps<T>) {
   const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const baseInputClass =
     'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 text-slate-900 dark:text-white text-base focus:border-primary focus:bg-white dark:focus:bg-slate-800';

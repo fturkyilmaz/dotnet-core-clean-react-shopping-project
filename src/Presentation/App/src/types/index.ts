@@ -69,5 +69,3 @@ export interface PaginatedData<T> {
   hasPrevious: boolean;
   hasNext: boolean;
 }
-
-export * from './navigation';

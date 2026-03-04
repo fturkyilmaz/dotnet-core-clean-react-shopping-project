@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { logout } from '@/presentation/store/slices/authSlice';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { useAppDispatch } from '@/presentation/store/hooks';
-import { useAppNavigation } from '../hooks/useAppNavigation';
+import { useRouter } from 'expo-router';
 
 interface CustomHeaderProps {
     title: string;
@@ -15,7 +15,7 @@ interface CustomHeaderProps {
 export default function CustomHeader({ title, showBack = false }: CustomHeaderProps) {
     const dispatch = useAppDispatch();
     const { theme, toggleTheme } = useTheme();
-    const navigation = useAppNavigation();
+    const router = useRouter();
 
     const handleLogout = () => {
         Alert.alert(
@@ -38,7 +38,7 @@ export default function CustomHeader({ title, showBack = false }: CustomHeaderPr
                     {showBack && (
                         <AccessibleTouchable
                             accessibilityLabel="Go back"
-                            onPress={() => navigation.goBack()}
+                            onPress={() => router.back()}
                             className="mr-3 p-1 rounded-full active:bg-slate-100 dark:active:bg-slate-800"
                         >
                             <Ionicons

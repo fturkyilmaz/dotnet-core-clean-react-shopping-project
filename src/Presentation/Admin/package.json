@@ -6,11 +6,22 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:analyze": "tsc -b && vite build && npx serve dist",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
-    "knip": "knip"
+    "knip": "knip",
+    "knip:ci": "knip --production",
+    "type-check": "tsc --noEmit",
+    "analyze": "vite-bundle-visualizer",
+    "ci": "pnpm type-check && pnpm lint && pnpm knip:ci && pnpm build",
+    "prepare": "cd ../.. && husky src/Presentation/Admin/.husky || true"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md,css}": ["prettier --write"]
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.58.1",
@@ -76,11 +87,15 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.25",
     "globals": "^16.5.0",
+    "husky": "^9.1.7",
     "knip": "^5.73.4",
+    "lint-staged": "^16.3.1",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "rollup-plugin-visualizer": "^7.0.0",
+    "terser": "^5.46.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.49.0",
-    "vite": "^7.3.0"
+    "vite": "^7.3.1"
   }
 }

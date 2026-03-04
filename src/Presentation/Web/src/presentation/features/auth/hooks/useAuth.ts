@@ -5,7 +5,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { authService } from '@services/dependencyInjector';
 import type { LoginCredentials, RegisterData } from '@core/domain/ports/IAuthService';
 import { setCredentials, logout as logoutAction } from '@/presentation/store/slices/authSlice';

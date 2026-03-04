@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
 import { useColorScheme } from 'nativewind';
 
 type Theme = 'light' | 'dark';
@@ -18,7 +18,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     useEffect(() => {
         const loadTheme = async () => {
             try {
-                const savedTheme = await AsyncStorage.getItem('theme');
+                const savedTheme = await sqliteRepository.getItem('theme');
                 if (savedTheme) {
                     setTheme(savedTheme as Theme);
                     setColorScheme(savedTheme as Theme);
@@ -46,7 +46,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setColorScheme(newTheme);
         setTheme(newTheme);
         try {
-            await AsyncStorage.setItem('theme', newTheme);
+            await sqliteRepository.setItem('theme', newTheme);
         } catch (error) {
             console.error('Failed to save theme', error);
         }

@@ -1,145 +1,246 @@
-import type { FC } from "react";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import Loader from "@/presentation/shared/components/Loader";
-import { useProducts } from "../hooks/useProducts";
+import { motion } from "framer-motion";
+import {
+  Monitor,
+  Gem,
+  Shirt,
+  ShoppingBag,
+  Grid3X3,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { SkeletonProductGrid } from "@/components/ui/skeleton";
+import ProductCard from "@/presentation/features/product/components/ProductCard";
+import { useProducts } from "@/presentation/features/product/hooks/useProducts";
 
-interface CategoryIcons {
-  [key: string]: string;
+interface CategoryData {
+  id: string;
+  name: string;
+  icon: React.ElementType;
+  description: string;
+  color: string;
+  gradient: string;
 }
 
-interface CategoryColors {
-  [key: string]: string;
-}
+const categoryData: CategoryData[] = [
+  {
+    id: "all",
+    name: "allProducts",
+    icon: Grid3X3,
+    description: "browseAllProducts",
+    color: "bg-blue-500",
+    gradient: "from-blue-500 to-cyan-500",
+  },
+  {
+    id: "electronics",
+    name: "electronics",
+    icon: Monitor,
+    description: "latestGadgets",
+    color: "bg-purple-500",
+    gradient: "from-purple-500 to-pink-500",
+  },
+  {
+    id: "jewelery",
+    name: "jewelry",
+    icon: Gem,
+    description: "elegantJewelry",
+    color: "bg-yellow-500",
+    gradient: "from-yellow-500 to-orange-500",
+  },
+  {
+    id: "men's clothing",
+    name: "mensClothing",
+    icon: Shirt,
+    description: "mensFashion",
+    color: "bg-slate-500",
+    gradient: "from-slate-500 to-gray-500",
+  },
+  {
+    id: "women's clothing",
+    name: "womensClothing",
+    icon: ShoppingBag,
+    description: "womensFashion",
+    color: "bg-pink-500",
+    gradient: "from-pink-500 to-rose-500",
+  },
+];
 
-const categoryIcons: CategoryIcons = {
-  "all": "🏪",
-  "electronics": "💻",
-  "jewelery": "💎",
-  "men's clothing": "👔",
-  "women's clothing": "👗"
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 },
+  },
 };
 
-const categoryColors: CategoryColors = {
-  "all": "primary",
-  "electronics": "info",
-  "jewelery": "warning",
-  "men's clothing": "secondary",
-  "women's clothing": "danger"
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
 };
 
-const CategoryPage: FC = () => {
+const CategoryPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { data: products, isLoading, isError } = useProducts();
   const [searchParams] = useSearchParams();
-  const category = searchParams.get("category") || "all";
+  const selectedCategory = searchParams.get("category") || "all";
 
-  const categories = useMemo(() => {
+  // Get unique categories for display
+  useMemo(() => {
     if (!products) return [];
-    const uniqueCategories = Array.from(new Set(products.map(p => p.category)));
+    const uniqueCategories = Array.from(new Set(products.map((p) => p.category)));
     return uniqueCategories.sort();
   }, [products]);
 
-  const handleSetCategory = useCallback((cat: string): void => {
-    navigate(`/?category=${encodeURIComponent(cat)}`);
-  }, [navigate]);
+  const handleCategorySelect = (categoryId: string) => {
+    if (categoryId === "all") {
+      navigate("/");
+    } else {
+      navigate(`/?category=${encodeURIComponent(categoryId)}`);
+    }
+  };
 
-  if (isLoading) {
-    return (
-      <div className="container my-5" role="status" aria-live="polite">
-        <Loader />
-      </div>
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+    if (selectedCategory === "all") return products;
+    return products.filter(
+      (p) => p.category.toLowerCase() === selectedCategory.toLowerCase()
     );
-  }
-
-  if (isError || categories.length === 0) {
-    return (
-      <div className="container my-5 text-center" role="alert">
-        <div className="p-5 bg-light rounded-3 shadow-sm">
-          <h2 className="display-6 text-secondary mb-3">{t("error")}</h2>
-          <p className="text-muted">{t("productNotFound")}</p>
-        </div>
-      </div>
-    );
-  }
+  }, [products, selectedCategory]);
 
   return (
-    <div className="container my-5">
-      <div className="text-center mb-5">
-        <h1 className="display-4 fw-bold mb-3">{t("categories")}</h1>
-        <p className="text-muted fs-5">
-          {t("selectCategory") ?? "Select a category to start shopping"}
-        </p>
-      </div>
-
-      <div className="row g-4">
-        {/* All Categories Card */}
-        <div className="col-md-6 col-lg-4">
-          <div
-            onClick={() => handleSetCategory("all")}
-            className={`category-card card border-0 shadow-sm h-100 ${category === "all" ? "active" : ""}`}
-            style={{ cursor: "pointer", transition: "all 0.3s ease" }}
-            role="button"
-            tabIndex={0}
-            onKeyPress={(e) => e.key === "Enter" && handleSetCategory("all")}
+    <div className="min-h-screen bg-muted/30">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-primary/5 via-background to-secondary/20 py-16 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center max-w-2xl mx-auto"
           >
-            <div className="card-body text-center p-4">
-              <div className="category-icon fs-1 mb-3">{categoryIcons["all"]}</div>
-              <h3 className="card-title fw-bold text-capitalize mb-2">{t("products")}</h3>
-              <p className="text-muted small mb-0">
-                {t("viewAllProducts") ?? "View products from all categories"}
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              {t("categories")}
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              {t("categoriesDescription") || "Explore our wide range of products across different categories"}
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Categories Grid */}
+      <section className="py-12 -mt-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
+          >
+            {categoryData.map((category) => {
+              const isActive =
+                category.id === selectedCategory ||
+                (category.id === "all" && selectedCategory === "all");
+              const productCount =
+                category.id === "all"
+                  ? products?.length || 0
+                  : products?.filter((p) => p.category === category.id).length || 0;
+
+              return (
+                <motion.div key={category.id} variants={itemVariants}>
+                  <Card
+                    onClick={() => handleCategorySelect(category.id)}
+                    className={`relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+                      isActive ? "ring-2 ring-primary shadow-lg" : ""
+                    }`}
+                  >
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 transition-opacity duration-300 ${
+                        isActive ? "opacity-10" : "group-hover:opacity-5"
+                      }`}
+                    />
+                    <div className="p-6">
+                      <div
+                        className={`w-12 h-12 rounded-xl ${category.color} flex items-center justify-center mb-4`}
+                      >
+                        <category.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="font-semibold text-lg mb-1">
+                        {t(category.name)}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {t(category.description)}
+                      </p>
+                      <p className="text-sm font-medium text-primary">
+                        {productCount} {t("products")}
+                      </p>
+                    </div>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Products Section */}
+      <section className="py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold capitalize">
+                {selectedCategory === "all"
+                  ? t("allProducts")
+                  : selectedCategory}
+              </h2>
+              <p className="text-muted-foreground">
+                {filteredProducts.length} {t("productsFound")}
               </p>
             </div>
+            {selectedCategory !== "all" && (
+              <Button variant="outline" onClick={() => handleCategorySelect("all")}>
+                {t("viewAllCategories")}
+              </Button>
+            )}
           </div>
-        </div>
 
-        {/* Category Cards */}
-        {categories.map((cat) => (
-          <div className="col-md-6 col-lg-4" key={cat}>
-            <div
-              onClick={() => handleSetCategory(cat)}
-              className={`category-card card border-0 shadow-sm h-100 ${category === cat ? "active" : ""}`}
-              style={{ cursor: "pointer", transition: "all 0.3s ease" }}
-              role="button"
-              tabIndex={0}
-              onKeyPress={(e) => e.key === "Enter" && handleSetCategory(cat)}
-            >
-              <div className="card-body text-center p-4">
-                <div className="category-icon fs-1 mb-3">
-                  {categoryIcons[cat] || "📦"}
-                </div>
-                <h3 className="card-title fw-bold text-capitalize mb-2">{cat}</h3>
-                <span className={`badge bg-${categoryColors[cat] || "primary"} px-3 py-2`}>
-                  {t("viewDetails")}
-                </span>
-              </div>
+          {isLoading ? (
+            <SkeletonProductGrid count={8} />
+          ) : isError ? (
+            <div className="text-center py-20">
+              <p className="text-destructive">{t("error")}</p>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <style>{`
-        .category-card {
-          transform: translateY(0);
-          border: 2px solid transparent !important;
-        }
-        .category-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
-        }
-        .category-card.active {
-          border-color: var(--bs-primary) !important;
-          box-shadow: 0 8px 24px rgba(13,110,253,0.3) !important;
-        }
-        .category-icon {
-          transition: transform 0.3s ease;
-        }
-        .category-card:hover .category-icon {
-          transform: scale(1.2) rotate(5deg);
-        }
-      `}</style>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="text-6xl mb-4">📦</div>
+              <h3 className="text-lg font-semibold mb-2">
+                {t("noProductsInCategory")}
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                {t("tryDifferentCategory")}
+              </p>
+              <Button onClick={() => handleCategorySelect("all")}>
+                {t("viewAllProducts")}
+              </Button>
+            </div>
+          ) : (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              {filteredProducts.map((product) => (
+                <motion.div key={product.id} variants={itemVariants}>
+                  <ProductCard product={product} />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

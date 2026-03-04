@@ -6,16 +6,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        
+
         primary: {
           DEFAULT: '#2563eb',
           400: '#60a5fa',
-          700: '#1e40af', 
+          700: '#1e40af',
         },
         secondary: {
           DEFAULT: '#6b7280',
           400: '#6b7280',
-          700: '#6b7280', 
+          700: '#6b7280',
         },
 
         background: '#ffffff',

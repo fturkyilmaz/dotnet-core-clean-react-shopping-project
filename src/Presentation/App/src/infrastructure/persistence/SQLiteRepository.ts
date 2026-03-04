@@ -69,16 +69,25 @@ export class SQLiteRepository {
         );
       `);
 
+      // Create Key-Value Store table for app settings
+      await this.db.execAsync(`
+        CREATE TABLE IF NOT EXISTS key_value_store (
+          key TEXT PRIMARY KEY NOT NULL,
+          value TEXT NOT NULL,
+          updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
       // Create indexes for performance optimization
       await this.db.execAsync(`
         CREATE INDEX IF NOT EXISTS idx_products_id ON products(id);
         CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
         CREATE INDEX IF NOT EXISTS idx_products_synced_at ON products(synced_at);
-        
+
         CREATE INDEX IF NOT EXISTS idx_cart_items_id ON cart_items(id);
         CREATE INDEX IF NOT EXISTS idx_cart_items_product_id ON cart_items(product_id);
         CREATE INDEX IF NOT EXISTS idx_cart_items_updated_at ON cart_items(updated_at);
-        
+
         CREATE INDEX IF NOT EXISTS idx_offline_queue_status ON offline_queue(status);
         CREATE INDEX IF NOT EXISTS idx_offline_queue_entity_type ON offline_queue(entity_type);
         CREATE INDEX IF NOT EXISTS idx_offline_queue_created_at ON offline_queue(created_at);
@@ -112,10 +121,59 @@ export class SQLiteRepository {
         DELETE FROM cart_items;
         DELETE FROM products;
         DELETE FROM offline_queue;
+        DELETE FROM key_value_store;
       `);
       console.log('All data cleared from database');
     } catch (error) {
       console.error('Failed to clear data:', error);
+      throw error;
+    }
+  }
+
+  // ============= KEY-VALUE STORAGE =============
+
+  /**
+   * Get a value from key-value store
+   */
+  async getItem(key: string): Promise<string | null> {
+    if (!this.db) return null;
+    try {
+      const result = await this.db.getFirstAsync<{ value: string }>(
+        'SELECT value FROM key_value_store WHERE key = ?',
+        [key]
+      );
+      return result?.value ?? null;
+    } catch (error) {
+      console.error(`Error getting item ${key}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Set a value in key-value store
+   */
+  async setItem(key: string, value: string): Promise<void> {
+    if (!this.db) return;
+    try {
+      await this.db.runAsync(
+        `INSERT OR REPLACE INTO key_value_store (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)`,
+        [key, value]
+      );
+    } catch (error) {
+      console.error(`Error setting item ${key}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Remove a value from key-value store
+   */
+  async removeItem(key: string): Promise<void> {
+    if (!this.db) return;
+    try {
+      await this.db.runAsync('DELETE FROM key_value_store WHERE key = ?', [key]);
+    } catch (error) {
+      console.error(`Error removing item ${key}:`, error);
       throw error;
     }
   }

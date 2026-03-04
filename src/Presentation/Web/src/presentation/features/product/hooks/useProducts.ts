@@ -3,7 +3,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { productRepository } from '@services/dependencyInjector';
 import type { CreateProduct, UpdateProduct } from '@core/domain/entities/Product';
 

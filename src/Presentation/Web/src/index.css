@@ -28,13 +28,13 @@
 
 /* Dark Theme Variables */
 [data-theme="dark"] {
-  --bg-primary: #1a1d24;
-  --bg-secondary: #242831;
-  --bg-tertiary: #2d323e;
-  --text-primary: #e9ecef;
-  --text-secondary: #adb5bd;
-  --text-muted: #6c757d;
-  --border-color: #3d4452;
+  --bg-primary: #0f1115;
+  --bg-secondary: #1a1d24;
+  --bg-tertiary: #242831;
+  --text-primary: #ffffff;
+  --text-secondary: #c1c7cd;
+  --text-muted: #9ca3af;
+  --border-color: #4b5563;
   --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
   --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.5);

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useBiometricAuth } from '../hooks/useBiometricAuth';
 import { BiometricLoginScreen } from '../screens/BiometricLoginScreen';
-import { useNavigation } from '@react-navigation/native';
+
 
 /**
  * Biometric Authentication Implementation Examples
@@ -14,7 +14,6 @@ import { useNavigation } from '@react-navigation/native';
 // Example 1: Simple Biometric Login Button
 export const SimpleBiometricLoginButton = () => {
   const { authenticate, isLoading, isAvailable, getBiometryTypeName } = useBiometricAuth();
-  const navigation = useNavigation();
 
   const handlePress = async () => {
     const result = await authenticate();
@@ -133,7 +132,6 @@ export const ConditionalBiometricUI = () => {
 
 // Example 5: Biometric Authentication Demo Screen
 export const BiometricDemoScreen = () => {
-  const navigation = useNavigation();
 
   const handleAuthSuccess = () => {
     console.log('Authentication successful');

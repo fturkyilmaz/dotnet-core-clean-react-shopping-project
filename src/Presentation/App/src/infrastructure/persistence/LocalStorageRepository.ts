@@ -1,6 +1,5 @@
-import { SQLiteRepository } from './SQLiteRepository';
+import sqliteRepository from './SQLiteRepository';
 import { Product } from '../../core/domain/entities/Product';
-import { CartItem } from '@/types';
 import { IOfflineQueueRepository } from '../../core/domain/ports/IOfflineQueueRepository';
 
 // Temporary type definition until we fix imports
@@ -18,17 +17,15 @@ export interface OfflineOperation {
  * Implements offline data persistence using SQLite
  */
 export class LocalStorageRepository implements IOfflineQueueRepository {
-  private db: ReturnType<typeof SQLiteRepository.getInstance>;
-
-  constructor() {
-    this.db = SQLiteRepository.getInstance();
+  private get db() {
+    return sqliteRepository.getDb();
   }
 
   // ============= PRODUCTS =============
 
   async getProducts(): Promise<Product[]> {
     try {
-      const result = await this.db.getDb().getAllAsync<Product>(
+      const result = await this.db.getAllAsync<Product>(
         'SELECT id, title, price, description, category, image, rating_rate as "rating.rate", rating_count as "rating.count" FROM products ORDER BY created_at DESC'
       );
       return result || [];
@@ -40,7 +37,7 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
 
   async getProduct(id: number): Promise<Product | null> {
     try {
-      const result = await this.db.getDb().getFirstAsync<Product>(
+      const result = await this.db.getFirstAsync<Product>(
         'SELECT id, title, price, description, category, image, rating_rate as "rating.rate", rating_count as "rating.count" FROM products WHERE id = ?',
         [id]
       );
@@ -53,7 +50,7 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
 
   async saveProducts(products: Product[]): Promise<void> {
     try {
-      const db = this.db.getDb();
+      const db = this.db;
 
       for (const product of products) {
         await db.runAsync(
@@ -85,7 +82,7 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
   // Note: CartItem interface might need adjustment to match DB schema vs Domain Entity
   async getCartItems(): Promise<any[]> {
     try {
-      const result = await this.db.getDb().getAllAsync<any>(
+      const result = await this.db.getAllAsync<any>(
         `SELECT c.id, c.product_id, c.quantity, p.title, p.price, p.description, p.category, p.image, p.rating_rate, p.rating_count
          FROM cart_items c
          JOIN products p ON c.product_id = p.id
@@ -100,7 +97,7 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
 
   async addCartItem(cartItem: any): Promise<void> {
     try {
-      await this.db.getDb().runAsync(
+      await this.db.runAsync(
         `INSERT OR REPLACE INTO cart_items (id, product_id, quantity)
          VALUES (?, ?, ?)`,
         [cartItem.id, cartItem.id, cartItem.quantity || 1]
@@ -116,7 +113,7 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
 
   async updateCartItem(cartItem: any): Promise<void> {
     try {
-      await this.db.getDb().runAsync(
+      await this.db.runAsync(
         `UPDATE cart_items SET quantity = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
         [cartItem.quantity, cartItem.id]
       );
@@ -131,7 +128,7 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
 
   async removeCartItem(id: number): Promise<void> {
     try {
-      await this.db.getDb().runAsync(
+      await this.db.runAsync(
         'DELETE FROM cart_items WHERE id = ?',
         [id]
       );
@@ -146,7 +143,7 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
 
   async clearCartItems(): Promise<void> {
     try {
-      await this.db.getDb().runAsync('DELETE FROM cart_items');
+      await this.db.runAsync('DELETE FROM cart_items');
       await this.addToQueue('deleteAll', { entityType: 'cartItem', entityId: 0, payload: {} });
       console.log('Cleared all cart items');
     } catch (error) {
@@ -161,18 +158,18 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
     // Mapping generic action to specific DB fields
     // This is a simplification. In a real app, we might need more specific arguments or parsing.
     // Assuming payload contains entityType, entityId, and actual payload data.
-    
+
     // For now, let's adapt the interface to match the DB schema logic from the original file
     // The original file had: queueOperation(operationType, entityType, entityId, payload)
-    
+
     // We will parse the 'payload' argument to extract these if possible, or change the interface.
     // Since I defined IOfflineQueueRepository with (action, payload), I'll stick to that but maybe payload needs to be structured.
-    
+
     const { entityType, entityId, payload: actualPayload } = payload;
     const operationType = action;
 
     try {
-      await this.db.getDb().runAsync(
+      await this.db.runAsync(
         `INSERT INTO offline_queue (operation_type, entity_type, entity_id, payload, status)
          VALUES (?, ?, ?, ?, ?)`,
         [
@@ -192,7 +189,7 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
 
   async getQueue(): Promise<any[]> {
     try {
-      const result = await this.db.getDb().getAllAsync<OfflineOperation>(
+      const result = await this.db.getAllAsync<OfflineOperation>(
         `SELECT id, operation_type, entity_type, entity_id, payload, retry_count
          FROM offline_queue
          WHERE status = 'pending'
@@ -213,7 +210,7 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
   async clearQueue(): Promise<void> {
       // Clear synced operations
       try {
-        await this.db.getDb().runAsync(
+        await this.db.runAsync(
           `DELETE FROM offline_queue WHERE status = 'synced'`
         );
       } catch (error) {
@@ -225,7 +222,7 @@ export class LocalStorageRepository implements IOfflineQueueRepository {
   // Helper methods
   async markOperationAsSynced(operationId: number): Promise<void> {
     try {
-      await this.db.getDb().runAsync(
+      await this.db.runAsync(
         `UPDATE offline_queue SET status = 'synced', synced_at = CURRENT_TIMESTAMP WHERE id = ?`,
         [operationId]
       );

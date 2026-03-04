@@ -7,6 +7,12 @@ import { toast } from 'sonner'
 import { productsApi } from '@/lib/api/products'
 import type { CreateProductCommand, UpdateProductCommand } from '@/lib/api/types'
 
+// Cache configuration for consistent caching across all product queries
+export const PRODUCT_CACHE_CONFIG = {
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes (formerly cacheTime)
+}
+
 export const productKeys = {
     all: ['products'] as const,
     lists: () => [...productKeys.all, 'list'] as const,
@@ -26,6 +32,7 @@ export function useProducts() {
             }
             return result.data || []
         },
+        ...PRODUCT_CACHE_CONFIG,
     })
 }
 
@@ -39,6 +46,7 @@ export function useProductsPaged(pageNumber = 1, pageSize = 10) {
             }
             return result.data
         },
+        ...PRODUCT_CACHE_CONFIG,
     })
 }
 
@@ -53,6 +61,7 @@ export function useProduct(id: number) {
             return result.data
         },
         enabled: !!id,
+        ...PRODUCT_CACHE_CONFIG,
     })
 }
 

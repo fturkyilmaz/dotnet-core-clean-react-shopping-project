@@ -1,0 +1,2 @@
+cd src/Presentation/Admin
+npx lint-staged

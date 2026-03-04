@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Plus, RefreshCw } from 'lucide-react'
-import { useProducts, useDeleteProduct } from '@/hooks/useProducts'
+import { useProductsPaged, useDeleteProduct } from '@/hooks/useProducts'
 import { Button } from '@/components/ui/button'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -10,11 +10,45 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ProductsTable } from './components/products-table'
 import { ProductDialog } from './components/product-dialog'
 import { ProductDeleteDialog } from './components/product-delete-dialog'
-import type { ProductDto } from '@/lib/api/types'
+import type { ProductDto, PaginatedList } from '@/lib/api/types'
+
+const DEFAULT_PAGE_SIZE = 10
+const PAGE_SIZE_OPTIONS = [10, 20, 30, 50] as const
 
 export function Products() {
-    const { data: products, isLoading, refetch, isRefetching } = useProducts()
+    const [pagination, setPagination] = useState({
+        pageNumber: 1,
+        pageSize: DEFAULT_PAGE_SIZE
+    })
+
+    const { pageNumber, pageSize } = pagination
+
+    const { data: paginatedData, isLoading, refetch, isRefetching } = useProductsPaged(pageNumber, pageSize)
     const deleteProduct = useDeleteProduct()
+
+    // Extract pagination info from response
+    const paginationData = useMemo<PaginatedList<ProductDto>>(() => {
+        if (!paginatedData) {
+            return {
+                items: [],
+                pageNumber: 1,
+                totalPages: 1,
+                totalCount: 0,
+                hasPreviousPage: false,
+                hasNextPage: false,
+            }
+        }
+        return {
+            items: paginatedData.items || [],
+            pageNumber: paginatedData.pageNumber || 1,
+            totalPages: paginatedData.totalPages || 1,
+            totalCount: paginatedData.totalCount || 0,
+            hasPreviousPage: paginatedData.hasPreviousPage || false,
+            hasNextPage: paginatedData.hasNextPage || false,
+        }
+    }, [paginatedData])
+
+    const products = paginationData.items || []
 
     const [dialogOpen, setDialogOpen] = useState(false)
     const [editingProduct, setEditingProduct] = useState<ProductDto | null>(null)
@@ -42,6 +76,14 @@ export function Products() {
             setDeleteDialogOpen(false)
             setProductToDelete(null)
         }
+    }
+
+    const handlePageChange = (newPage: number) => {
+        setPagination(prev => ({ ...prev, pageNumber: newPage }))
+    }
+
+    const handlePageSizeChange = (newSize: number) => {
+        setPagination({ pageNumber: 1, pageSize: newSize })
     }
 
     return (
@@ -80,10 +122,14 @@ export function Products() {
                 </div>
 
                 <ProductsTable
-                    products={products || []}
+                    products={products}
                     isLoading={isLoading}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    pagination={pagination}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                    pageSizeOptions={PAGE_SIZE_OPTIONS}
                 />
             </Main>
 

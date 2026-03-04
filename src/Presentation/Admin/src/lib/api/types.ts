@@ -204,3 +204,47 @@ export interface IPaginate<T> {
     hasPrevious?: boolean
     hasNext?: boolean
 }
+
+// --------------------
+// Dashboard Types
+// --------------------
+
+export interface DashboardStats {
+    totalProducts: number
+    totalCarts: number
+    totalUsers: number
+    recentSales: number
+    productsChange: number
+    cartsChange: number
+    usersChange: number
+    salesChange: number
+}
+
+export interface SalesData {
+    month: string
+    sales: number
+    revenue: number
+}
+
+export interface TrafficData {
+    name: string
+    visitors: number
+    pageViews: number
+}
+
+export interface RecentSale {
+    id: string
+    name: string
+    email: string
+    amount: string
+    avatar?: string
+    status: 'completed' | 'pending' | 'cancelled'
+    date: string
+}
+
+export interface DashboardData {
+    stats: DashboardStats
+    salesData: SalesData[]
+    trafficData: TrafficData[]
+    recentSales: RecentSale[]
+}

@@ -1,8 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '@/services/api';
 import { AuthResponse, User, LoginRequest, ApiResponse } from '@/types';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { secureStorage } from '@/infrastructure/persistence/SecureStorageService';
+import secureStorage from '@/infrastructure/services/SecureStorageService';
 
 interface AuthState {
   user: User | null;
@@ -20,6 +19,15 @@ const initialState: AuthState = {
   error: null,
 };
 
+// Load token from secure storage on app startup
+export const initializeAuth = createAsyncThunk(
+  'auth/initialize',
+  async () => {
+    const token = await secureStorage.getItem('token');
+    return token;
+  }
+);
+
 export const login = createAsyncThunk(
   'auth/login',
   async (credentials: LoginRequest, { rejectWithValue }) => {
@@ -32,9 +40,9 @@ export const login = createAsyncThunk(
 
       const { accessToken, refreshToken } = response.data.data;
 
-      // Save tokens to AsyncStorage
-      await AsyncStorage.setItem('token', accessToken);
-      await AsyncStorage.setItem('refreshToken', refreshToken);
+      // Save tokens securely using expo-secure-store
+      await secureStorage.setItem('token', accessToken);
+      await secureStorage.setItem('refreshToken', refreshToken);
 
       // Save credentials securely for biometric login
       await secureStorage.setItem('user_email', credentials.email);
@@ -73,8 +81,8 @@ export const biometricLogin = createAsyncThunk(
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-  await AsyncStorage.removeItem('token');
-  await AsyncStorage.removeItem('refreshToken');
+  await secureStorage.removeItem('token');
+  await secureStorage.removeItem('refreshToken');
   await secureStorage.removeItem('user_email');
   await secureStorage.removeItem('user_password');
 });
@@ -142,6 +150,12 @@ const authSlice = createSlice({
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(initializeAuth.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.token = action.payload;
+          state.isAuthenticated = true;
+        }
       });
   },
 });

@@ -1,3 +1,5 @@
+import { DollarSign, Users, ShoppingCart, Package, TrendingUp, TrendingDown, Download, Plus, RefreshCw } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -7,6 +9,8 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { SkeletonStats } from '@/components/ui/skeleton'
+import { EmptyState, ErrorState } from '@/components/empty-state'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -14,17 +18,31 @@ import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { StatisticCard } from './components/statistic-card'
 import { Analytics } from './components/analytics'
 import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
+import { useDashboardStats, useRecentSales } from './hooks/useDashboard'
+
+const topNav = [
+  { title: 'Overview', href: '/', isActive: true },
+  { title: 'Customers', href: '/users', isActive: false },
+  { title: 'Products', href: '/products', isActive: false },
+  { title: 'Settings', href: '/settings', isActive: false },
+]
 
 export function Dashboard() {
+  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useDashboardStats()
+  const { data: recentSales, isLoading: salesLoading, error: salesError, refetch: refetchSales } = useRecentSales(5)
+
+  const isError = statsError || salesError
+
   return (
     <>
       {/* ===== Top Heading ===== */}
       <Header>
         <TopNav links={topNav} />
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-2 sm:gap-4'>
           <Search />
           <ThemeSwitch />
           <ConfigDrawer />
@@ -33,188 +51,241 @@ export function Dashboard() {
       </Header>
 
       {/* ===== Main ===== */}
-      <Main>
-        <div className='mb-2 flex items-center justify-between space-y-2'>
-          <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
-          <div className='flex items-center space-x-2'>
-            <Button>Download</Button>
+      <Main className='animate-fade-in'>
+        <div className='mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+          <div>
+            <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
+            <p className='text-sm text-muted-foreground'>
+              İşletmenizin performansına genel bakış
+            </p>
+          </div>
+          <div className='flex items-center gap-2'>
+            <Button variant='outline' size='sm' onClick={() => { refetchStats(); refetchSales(); }}>
+              <RefreshCw className='mr-2 h-4 w-4' />
+              Yenile
+            </Button>
+            <Button size='sm'>
+              <Download className='mr-2 h-4 w-4' />
+              Rapor İndir
+            </Button>
           </div>
         </div>
-        <Tabs
-          orientation='vertical'
-          defaultValue='overview'
-          className='space-y-4'
-        >
-          <div className='w-full overflow-x-auto pb-2'>
-            <TabsList>
-              <TabsTrigger value='overview'>Overview</TabsTrigger>
-              <TabsTrigger value='analytics'>Analytics</TabsTrigger>
-              <TabsTrigger value='reports' disabled>
-                Reports
-              </TabsTrigger>
-              <TabsTrigger value='notifications' disabled>
-                Notifications
-              </TabsTrigger>
-            </TabsList>
-          </div>
-          <TabsContent value='overview' className='space-y-4'>
-            <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Total Revenue
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>$45,231.89</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +20.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Subscriptions
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-                    <circle cx='9' cy='7' r='4' />
-                    <path d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+2350</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +180.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>Sales</CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <rect width='20' height='14' x='2' y='5' rx='2' />
-                    <path d='M2 10h20' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+12,234</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +19% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Active Now
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+573</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +201 since last hour
-                  </p>
-                </CardContent>
-              </Card>
+
+        {isError ? (
+          <ErrorState
+            title="Dashboard verileri yüklenemedi"
+            description="İstatistikler alınırken bir hata oluştu. Lütfen tekrar deneyin."
+            onRetry={() => { refetchStats(); refetchSales(); }}
+          />
+        ) : (
+          <Tabs
+            orientation='vertical'
+            defaultValue='overview'
+            className='space-y-6'
+          >
+            <div className='w-full overflow-x-auto pb-1'>
+              <TabsList className='w-full sm:w-auto'>
+                <TabsTrigger value='overview'>Genel Bakış</TabsTrigger>
+                <TabsTrigger value='analytics'>Analitik</TabsTrigger>
+                <TabsTrigger value='reports' disabled>
+                  Raporlar
+                </TabsTrigger>
+                <TabsTrigger value='notifications' disabled>
+                  Bildirimler
+                </TabsTrigger>
+              </TabsList>
             </div>
-            <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
-              <Card className='col-span-1 lg:col-span-4'>
+
+            <TabsContent value='overview' className='space-y-6'>
+              {/* Statistics Cards */}
+              {statsLoading ? (
+                <SkeletonStats count={4} />
+              ) : (
+                <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                  <StatisticCard
+                    title='Toplam Ürün'
+                    value={stats?.totalProducts?.toLocaleString('tr-TR') ?? '—'}
+                    icon={Package}
+                    trend={stats?.productsChange !== undefined ? {
+                      value: Math.abs(stats.productsChange),
+                      isPositive: stats.productsChange >= 0,
+                      label: 'geçen aya göre'
+                    } : undefined}
+                    variant='default'
+                  />
+                  <StatisticCard
+                    title='Toplam Sepet'
+                    value={stats?.totalCarts?.toLocaleString('tr-TR') ?? '—'}
+                    icon={ShoppingCart}
+                    trend={stats?.cartsChange !== undefined ? {
+                      value: Math.abs(stats.cartsChange),
+                      isPositive: stats.cartsChange >= 0,
+                      label: 'geçen aya göre'
+                    } : undefined}
+                    variant='info'
+                  />
+                  <StatisticCard
+                    title='Aktif Kullanıcılar'
+                    value={stats?.totalUsers?.toLocaleString('tr-TR') ?? '—'}
+                    icon={Users}
+                    trend={stats?.usersChange !== undefined ? {
+                      value: Math.abs(stats.usersChange),
+                      isPositive: stats.usersChange >= 0,
+                      label: 'geçen aya göre'
+                    } : undefined}
+                    variant='success'
+                  />
+                  <StatisticCard
+                    title='Son Satışlar'
+                    value={stats?.recentSales?.toLocaleString('tr-TR') ?? '—'}
+                    icon={DollarSign}
+                    trend={stats?.salesChange !== undefined ? {
+                      value: Math.abs(stats.salesChange),
+                      isPositive: stats.salesChange >= 0,
+                      label: 'geçen aya göre'
+                    } : undefined}
+                    variant={stats?.salesChange && stats.salesChange >= 0 ? 'success' : 'error'}
+                  />
+                </div>
+              )}
+
+              {/* Main Content Grid */}
+              <div className='grid gap-6 lg:grid-cols-7'>
+                {/* Analytics Chart */}
+                <Card className='lg:col-span-4'>
+                  <CardHeader>
+                    <CardTitle>Gelir Grafiği</CardTitle>
+                    <CardDescription>
+                      Son 30 günlük gelir performansı
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className='pl-2'>
+                    <Analytics />
+                  </CardContent>
+                </Card>
+
+                {/* Recent Sales */}
+                <Card className='lg:col-span-3'>
+                  <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-4'>
+                    <div>
+                      <CardTitle>Son Satışlar</CardTitle>
+                      <CardDescription>
+                        Son {recentSales?.length || 0} satış işlemi
+                      </CardDescription>
+                    </div>
+                    <Button variant='ghost' size='sm' className='gap-1'>
+                      Tümünü Gör
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    {salesLoading ? (
+                      <div className='space-y-4'>
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className='flex items-center gap-4'>
+                            <div className='h-9 w-9 rounded-full bg-muted' />
+                            <div className='flex-1 space-y-1'>
+                              <div className='h-4 w-24 bg-muted rounded' />
+                              <div className='h-3 w-32 bg-muted rounded' />
+                            </div>
+                            <div className='h-4 w-16 bg-muted rounded' />
+                          </div>
+                        ))}
+                      </div>
+                    ) : salesError ? (
+                      <EmptyState
+                        icon={TrendingDown}
+                        title="Veri yüklenemedi"
+                        description="Satış verileri alınırken bir hata oluştu."
+                        action={{
+                          label: 'Tekrar Dene',
+                          onClick: refetchSales
+                        }}
+                        size='sm'
+                      />
+                    ) : (
+                      <RecentSales sales={recentSales || []} />
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Overview Section */}
+              <Card>
                 <CardHeader>
-                  <CardTitle>Overview</CardTitle>
-                </CardHeader>
-                <CardContent className='ps-2'>
-                  <Overview />
-                </CardContent>
-              </Card>
-              <Card className='col-span-1 lg:col-span-3'>
-                <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
+                  <CardTitle>Genel Performans</CardTitle>
                   <CardDescription>
-                    You made 265 sales this month.
+                    Tüm metriklerin detaylı analizi
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <RecentSales />
+                  <Overview />
                 </CardContent>
               </Card>
-            </div>
-          </TabsContent>
-          <TabsContent value='analytics' className='space-y-4'>
-            <Analytics />
-          </TabsContent>
-        </Tabs>
+
+              {/* Quick Actions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Hızlı İşlemler</CardTitle>
+                  <CardDescription>
+                    Sık kullanılan işlemler için kısayollar
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                    <Button variant='outline' className='h-auto flex-col items-start gap-2 p-4 text-left hover:bg-muted/50'>
+                      <Plus className='h-5 w-5 text-primary' />
+                      <div>
+                        <div className='font-medium'>Yeni Ürün</div>
+                        <div className='text-xs text-muted-foreground'>Ürün kataloğuna ekle</div>
+                      </div>
+                    </Button>
+                    <Button variant='outline' className='h-auto flex-col items-start gap-2 p-4 text-left hover:bg-muted/50'>
+                      <Users className='h-5 w-5 text-success' />
+                      <div>
+                        <div className='font-medium'>Kullanıcı Davet</div>
+                        <div className='text-xs text-muted-foreground'>Yeni kullanıcı ekle</div>
+                      </div>
+                    </Button>
+                    <Button variant='outline' className='h-auto flex-col items-start gap-2 p-4 text-left hover:bg-muted/50'>
+                      <ShoppingCart className='h-5 w-5 text-info' />
+                      <div>
+                        <div className='font-medium'>Sipariş Yönetimi</div>
+                        <div className='text-xs text-muted-foreground'>Bekleyen siparişler</div>
+                      </div>
+                    </Button>
+                    <Button variant='outline' className='h-auto flex-col items-start gap-2 p-4 text-left hover:bg-muted/50'>
+                      <TrendingUp className='h-5 w-5 text-warning-foreground' />
+                      <div>
+                        <div className='font-medium'>Rapor Oluştur</div>
+                        <div className='text-xs text-muted-foreground'>Özel rapor hazırla</div>
+                      </div>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value='analytics' className='space-y-6'>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Detaylı Analitik</CardTitle>
+                  <CardDescription>
+                    Tüm metriklerin detaylı analizi burada gösterilecek
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <EmptyState
+                    icon={TrendingUp}
+                    title="Analitik modülü geliştirme aşamasında"
+                    description="Bu özellik yakında kullanıma sunulacak."
+                    size='md'
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        )}
       </Main>
     </>
   )
 }
-
-const topNav = [
-  {
-    title: 'Overview',
-    href: 'dashboard/overview',
-    isActive: true,
-    disabled: false,
-  },
-  {
-    title: 'Customers',
-    href: 'dashboard/customers',
-    isActive: false,
-    disabled: true,
-  },
-  {
-    title: 'Products',
-    href: 'dashboard/products',
-    isActive: false,
-    disabled: true,
-  },
-  {
-    title: 'Settings',
-    href: 'dashboard/settings',
-    isActive: false,
-    disabled: true,
-  },
-]
