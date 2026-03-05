@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
-import { useColorScheme } from 'nativewind';
+import { useColorScheme as useSystemColorScheme } from 'react-native';
 
 type Theme = 'light' | 'dark';
 
@@ -12,8 +12,8 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { colorScheme, setColorScheme } = useColorScheme();
-    const [theme, setTheme] = useState<Theme>(colorScheme || 'light');
+    const systemColorScheme = useSystemColorScheme();
+    const [theme, setTheme] = useState<Theme>('light');
 
     useEffect(() => {
         const loadTheme = async () => {
@@ -21,29 +21,19 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 const savedTheme = await sqliteRepository.getItem('theme');
                 if (savedTheme) {
                     setTheme(savedTheme as Theme);
-                    setColorScheme(savedTheme as Theme);
                 } else {
-                    setColorScheme(colorScheme || 'light');
-                    setTheme(colorScheme as Theme || 'light');
+                    setTheme((systemColorScheme as Theme) || 'light');
                 }
             } catch (error) {
                 console.error('Failed to load theme', error);
-                setColorScheme('light');
                 setTheme('light');
             }
         };
         loadTheme();
-    }, []);
-
-    useEffect(() => {
-        if (colorScheme) {
-            setTheme(colorScheme as Theme);
-        }
-    }, [colorScheme]);
+    }, [systemColorScheme]);
 
     const toggleTheme = async () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
-        setColorScheme(newTheme);
         setTheme(newTheme);
         try {
             await sqliteRepository.setItem('theme', newTheme);

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, ScrollView, Switch } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 import { logout, fetchUserProfile } from '@/presentation/store/slices/authSlice';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import sqliteRepository from '@/infrastructure/persistence/SQLiteRepository';
@@ -60,7 +60,7 @@ const ProfileScreen = () => {
                             <View className="flex-row items-center">
                                 {/* Avatar */}
                                 <View className={`w-20 h-20 rounded-2xl items-center justify-center mr-4 shadow-lg ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}>
-                                    <Ionicons name="person" size={40} color={isDark ? '#94a3b8' : '#64748b'} />
+                                    <Icon name="person" size={40} color={isDark ? '#94a3b8' : '#64748b'} />
                                 </View>
 
                                 {/* User Info */}
@@ -74,7 +74,7 @@ const ProfileScreen = () => {
 
                                     {/* Member Badge */}
                                     <View className={`flex-row items-center mt-2 px-2 py-1 rounded-full ${isDark ? 'bg-blue-500/20' : 'bg-blue-100'} w-fit`}>
-                                        <Ionicons name="star" size={12} color={isDark ? '#60a5fa' : '#2563eb'} />
+                                        <Icon name="star" size={12} color={isDark ? '#60a5fa' : '#2563eb'} />
                                         <Text className={`text-xs font-medium ml-1 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
                                             Premium Member
                                         </Text>
@@ -116,7 +116,7 @@ const ProfileScreen = () => {
                         <View className="flex-row items-center justify-between py-2">
                             <View className="flex-row items-center gap-3">
                                 <View className={`w-12 h-12 rounded-xl items-center justify-center ${isDark ? 'bg-blue-500/20' : 'bg-blue-100'}`}>
-                                    <Ionicons name="language" size={24} color={isDark ? '#60a5fa' : '#2563eb'} />
+                                    <Icon name="language" size={24} color={isDark ? '#60a5fa' : '#2563eb'} />
                                 </View>
                                 <View>
                                     <Text className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -155,7 +155,7 @@ const ProfileScreen = () => {
                         <View className="flex-row items-center justify-between py-3">
                             <View className="flex-row items-center gap-3">
                                 <View className={`w-12 h-12 rounded-xl items-center justify-center ${isDark ? 'bg-purple-500/20' : 'bg-purple-100'}`}>
-                                    <Ionicons name={isDark ? 'moon' : 'sunny'} size={24} color={isDark ? '#c084fc' : '#a855f7'} />
+                                    <Icon name={isDark ? 'moon' : 'sunny'} size={24} color={isDark ? '#c084fc' : '#a855f7'} />
                                 </View>
                                 <View>
                                     <Text className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -187,7 +187,7 @@ const ProfileScreen = () => {
                         <AccessibleTouchable className="flex-row items-center p-3 rounded-xl">
                             <View className="flex-row items-center gap-3">
                                 <View className={`w-12 h-12 rounded-xl items-center justify-center ${isDark ? 'bg-green-500/20' : 'bg-green-100'}`}>
-                                    <Ionicons name="notifications" size={24} color={isDark ? '#4ade80' : '#22c55e'} />
+                                    <Icon name="notifications" size={24} color={isDark ? '#4ade80' : '#22c55e'} />
                                 </View>
                                 <View>
                                     <Text className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -198,14 +198,14 @@ const ProfileScreen = () => {
                                     </Text>
                                 </View>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color={isDark ? '#64748b' : '#94a3b8'} />
+                            <Icon name="chevron-forward" size={20} color={isDark ? '#64748b' : '#94a3b8'} />
                         </AccessibleTouchable>
 
                         {/* Privacy & Security */}
                         <AccessibleTouchable className="flex-row items-center p-3 rounded-xl">
                             <View className="flex-row items-center gap-3">
                                 <View className={`w-12 h-12 rounded-xl items-center justify-center ${isDark ? 'bg-orange-500/20' : 'bg-orange-100'}`}>
-                                    <Ionicons name="shield-checkmark" size={24} color={isDark ? '#fb923c' : '#f97316'} />
+                                    <Icon name="shield-checkmark" size={24} color={isDark ? '#fb923c' : '#f97316'} />
                                 </View>
                                 <View>
                                     <Text className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -216,14 +216,14 @@ const ProfileScreen = () => {
                                     </Text>
                                 </View>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color={isDark ? '#64748b' : '#94a3b8'} />
+                            <Icon name="chevron-forward" size={20} color={isDark ? '#64748b' : '#94a3b8'} />
                         </AccessibleTouchable>
 
                         {/* Help & Support */}
                         <AccessibleTouchable className="flex-row items-center p-3 rounded-xl">
                             <View className="flex-row items-center gap-3">
                                 <View className={`w-12 h-12 rounded-xl items-center justify-center ${isDark ? 'bg-cyan-500/20' : 'bg-cyan-100'}`}>
-                                    <Ionicons name="help-circle" size={24} color={isDark ? '#22d3ee' : '#06b6d4'} />
+                                    <Icon name="help-circle" size={24} color={isDark ? '#22d3ee' : '#06b6d4'} />
                                 </View>
                                 <View>
                                     <Text className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -234,7 +234,7 @@ const ProfileScreen = () => {
                                     </Text>
                                 </View>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color={isDark ? '#64748b' : '#94a3b8'} />
+                            <Icon name="chevron-forward" size={20} color={isDark ? '#64748b' : '#94a3b8'} />
                         </AccessibleTouchable>
                     </View>
 
@@ -243,7 +243,7 @@ const ProfileScreen = () => {
                         onPress={handleLogout}
                         className="flex-row items-center justify-center p-4 rounded-xl bg-red-500/10 border border-red-500/20"
                     >
-                        <Ionicons name="log-out" size={20} color="#ef4444" />
+                        <Icon name="log-out" size={20} color="#ef4444" />
                         <Text className="text-red-500 font-semibold ml-2">{t('auth.logout')}</Text>
                     </AccessibleTouchable>
 

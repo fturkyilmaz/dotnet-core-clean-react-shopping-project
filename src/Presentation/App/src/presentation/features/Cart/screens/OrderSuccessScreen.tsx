@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 import { clearCart } from '@/presentation/store/slices/cartSlice';
 import LottieView from 'lottie-react-native';
 import { useAppDispatch } from '@/presentation/store/hooks';
@@ -93,7 +93,7 @@ export default function OrderSuccessScreen() {
                         onPress={() => router.push('/(tabs)')}
                     >
                         <View className="flex-row items-center">
-                            <Ionicons name="home-outline" size={24} color="white" />
+                            <Icon name="home-outline" size={24} color="white" />
                             <Text className="text-white font-bold text-lg ml-2">
                                 Continue Shopping
                             </Text>

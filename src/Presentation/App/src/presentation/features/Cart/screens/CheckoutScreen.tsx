@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 import { removeAllCartItems } from '@/presentation/store/slices/cartSlice';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
@@ -95,7 +95,7 @@ export default function CheckoutScreen() {
                     className="mr-3 p-2 -ml-2"
                     onPress={() => router.back()}
                 >
-                    <Ionicons
+                    <Icon
                         name="arrow-back"
                         size={24}
                         color={theme === 'dark' ? '#e2e8f0' : '#334155'}

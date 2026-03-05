@@ -3,7 +3,7 @@ import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouc
 import { useQuery } from '@tanstack/react-query';
 import { externalApi } from '@/services/api';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 
@@ -61,7 +61,7 @@ export default function CategoryScreen() {
                             className="w-14 h-14 rounded-2xl items-center justify-center"
                             style={{ backgroundColor: isDark ? colors.darkBg : colors.bg }}
                         >
-                            <Ionicons
+                            <Icon
                                 name={iconName as any}
                                 size={28}
                                 color={isDark ? '#60a5fa' : colors.icon}
@@ -77,7 +77,7 @@ export default function CategoryScreen() {
                         </View>
                     </View>
                     <View className={`w-10 h-10 rounded-full items-center justify-center ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}>
-                        <Ionicons name="chevron-forward" size={20} color={isDark ? '#94a3b8' : '#64748b'} />
+                        <Icon name="chevron-forward" size={20} color={isDark ? '#94a3b8' : '#64748b'} />
                     </View>
                 </View>
             </AccessibleTouchable>

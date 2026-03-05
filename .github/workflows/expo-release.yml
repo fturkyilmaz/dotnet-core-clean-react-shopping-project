@@ -1,0 +1,112 @@
+name: Expo Release Management
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/Presentation/App/**'
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Release channel'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - development
+          - preview
+          - staging
+          - production
+
+env:
+  EXPO_PROJECT_ROOT: src/Presentation/App
+
+jobs:
+  expo-update:
+    name: Create Expo Update (${{ github.event.inputs.channel || 'auto' }})
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: ${{ env.EXPO_PROJECT_ROOT }}/pnpm-lock.yaml
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        working-directory: ${{ env.EXPO_PROJECT_ROOT }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Set channel based on branch
+        if: github.event_name == 'push'
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "EXPO_CHANNEL=production" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "EXPO_CHANNEL=staging" >> $GITHUB_ENV
+          else
+            echo "EXPO_CHANNEL=preview" >> $GITHUB_ENV
+          fi
+
+      - name: Determine channel
+        run: |
+          echo "EXPO_CHANNEL=${{ github.event.inputs.channel || env.EXPO_CHANNEL }}" >> $GITHUB_ENV
+
+      - name: Create Expo Update
+        working-directory: ${{ env.EXPO_PROJECT_ROOT }}
+        run: |
+          npx expo export --platform ios,android
+          npx expo-updates create-manifest-archive \
+            --output-dir dist/${{ env.EXPO_CHANNEL }}
+
+      - name: Upload manifest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: expo-update-${{ env.EXPO_CHANNEL }}
+          path: ${{ env.EXPO_PROJECT_ROOT }}/dist/${{ env.EXPO_CHANNEL }}
+
+  deploy-staging:
+    needs: expo-update
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: ${{ env.EXPO_PROJECT_ROOT }}/pnpm-lock.yaml
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        working-directory: ${{ env.EXPO_PROJECT_ROOT }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Determine channel
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "EXPO_CHANNEL=production" >> $GITHUB_ENV
+          else
+            echo "EXPO_CHANNEL=staging" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to Expo
+        uses: expo/expo-github-actions/update-staging@v1
+        with:
+          expo-token: ${{ secrets.EXPO_TOKEN }}
+          channel: ${{ env.EXPO_CHANNEL }}

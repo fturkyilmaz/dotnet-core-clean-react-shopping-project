@@ -1,7 +1,7 @@
 import { Redirect, Tabs } from 'expo-router';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { StatusBar } from 'react-native';
 
@@ -45,7 +45,7 @@ export default function TabLayout() {
                         headerTitle: t('navigation.home'),
                         headerShown: true,
                         tabBarIcon: ({ color, size }) => (
-                            <Ionicons name="home" size={size} color={color} />
+                            <Icon name="home" size={size} color={color} />
                         ),
                     }}
                 />
@@ -56,7 +56,7 @@ export default function TabLayout() {
                         headerTitle: t('navigation.categories'),
                         headerShown: true,
                         tabBarIcon: ({ color, size }) => (
-                            <Ionicons name="grid" size={size} color={color} />
+                            <Icon name="grid" size={size} color={color} />
                         ),
                     }}
                 />
@@ -67,7 +67,7 @@ export default function TabLayout() {
                         headerTitle: t('navigation.products'),
                         headerShown: true,
                         tabBarIcon: ({ color, size }) => (
-                            <Ionicons name="pricetag" size={size} color={color} />
+                            <Icon name="pricetag" size={size} color={color} />
                         ),
                     }}
                 />
@@ -78,7 +78,7 @@ export default function TabLayout() {
                         headerTitle: t('navigation.cart'),
                         headerShown: true,
                         tabBarIcon: ({ color, size }) => (
-                            <Ionicons name="cart" size={size} color={color} />
+                            <Icon name="cart" size={size} color={color} />
                         ),
                     }}
                 />
@@ -89,7 +89,7 @@ export default function TabLayout() {
                         headerTitle: t('navigation.profile'),
                         headerShown: true,
                         tabBarIcon: ({ color, size }) => (
-                            <Ionicons name="person" size={size} color={color} />
+                            <Icon name="person" size={size} color={color} />
                         ),
                     }}
                 />

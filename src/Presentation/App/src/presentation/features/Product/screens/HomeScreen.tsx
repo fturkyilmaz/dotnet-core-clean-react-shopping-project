@@ -1,7 +1,7 @@
 import { View, Text, FlatList, Image, ScrollView, ActivityIndicator } from 'react-native';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 import { useFeaturedProducts } from '@/presentation/features/Product/hooks/useProducts';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
@@ -70,7 +70,7 @@ export default function HomeScreen() {
                                 onPress={() => router.push({ pathname: '/products', params: { category: item } })}
                             >
                                 <View className="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl items-center justify-center shadow-sm border border-slate-100 dark:border-slate-700 mb-2">
-                                    <Ionicons
+                                    <Icon
                                         name={index === 0 ? "hardware-chip-outline" : index === 1 ? "diamond-outline" : index === 2 ? "shirt-outline" : "woman-outline"}
                                         size={24}
                                         color={primaryColor}

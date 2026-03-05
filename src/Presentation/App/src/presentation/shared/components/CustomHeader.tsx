@@ -1,7 +1,7 @@
 import { View, Text, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 import { logout } from '@/presentation/store/slices/authSlice';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import { useAppDispatch } from '@/presentation/store/hooks';
@@ -41,7 +41,7 @@ export default function CustomHeader({ title, showBack = false }: CustomHeaderPr
                             onPress={() => router.back()}
                             className="mr-3 p-1 rounded-full active:bg-slate-100 dark:active:bg-slate-800"
                         >
-                            <Ionicons
+                            <Icon
                                 name="arrow-back"
                                 size={24}
                                 color={theme === 'dark' ? '#f8fafc' : '#0f172a'}
@@ -59,7 +59,7 @@ export default function CustomHeader({ title, showBack = false }: CustomHeaderPr
                         onPress={toggleTheme}
                         className="p-2 rounded-full bg-slate-50 dark:bg-slate-800"
                     >
-                        <Ionicons
+                        <Icon
                             name={theme === 'dark' ? 'sunny' : 'moon'}
                             size={20}
                             color={theme === 'dark' ? '#fbbf24' : '#64748b'}
@@ -71,7 +71,7 @@ export default function CustomHeader({ title, showBack = false }: CustomHeaderPr
                         onPress={handleLogout}
                         className="p-2 rounded-full bg-red-50 dark:bg-red-900/20"
                     >
-                        <Ionicons
+                        <Icon
                             name="log-out-outline"
                             size={20}
                             color="#ef4444"

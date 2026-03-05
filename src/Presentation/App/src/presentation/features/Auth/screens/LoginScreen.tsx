@@ -18,7 +18,7 @@ import FormInput from '@/presentation/shared/components/FormInput';
 import { LoginFormData, loginSchema } from '../validation/loginSchema';
 import { useAppDispatch, useAppSelector } from '@/presentation/store/hooks/useRedux';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 import { useBiometrics } from '@/presentation/shared/hooks/useBiometrics';
 
 export default function LoginScreen() {
@@ -75,7 +75,7 @@ export default function LoginScreen() {
                         {/* Logo/Brand */}
                         <View className="items-center mb-8">
                             <View className={`w-20 h-20 rounded-2xl ${isDark ? 'bg-blue-600' : 'bg-blue-600'} items-center justify-center mb-4 shadow-lg shadow-blue-500/30`}>
-                                <Ionicons name="cart" size={40} color="white" />
+                                <Icon name="cart" size={40} color="white" />
                             </View>
                             <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                 ShopHub
@@ -95,7 +95,7 @@ export default function LoginScreen() {
                         {/* Error Alert */}
                         {error && (
                             <View className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6 flex-row items-center">
-                                <Ionicons name="alert-circle" size={20} color="#ef4444" className="mr-3" />
+                                <Icon name="alert-circle" size={20} color="#ef4444" className="mr-3" />
                                 <Text className="text-red-500 text-sm flex-1">
                                     {error}
                                 </Text>
@@ -144,7 +144,7 @@ export default function LoginScreen() {
                                         className={`flex-row items-center justify-center py-3 rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'} mb-4`}
                                         onPress={handleBiometricLogin}
                                     >
-                                        <Ionicons
+                                        <Icon
                                             name="finger-print"
                                             size={24}
                                             color={isDark ? '#60a5fa' : '#2563eb'}
@@ -169,7 +169,7 @@ export default function LoginScreen() {
                                             <Text className="text-white font-bold text-lg">
                                                 {t('auth.loginButton')}
                                             </Text>
-                                            <Ionicons name="arrow-forward" size={20} color="white" className="ml-2" />
+                                            <Icon name="arrow-forward" size={20} color="white" className="ml-2" />
                                         </View>
                                     )}
                                 </AccessibleTouchable>

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 
@@ -40,7 +40,7 @@ export default function ForgotPasswordScreen() {
                             onPress={() => router.back()}
                             className={`w-12 h-12 ${isDark ? 'bg-slate-800' : 'bg-white'} rounded-full items-center justify-center mb-6 shadow-sm`}
                         >
-                            <Ionicons
+                            <Icon
                                 name="arrow-back"
                                 size={22}
                                 color={isDark ? '#e2e8f0' : '#334155'}
@@ -52,7 +52,7 @@ export default function ForgotPasswordScreen() {
                                 {/* Header */}
                                 <View className="items-center mb-8">
                                     <View className={`w-20 h-20 rounded-2xl ${isDark ? 'bg-orange-500' : 'bg-orange-500'} items-center justify-center mb-4 shadow-lg shadow-orange-500/30`}>
-                                        <Ionicons name="key" size={36} color="white" />
+                                        <Icon name="key" size={36} color="white" />
                                     </View>
                                     <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'} mb-2 text-center`}>
                                         {t('auth.forgotPasswordTitle')}
@@ -69,7 +69,7 @@ export default function ForgotPasswordScreen() {
                                             {t('auth.email')}
                                         </Text>
                                         <View className={`flex-row items-center ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'} border rounded-xl px-4 mb-6`}>
-                                            <Ionicons name="mail-outline" size={20} color={isDark ? '#64748b' : '#94a3b8'} />
+                                            <Icon name="mail-outline" size={20} color={isDark ? '#64748b' : '#94a3b8'} />
                                             <TextInput
                                                 className={`flex-1 py-3.5 ml-2 text-base ${isDark ? 'text-white' : 'text-slate-900'}`}
                                                 placeholder={t('auth.email')}
@@ -93,7 +93,7 @@ export default function ForgotPasswordScreen() {
                                                     <Text className="text-white font-bold text-lg">
                                                         {t('auth.submit')}
                                                     </Text>
-                                                    <Ionicons name="arrow-forward" size={20} color="white" className="ml-2" />
+                                                    <Icon name="arrow-forward" size={20} color="white" className="ml-2" />
                                                 </View>
                                             )}
                                         </AccessibleTouchable>
@@ -104,7 +104,7 @@ export default function ForgotPasswordScreen() {
                             /* Success State */
                             <View className="flex-1 items-center justify-center py-8">
                                 <View className={`w-24 h-24 rounded-full ${isDark ? 'bg-green-500/20' : 'bg-green-100'} items-center justify-center mb-6`}>
-                                    <Ionicons name="checkmark-circle" size={56} color="#16a34a" />
+                                    <Icon name="checkmark-circle" size={56} color="#16a34a" />
                                 </View>
                                 <Text className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'} mb-2 text-center`}>
                                     {t('auth.checkEmail')}

@@ -120,10 +120,6 @@ function AppInitializer() {
         };
 
         initDB();
-
-        return () => {
-            sqliteRepository.close();
-        };
     }, []);
 
     if (!isDbReady) {

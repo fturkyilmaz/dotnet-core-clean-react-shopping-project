@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AccessibleTouchable from "@/presentation/shared/components/AccessibleTouchable";
 import { useTheme } from "@/presentation/shared/context/ThemeContext";
 import { useTranslation } from "react-i18next";
-import { Ionicons } from "@expo/vector-icons";
+import { Icon } from '@/presentation/shared/components/Icon';
 import { useQuery } from "@tanstack/react-query";
 import { externalApi } from "@/services/api";
 import { useDispatch } from "react-redux";
@@ -20,7 +20,6 @@ export default function ProductDetailScreen() {
   const router = useRouter();
   const productId = id;
   const { theme } = useTheme();
-  const isDark = theme === 'dark';
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -85,7 +84,7 @@ export default function ProductDetailScreen() {
             className="mr-3 p-2 -ml-2"
             onPress={() => router.back()}
           >
-            <Ionicons
+            <Icon
               name="arrow-back"
               size={24}
               color={theme === "dark" ? "#e2e8f0" : "#334155"}
@@ -129,7 +128,7 @@ export default function ProductDetailScreen() {
           {/* Rating */}
           <View className="flex-row items-center mb-4">
             <View className="flex-row items-center bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-lg mr-2">
-              <Ionicons name="star" size={16} color="#f59e0b" />
+              <Icon name="star" size={16} color="#f59e0b" />
               <Text className="text-amber-700 dark:text-amber-400 font-semibold ml-1">
                 {product.rating.rate.toFixed(1)}
               </Text>
@@ -166,7 +165,7 @@ export default function ProductDetailScreen() {
             </Text>
             <View className="space-y-2">
               <View className="flex-row items-center py-2">
-                <Ionicons
+                <Icon
                   name="checkmark-circle"
                   size={20}
                   color={theme === "dark" ? "#60a5fa" : "#2563eb"}
@@ -176,7 +175,7 @@ export default function ProductDetailScreen() {
                 </Text>
               </View>
               <View className="flex-row items-center py-2">
-                <Ionicons
+                <Icon
                   name="checkmark-circle"
                   size={20}
                   color={theme === "dark" ? "#60a5fa" : "#2563eb"}
@@ -186,7 +185,7 @@ export default function ProductDetailScreen() {
                 </Text>
               </View>
               <View className="flex-row items-center py-2">
-                <Ionicons
+                <Icon
                   name="checkmark-circle"
                   size={20}
                   color={theme === "dark" ? "#60a5fa" : "#2563eb"}
@@ -208,7 +207,7 @@ export default function ProductDetailScreen() {
           onPress={handleAddToCart}
         >
           <View className="flex-row items-center">
-            <Ionicons name="cart-outline" size={24} color="white" />
+            <Icon name="cart-outline" size={24} color="white" />
             <Text className="text-white font-bold text-lg ml-2">
               {t("products.addToCart")}
             </Text>

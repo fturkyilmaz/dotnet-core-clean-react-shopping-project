@@ -7,7 +7,7 @@ import { useOrderSignal } from '@/presentation/shared/hooks/useOrderSignal';
 import { useNotificationSignal } from '@/presentation/shared/hooks/useNotificationSignal';
 import AccessibleTouchable from '@/presentation/shared/components/AccessibleTouchable';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 
 export default function NotificationsScreen() {
     const { t } = useTranslation();
@@ -79,7 +79,7 @@ export default function NotificationsScreen() {
                 {expoPushToken && (
                     <View className="bg-white dark:bg-slate-800 rounded-2xl p-5 mb-4 shadow-sm border border-slate-100 dark:border-slate-700">
                         <View className="flex-row items-center mb-2">
-                            <Ionicons name="key-outline" size={20} color={theme === 'dark' ? '#60a5fa' : '#2563eb'} />
+                            <Icon name="key-outline" size={20} color={theme === 'dark' ? '#60a5fa' : '#2563eb'} />
                             <Text className="text-base font-semibold text-slate-900 dark:text-white ml-2">
                                 Push Token
                             </Text>
@@ -106,7 +106,7 @@ export default function NotificationsScreen() {
                         disabled={!isConnected}
                     >
                         <View className="flex-row items-center justify-center">
-                            <Ionicons name="cloud-outline" size={20} color="white" />
+                            <Icon name="cloud-outline" size={20} color="white" />
                             <Text className="text-white font-semibold text-base ml-2">
                                 Test SignalR Notification
                             </Text>
@@ -119,7 +119,7 @@ export default function NotificationsScreen() {
                         onPress={testLocalNotification}
                     >
                         <View className="flex-row items-center justify-center">
-                            <Ionicons name="phone-portrait-outline" size={20} color="white" />
+                            <Icon name="phone-portrait-outline" size={20} color="white" />
                             <Text className="text-white font-semibold text-base ml-2">
                                 Test Local Notification
                             </Text>
@@ -130,7 +130,7 @@ export default function NotificationsScreen() {
                 {/* Features Info */}
                 <View className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
                     <View className="flex-row items-center mb-4">
-                        <Ionicons name="information-circle-outline" size={24} color={theme === 'dark' ? '#60a5fa' : '#2563eb'} />
+                        <Icon name="information-circle-outline" size={24} color={theme === 'dark' ? '#60a5fa' : '#2563eb'} />
                         <Text className="text-lg font-bold text-slate-900 dark:text-white ml-2">
                             Real-time Features
                         </Text>
@@ -142,7 +142,7 @@ export default function NotificationsScreen() {
                             <Text className="text-slate-700 dark:text-slate-300 flex-1">
                                 Cart updates across devices
                             </Text>
-                            <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+                            <Icon name="checkmark-circle" size={20} color="#10b981" />
                         </View>
 
                         <View className="flex-row items-center py-2">
@@ -150,7 +150,7 @@ export default function NotificationsScreen() {
                             <Text className="text-slate-700 dark:text-slate-300 flex-1">
                                 Order status notifications
                             </Text>
-                            <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+                            <Icon name="checkmark-circle" size={20} color="#10b981" />
                         </View>
 
                         <View className="flex-row items-center py-2">
@@ -158,7 +158,7 @@ export default function NotificationsScreen() {
                             <Text className="text-slate-700 dark:text-slate-300 flex-1">
                                 Push notifications
                             </Text>
-                            <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+                            <Icon name="checkmark-circle" size={20} color="#10b981" />
                         </View>
 
                         <View className="flex-row items-center py-2">
@@ -166,7 +166,7 @@ export default function NotificationsScreen() {
                             <Text className="text-slate-700 dark:text-slate-300 flex-1">
                                 Live admin updates
                             </Text>
-                            <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+                            <Icon name="checkmark-circle" size={20} color="#10b981" />
                         </View>
                     </View>
                 </View>

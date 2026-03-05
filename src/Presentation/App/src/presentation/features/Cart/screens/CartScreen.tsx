@@ -10,7 +10,7 @@ import {
     removeCartItem,
     removeAllCartItems
 } from '@/presentation/store/slices/cartSlice';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '@/presentation/shared/components/Icon';
 import { useTheme } from '@/presentation/shared/context/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { useNetworkStatus } from '@/presentation/shared/hooks/useNetworkStatus';
@@ -125,7 +125,7 @@ export default function CartScreen() {
                         className="bg-red-50 dark:bg-red-900/20 p-2 rounded-lg"
                         onPress={() => handleRemoveItem(item)}
                     >
-                        <Ionicons name="trash-outline" size={20} color="#ef4444" />
+                        <Icon name="trash-outline" size={20} color="#ef4444" />
                     </AccessibleTouchable>
                 </View>
             </View>
@@ -179,7 +179,7 @@ export default function CartScreen() {
                 ListEmptyComponent={
                     <View className="items-center justify-center py-20">
                         <View className="bg-slate-100 dark:bg-slate-800 w-20 h-20 rounded-full items-center justify-center mb-4">
-                            <Ionicons name="cart-outline" size={40} color={theme === 'dark' ? '#94a3b8' : '#94a3b8'} />
+                            <Icon name="cart-outline" size={40} color={theme === 'dark' ? '#94a3b8' : '#94a3b8'} />
                         </View>
                         <Text className="text-slate-900 dark:text-white text-xl font-bold mb-2">{t('cart.empty')}</Text>
                         <Text className="text-slate-500 dark:text-slate-400 text-center px-10">
