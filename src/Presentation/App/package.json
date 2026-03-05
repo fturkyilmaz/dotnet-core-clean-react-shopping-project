@@ -18,10 +18,16 @@
         "codegen": "orval --config orval.config.js",
         "knip:check": "npx knip",
         "knip:fix": "npx knip --fix",
-        "sentry:sourcemaps": "npx sentry-expo-upload-sourcemaps dist"
+        "sentry:sourcemaps": "npx sentry-expo-upload-sourcemaps dist",
+        "clean": "watchman watch-del-all && rm -rf node_modules && rm -rf /tmp/metro-*",
+        "clear-cache": "expo start -c",
+        "typecheck": "tsc --noEmit",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "lint:fix": "eslint . --ext .ts,.tsx --fix",
+        "prebuild": "npx expo prebuild"
     },
     "dependencies": {
-        "@expo/vector-icons": "^15.1.1",
         "@hookform/resolvers": "^5.2.2",
         "@microsoft/signalr": "^8.0.7",
         "@react-native-community/netinfo": "11.5.2",
@@ -60,7 +66,6 @@
         "react-hook-form": "^7.66.1",
         "react-i18next": "^16.3.5",
         "react-native": "0.83.2",
-        "react-native-css": "^2.0.0",
         "react-native-reanimated": "4.2.1",
         "react-native-safe-area-context": "~5.6.0",
         "react-native-screens": "~4.23.0",
@@ -73,14 +78,12 @@
         "zod": "^4.1.12"
     },
     "devDependencies": {
-        "@babel/core": "^7.28.5",
         "@tanstack/react-query-devtools": "^5.66.0",
         "@testing-library/react-native": "14.0.0-beta.0",
         "@types/jest": "29.5.14",
         "@types/react": "~19.2.10",
         "@typescript-eslint/eslint-plugin": "^6.0.0",
         "@typescript-eslint/parser": "^6.0.0",
-        "babel-preset-expo": "~55.0.8",
         "eslint": "^9.25.0",
         "eslint-config-expo": "~55.0.0",
         "eslint-plugin-react": "^7.37.2",
@@ -94,6 +97,5 @@
         "ts-jest": "^29.4.6",
         "typescript": "~5.9.2"
     },
-    "private": true,
-    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+    "private": true
 }
