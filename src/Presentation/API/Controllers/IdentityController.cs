@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingProject.Application.Common.Models;
@@ -14,6 +15,7 @@ using ShoppingProject.Application.Identity.Commands.UpdateMe;
 using ShoppingProject.Application.Identity.Queries.GetAllUsers;
 using ShoppingProject.Application.Identity.Queries.GetCurrentUserInfo;
 using ShoppingProject.Domain.Constants;
+using ShoppingProject.WebApi.Extensions;
 
 namespace ShoppingProject.WebApi.Controllers;
 

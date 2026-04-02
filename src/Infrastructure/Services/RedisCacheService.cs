@@ -52,6 +52,10 @@ public class RedisCacheService : ICacheService
         await _cache.RemoveAsync(key, cancellationToken);
     }
 
+    public async Task RemoveByTagAsync(string tag, CancellationToken cancellationToken = default)
+    {
+    }
+
     public async Task<T> GetOrCreateAsync<T>(
         string key,
         Func<Task<T>> factory,

@@ -48,6 +48,10 @@ public class CacheService : ICacheService
         await _distributedCache.RemoveAsync(key, cancellationToken);
     }
 
+    public async Task RemoveByTagAsync(string tag, CancellationToken cancellationToken = default)
+    {
+    }
+
     public async Task<T> GetOrSetAsync<T>(
         string key,
         Func<Task<T>> factory,

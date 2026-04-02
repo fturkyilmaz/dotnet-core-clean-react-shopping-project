@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using ShoppingProject.Application.Common.Interfaces;
 
 namespace ShoppingProject.Application.Common.Behaviours;
 
@@ -12,11 +13,11 @@ public class CachingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest,
     where TRequest : IRequest<TResponse>
     where TResponse : class
 {
-    private readonly ICacheService _cacheService;
+    private readonly Application.Common.Interfaces.ICacheService _cacheService;
     private readonly ILogger<CachingBehaviour<TRequest, TResponse>> _logger;
 
     public CachingBehaviour(
-        ICacheService cacheService,
+        Application.Common.Interfaces.ICacheService cacheService,
         ILogger<CachingBehaviour<TRequest, TResponse>> logger)
     {
         _cacheService = cacheService;
@@ -111,16 +112,4 @@ public class CacheInvalidatorAttribute : Attribute
     {
         Tags = tags;
     }
-}
-
-/// <summary>
-/// Enhanced cache service interface with tag-based invalidation.
-/// </summary>
-public interface ICacheService
-{
-    Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default);
-    Task SetAsync<T>(string key, T value, TimeSpan? expiration = null, CancellationToken cancellationToken = default);
-    Task RemoveAsync(string key, CancellationToken cancellationToken = default);
-    Task RemoveByTagAsync(string tag, CancellationToken cancellationToken = default);
-    Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default);
 }

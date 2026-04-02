@@ -1,5 +1,5 @@
 /**
- * Auth Hooks - Using Generated React Query API
+ * Auth Hooks - Using HttpOnly cookies for authentication
  * All API calls are now integrated with React Query
  */
 
@@ -12,8 +12,8 @@ import {
   usePostApiV1IdentityRegister,
   useGetApiV1IdentityMe,
 } from '@/infrastructure/api/generated/identity/identity';
-import { setAuthToken, setRefreshToken, clearTokens } from '@/infrastructure/api/httpClient';
-import { setCredentials, logout as logoutAction } from '@/presentation/store/slices/authSlice';
+import { clearCsrfToken, authService } from '@/infrastructure/api/httpClient';
+import { logout as logoutAction } from '@/presentation/store/slices/authSlice';
 import type { LoginCommand, RegisterCommand } from '@/infrastructure/api/generated/shoppingProjectAPI.schemas';
 
 export const authKeys = {
@@ -30,41 +30,18 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
 
   // Get current user query
-  const { data: currentUser, isLoading: isLoadingUser } = useGetApiV1IdentityMe({
+  const { data: userResponse, isLoading: isLoadingUser } = useGetApiV1IdentityMe({
     query: {
       queryKey: authKeys.user(),
-      select: (response) => response.data.data,
-      enabled: !!localStorage.getItem('authToken'),
     },
   });
 
   // Login mutation
   const loginMutation = usePostApiV1IdentityLogin({
     mutation: {
-      onSuccess: (response) => {
-        const authResult = response.data.data;
-        if (authResult) {
-          // Store tokens
-          setAuthToken(authResult.accessToken || null);
-          setRefreshToken(authResult.refreshToken || null);
-
-          // Store credentials in Redux
-          if (currentUser) {
-            dispatch(
-              setCredentials({
-                user: {
-                  id: currentUser.id || '',
-                  email: currentUser.email || '',
-                  roles: currentUser.roles || [],
-                },
-                token: authResult.accessToken || '',
-              })
-            );
-          }
-
-          navigate('/');
-          toast.success('Login successful');
-        }
+      onSuccess: () => {
+        navigate('/');
+        toast.success('Login successful');
       },
       onError: (error: any) => {
         toast.error(error?.response?.data?.message || 'Login failed');
@@ -86,12 +63,16 @@ export const useAuth = () => {
   });
 
   // Logout function
-  const logout = () => {
-    clearTokens();
-    dispatch(logoutAction());
-    queryClient.clear();
-    navigate('/login');
-    toast.info('Logged out successfully');
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } finally {
+      clearCsrfToken();
+      dispatch(logoutAction());
+      queryClient.clear();
+      navigate('/login');
+      toast.info('Logged out successfully');
+    }
   };
 
   const login = (credentials: LoginCommand) => {
@@ -108,8 +89,8 @@ export const useAuth = () => {
     register,
     isRegistering: registerMutation.isPending,
     logout,
-    currentUser,
-    isLoadingUser,
+    currentUser: userResponse?.data,
+    isLoadingUser: isLoadingUser,
   };
 };
 
@@ -117,17 +98,16 @@ export const useAuth = () => {
  * Hook for checking authentication status
  */
 export const useIsAuthenticated = () => {
-  const { data: user, isLoading } = useGetApiV1IdentityMe({
+  const { data: response, isLoading } = useGetApiV1IdentityMe({
     query: {
       queryKey: authKeys.user(),
-      select: (response) => response.data.data,
       retry: false,
     },
   });
 
   return {
-    isAuthenticated: !!user,
+    isAuthenticated: !!response?.data,
     isLoading,
-    user,
+    user: response?.data,
   };
 };

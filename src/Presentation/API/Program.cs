@@ -39,6 +39,16 @@ builder.Services.AddWebApiServices(builder.Configuration);
 // OutputCache
 builder.Services.AddOutputCache();
 
+// Antiforgery (CSRF Protection)
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-XSRF-TOKEN";
+    options.Cookie.Name = "XSRF-TOKEN";
+    options.Cookie.HttpOnly = false; // Must be accessible by JavaScript to send in header
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+});
+
 // Health Checks
 builder
     .Services.AddHealthChecks()
@@ -123,6 +133,7 @@ app.UseSerilogRequestLogging();
 app.UseCors(AppConstants.CorsPolicies.AllowReactApp);
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery();
 
 // OutputCache middleware
 app.UseOutputCache();

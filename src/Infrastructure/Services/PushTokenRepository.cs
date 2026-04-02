@@ -16,7 +16,11 @@ public class PushTokenRepository : IPushTokenRepository
 
     public Task SaveAsync(string userId, string token, string platform, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Saving push token for user {UserId}, platform {Platform}, token {Token}", userId, platform, token);
+        // Mask the token for logging to avoid exposing sensitive data
+        var maskedToken = token?.Length > 8
+            ? $"{token.Substring(0, 4)}...{token.Substring(token.Length - 4)}"
+            : "****";
+        _logger.LogInformation("Saving push token for user {UserId}, platform {Platform}, token: {Token}", userId, platform, maskedToken);
         return Task.CompletedTask;
     }
 }

@@ -73,8 +73,8 @@ public static class DependencyInjection
                         ?? Array.Empty<string>();
                     policy
                         .WithOrigins(allowedOrigins)
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
+                        .WithHeaders("Content-Type", "Authorization", "X-Requested-With", "X-XSRF-TOKEN")
+                        .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .AllowCredentials();
                 }
             );
